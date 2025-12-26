@@ -2393,6 +2393,9 @@ def patient_screening(patient_id):
             )
             db.session.add(fu)
             db.session.commit()
+            # NUEVO: email de control de screening
+            notify_screening_followup(fu)
+
             flash("Control agregado.", "success")
             return redirect(
                 url_for("patient_screening", patient_id=patient.id, _anchor="followups")
