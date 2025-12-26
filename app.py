@@ -100,6 +100,79 @@ def send_email(to_addresses, subject: str, body: str) -> bool:
         print(f"[WARN] No se pudo enviar email: {exc}")
         return False
 
+
+def _collect_emails(*lists):
+    emails = []
+    for lst in lists:
+        if not lst:
+            continue
+        if isinstance(lst, str):
+            parts = [lst]
+        else:
+            parts = lst
+        for item in parts:
+            if not item:
+                continue
+            cleaned = str(item).strip()
+            if cleaned and cleaned not in emails:
+                emails.append(cleaned)
+    return emails
+
+
+def notify_control_reminder(cr: "ControlReminder", patient: "Patient"):
+    try:
+        to_emails = []
+        if patient and patient.email:
+            to_emails.append(patient.email)
+        extra_list = []
+        if cr.extra_emails:
+            extra_list = [e.strip() for e in cr.extra_emails.split(",") if e.strip()]
+        creator_email = cr.created_by.email if cr.created_by and cr.created_by.email else None
+        to_emails = _collect_emails(to_emails, extra_list, creator_email)
+        if not to_emails:
+            return
+
+        patient_name = patient.full_name if patient else "Paciente"
+        subject = f"Control médico - {patient_name}"
+        lines = [
+            f"Se solicitó un control para el paciente: {patient_name}",
+            f"Fecha de control: {cr.control_date or 'sin fecha'}",
+        ]
+        if cr.consultation_id:
+            lines.append(f"Consulta ID: {cr.consultation_id}")
+        body = "\n".join(lines)
+        send_email(to_emails, subject, body)
+    except Exception as exc:
+        print(f"[WARN] No se pudo notificar control: {exc}")
+
+
+def notify_screening_followup(fu: "ScreeningFollowup"):
+    try:
+        sc = fu.screening
+        patient = sc.patient if sc else None
+        to_emails = []
+        if patient and patient.email:
+            to_emails.append(patient.email)
+        extra_email = sc.extra_email if sc else None
+        creator_email = fu.created_by.email if fu.created_by and fu.created_by.email else None
+        to_emails = _collect_emails(to_emails, extra_email, creator_email)
+        if not to_emails:
+            return
+
+        patient_name = patient.full_name if patient else "Paciente"
+        subject = f"Control médico - {patient_name}"
+        lines = [
+            f"Se programó un control de screening para el paciente: {patient_name}",
+            f"Tipo de estudio: {fu.study_type or 'Estudio'}",
+            f"Fecha del estudio: {fu.study_date or 'sin fecha'}",
+            f"Próximo control sugerido: {fu.next_control_date or 'sin fecha'}",
+        ]
+        body = "\n".join(lines)
+        send_email(to_emails, subject, body)
+    except Exception as exc:
+        print(f"[WARN] No se pudo notificar screening followup: {exc}")
+
+
 DEFAULT_CATALOGS = {
     "centers": [
         "Sanatorio Cruz Azul",
