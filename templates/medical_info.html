@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Información médica</h1>
+<p class="form-help">Espacio para guardar links o referencias útiles (guías, consensos, calculadoras, etc.).</p>
+
+<div class="form-section">
+  <h2>Material subido por el equipo</h2>
+  {% if resources %}
+    <ul>
+      {% for res in resources %}
+        <li>
+          <strong>{{ res.title }}</strong>
+          {% if res.url %}
+            - <a href="{{ res.url }}" target="_blank" rel="noopener">Link</a>
+          {% endif %}
+          {% if res.file_name %}
+            - <a href="{{ url_for('medical_info_download', resource_id=res.id) }}">Archivo</a>
+          {% endif %}
+          <small>({{ res.created_at.strftime('%Y-%m-%d') if res.created_at else '' }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay materiales cargados.</p>
+  {% endif %}
+</div>
+
+<div class="form-section">
+  <h2>Agregar nuevo</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="title">Título</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="url">Link (opcional)</label>
+    <input type="url" id="url" name="url" placeholder="https://...">
+
+    <label for="file">Subir archivo (PDF/imagen)</label>
+    <input type="file" id="file" name="file" accept=".pdf,.png,.jpg,.jpeg">
+
+    <label for="notes">Notas / descripción (opcional)</label>
+    <div class="voice-field">
+      <textarea id="notes" name="notes" rows="3" placeholder="Anotación breve o link adicional">{{ request.form.notes or '' }}</textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes">Dictado</button>
+    </div>
+
+    <button type="submit">Guardar</button>
+  </form>
+</div>
+{% endblock %}

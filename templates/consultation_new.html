@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Nueva consulta</h1>
+
+<p>
+  <strong>Paciente:</strong> {{ patient.full_name }}
+  {% if patient.dni %}(DNI: {{ patient.dni }}){% endif %}
+</p>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-section">
+    <h2>Datos de la consulta</h2>
+    <label for="date">Fecha</label>
+    <input type="date" id="date" name="date" required>
+
+  <label for="notes">Clinica / notas</label>
+  <div class="voice-field">
+    <textarea id="notes" name="notes" rows="4"></textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes">Dictado</button>
+ </div>
+  </div>
+
+  <div class="form-section">
+    <h2>Estudio asociado (opcional)</h2>
+    <label for="study_type">Tipo de estudio</label>
+    <select id="study_type" name="study_type">
+      <option value="">-- Seleccionar --</option>
+      {% for option in study_type_options %}
+        <option value="{{ option }}">{{ option }}</option>
+      {% endfor %}
+    </select>
+
+    <div class="grid-2">
+      <div>
+        <label for="study_date">Fecha del estudio</label>
+        <input type="date" id="study_date" name="study_date">
+      </div>
+      <div>
+        <label for="study_center_select">Centro</label>
+        <select id="study_center_select">
+          <option value="">-- Seleccionar --</option>
+          {% for center in center_options %}
+            <option value="{{ center }}">{{ center }}</option>
+          {% endfor %}
+          <option value="__otro__">Otro</option>
+        </select>
+        <input type="text" id="study_center" name="study_center" placeholder="Ej: Hospital Pasteur">
+        <p id="consult-center-link"></p>
+      </div>
+    </div>
+
+  <label for="study_description">Descripcion / hallazgos</label>
+  <div class="voice-field">
+    <textarea id="study_description" name="study_description" rows="3"></textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description">Dictado</button>
+  </div>
+
+  <label>Numero de acceso</label>
+  <input type="text" name="study_access_code">
+
+  <label>Subir informe (PDF)</label>
+  <input type="file" name="study_file" accept="application/pdf">
+
+  <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
+    <label>
+      <input type="checkbox" name="control_enabled" id="control_enabled">
+      Solicitar control (recordatorio)
+    </label>
+    <div id="control_block" style="display:none; margin-top:8px;">
+      <label for="control_date">Fecha de control</label>
+      <input type="date" id="control_date" name="control_date">
+
+      <label for="control_extra_emails">Emails adicionales (separar con coma)</label>
+      <input type="text" id="control_extra_emails" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
+
+      <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+    </div>
+  </div>
+  </div>
+
+  <div class="form-section">
+    <h2>Laboratorio general</h2>
+    <div class="voice-field">
+      <textarea id="lab_general" name="lab_general" rows="4"></textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="lab_general">Dictado</button>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2>Autoinmunidad</h2>
+    <p class="form-help">Marca los paraclinicos solicitados o relevantes.</p>
+    {% set core_options = immuno_core_options if immuno_core_options is defined else immuno_options %}
+    <div class="lab-grid">
+      {% for value, label in core_options %}
+        <label class="lab-row">
+          <span class="lab-label">
+            <input type="checkbox" name="lab_immunology" value="{{ value }}">
+            <span>{{ label }}</span>
+          </span>
+          <input type="text" class="lab-input" name="lab_immunology_value_{{ value }}" placeholder="Valor">
+        </label>
+      {% endfor %}
+    </div>
+    {% if immuno_rheum_options is defined and immuno_rheum_options %}
+      <details class="lab-details">
+        <summary>Desplegar panel ampliado para reumatología</summary>
+        <div class="lab-grid lab-grid--details">
+          {% for value, label in immuno_rheum_options %}
+            <label class="lab-row">
+              <span class="lab-label">
+                <input type="checkbox" name="lab_immunology" value="{{ value }}">
+                <span>{{ label }}</span>
+              </span>
+              <input type="text" class="lab-input" name="lab_immunology_value_{{ value }}" placeholder="Valor">
+            </label>
+          {% endfor %}
+        </div>
+      </details>
+    {% endif %}
+    <label for="lab_immunology_notes">Aclaraciones (dictado libre)</label>
+    <div class="voice-field">
+      <textarea id="lab_immunology_notes" name="lab_immunology_notes" rows="3"></textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="lab_immunology_notes">Dictado</button>
+    </div>
+    <style>
+      .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 10px 20px;
+      }
+      .lab-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 4px 0;
+      }
+      .lab-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+      }
+      .lab-input {
+        flex: 0 0 160px;
+      }
+      .lab-details {
+        margin-top: 12px;
+      }
+      .lab-details summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+    </style>
+  </div>
+
+  {% if review_users %}
+  <div class="form-section">
+    <h2>Solicitar revision</h2>
+  <p class="form-help">Selecciona colegas para notificarles que revisen este caso y deja un mensaje breve.</p>
+  <label>Profesionales para revisar</label>
+  <select name="review_recipients" multiple size="5">
+      {% for user in review_users %}
+        <option value="{{ user.id }}">{{ user.full_name }} ({{ user.specialty or 'sin especialidad' }})</option>
+      {% endfor %}
+    </select>
+    <label>Mensaje para la revision</label>
+    <div class="voice-field">
+      <textarea id="review_message" name="review_message" rows="3"></textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="review_message">Dictado</button>
+    </div>
+  </div>
+  {% endif %}
+
+<button type="submit">Guardar consulta</button>
+<a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
+</form>
+<script>
+  (function() {
+    const links = {{ center_links|tojson }};
+    const select = document.getElementById('study_center_select');
+    const input = document.getElementById('study_center');
+    const display = document.getElementById('consult-center-link');
+    function updateLink() {
+      if (!input || !display) return;
+      const value = (input.value || '').trim().toLowerCase();
+      const url = links[value] || '';
+      display.innerHTML = url ? 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>' : '';
+    }
+    function syncCenter() {
+      if (!select || !input) return;
+      if (select.value && select.value !== '__otro__') {
+        input.value = select.value;
+        input.readOnly = true;
+      } else if (select.value === '__otro__') {
+        input.readOnly = false;
+        input.value = '';
+        input.focus();
+      } else {
+        input.readOnly = false;
+        input.value = '';
+      }
+      updateLink();
+    }
+    if (select) {
+      select.addEventListener('change', syncCenter);
+      syncCenter();
+    }
+    if (input) {
+      input.addEventListener('input', updateLink);
+    }
+
+    const ctrlCheckbox = document.getElementById('control_enabled');
+    const ctrlBlock = document.getElementById('control_block');
+    function toggleControl() {
+      if (!ctrlCheckbox || !ctrlBlock) return;
+      ctrlBlock.style.display = ctrlCheckbox.checked ? 'block' : 'none';
+    }
+    if (ctrlCheckbox) {
+      ctrlCheckbox.addEventListener('change', toggleControl);
+      toggleControl();
+    }
+  })();
+</script>
+{% endblock %}
