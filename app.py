@@ -3187,6 +3187,57 @@ def consultation_new(patient_id):
         center_options=CATALOGS.get("centers", []),
     )
 
+@app.route("/consultations/<int:consultation_id>/edit", methods=["GET", "POST"])
+@login_required
+def consultation_edit(consultation_id):
+    consultation = Consultation.query.get_or_404(consultation_id)
+    patient = consultation.patient
+
+    if consultation.created_by_id and consultation.created_by_id != current_user.id:
+        flash("Solo puede editar la consulta quien la creó.", "danger")
+        return redirect(url_for("patient_detail", patient_id=patient.id))
+
+    if request.method == "POST":
+        consultation.date = request.form.get("date")
+        consultation.notes = request.form.get("notes")
+        consultation.lab_general = (request.form.get("lab_general") or "").strip() or None
+        consultation.lab_immunology = _serialize_list(request.form.getlist("lab_immunology"))
+        consultation.lab_immunology_notes = (request.form.get("lab_immunology_notes") or "").strip() or None
+        lab_immunology_values = {}
+        for key, _ in IMMUNO_LAB_OPTIONS:
+            val = (request.form.get(f"lab_immunology_value_{key}") or "").strip()
+            if val:
+                lab_immunology_values[key] = val
+        consultation.lab_immunology_values = _serialize_kv(lab_immunology_values)
+
+        db.session.commit()
+        flash("Consulta actualizada correctamente.", "success")
+        return redirect(url_for("patient_detail", patient_id=patient.id))
+
+    return render_template(
+        "consultation_edit.html",
+        consultation=consultation,
+        patient=patient,
+        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
+        immuno_options=IMMUNO_LAB_OPTIONS,
+        immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
+        immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
+    )
+
+
+@app.route("/consultations/<int:consultation_id>/view")
+@login_required
+def consultation_view(consultation_id):
+    consultation = Consultation.query.get_or_404(consultation_id)
+    patient = consultation.patient
+    return render_template(
+        "consultation_view.html",
+        consultation=consultation,
+        patient=patient,
+        immuno_map=IMMUNO_LAB_DICT,
+        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
+    )
+
 
 # -------------------------------------------------
 # CONTEXTO GLOBAL EXTRA (badge revisiones)
