@@ -3225,20 +3225,6 @@ def consultation_edit(consultation_id):
     )
 
 
-@app.route("/consultations/<int:consultation_id>/view")
-@login_required
-def consultation_view(consultation_id):
-    consultation = Consultation.query.get_or_404(consultation_id)
-    patient = consultation.patient
-    return render_template(
-        "consultation_view.html",
-        consultation=consultation,
-        patient=patient,
-        immuno_map=IMMUNO_LAB_DICT,
-        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
-    )
-
-
 # -------------------------------------------------
 # CONTEXTO GLOBAL EXTRA (badge revisiones)
 # -------------------------------------------------
