@@ -2077,61 +2077,34 @@ def patients_export_summary():
 @login_required
 def patient_new():
     form_options = patient_form_options()
-    if request.method == "POST":
+       if request.method == "POST":
         full_name = (request.form.get("full_name") or "").strip()
         dni = (request.form.get("dni") or "").strip()
+        email = (request.form.get("email") or "").strip()
         consent_flag = _checkbox_to_bool(request.form.get("consent_given"))
         consent_date = (request.form.get("consent_date") or "").strip()
 
+        # Construye un paciente temporal con lo ingresado para re‑renderizar el form si falta algo
+        temp_patient = Patient(created_by=current_user)
+        populate_patient_from_form(temp_patient, request.form, current_user)
+
+        missing = []
         if not full_name:
-            flash("El nombre del paciente es obligatorio.", "danger")
-            return redirect(url_for("patient_new"))
-
+            missing.append("Nombre y apellido")
+        if not dni:
+            missing.append("DNI")
+        if not email:
+            missing.append("Email")
         if not consent_flag:
-            flash(
-                "Necesitamos confirmar el consentimiento informado para cargar al paciente.",
-                "danger",
-            )
-            return redirect(url_for("patient_new"))
+            missing.append("Consentimiento informado")
         if consent_flag and not consent_date:
-            flash(
-                "Indica la fecha en la que se firmo el consentimiento informado.",
-                "danger",
-            )
-            return redirect(url_for("patient_new"))
+            missing.append("Fecha de consentimiento")
 
-        if dni:
-            existing = Patient.query.filter(Patient.dni == dni).first()
-            if existing:
-                flash(
-                    f"Ya existe un paciente con el DNI {dni}. Verifica antes de continuar.",
-                    "warning",
-                )
-                return redirect(url_for("patient_detail", patient_id=existing.id))
+        if missing:
+            flash("Completar campos obligatorios: " + ", ".join(missing), "danger")
+            return render_template("patient_new.html", patient=temp_patient, **form_options)
 
-        patient = Patient(created_by=current_user)
-        populate_patient_from_form(patient, request.form, current_user)
-        db.session.add(patient)
-        db.session.commit()
-
-        genogram_pdf = request.files.get("family_genogram_pdf")
-        if genogram_pdf and genogram_pdf.filename:
-            filename = secure_filename(genogram_pdf.filename)
-            if allowed_patient_file(filename):
-                unique_name = f"patient_{patient.id}_familiograma_{int(time.time())}.pdf"
-                genogram_pdf.save(os.path.join(UPLOAD_DIR, unique_name))
-                patient.family_genogram_pdf = unique_name
-                db.session.commit()
-            else:
-                flash("El familiograma solo admite PDF.", "warning")
-
-        log_action("patient_create", {"patient_id": patient.id})
-        flash("Paciente agregado correctamente.", "success")
-        return redirect(url_for("patients_list"))
-
-    return render_template("patient_new.html", patient=None, **form_options)
-
-
+     
 @app.route("/patients/<int:patient_id>")
 @login_required
 def patient_detail(patient_id):
