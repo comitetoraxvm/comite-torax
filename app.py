@@ -2608,6 +2608,9 @@ def patient_delete(patient_id):
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
     try:
+        # Controles de consulta (primero, para evitar FK)
+        ControlReminder.query.filter_by(patient_id=patient.id).delete()
+
         # Revisiones y comentarios
         reviews = ReviewRequest.query.filter_by(patient_id=patient.id).all()
         if reviews:
@@ -2619,7 +2622,7 @@ def patient_delete(patient_id):
                 ReviewRequest.id.in_(review_ids)
             ).delete(synchronize_session=False)
 
-        # Presentaci?n de caso
+        # Presentación de caso
         CasePresentation.query.filter_by(patient_id=patient.id).delete()
 
         # Consultas y sus estudios
@@ -2635,9 +2638,6 @@ def patient_delete(patient_id):
         for sc in screenings:
             ScreeningFollowup.query.filter_by(screening_id=sc.id).delete()
             db.session.delete(sc)
-
-        # Controles de consulta
-        ControlReminder.query.filter_by(patient_id=patient.id).delete()
 
         if patient.family_genogram_pdf:
             pdf_path = os.path.join(UPLOAD_DIR, patient.family_genogram_pdf)
