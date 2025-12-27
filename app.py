@@ -100,6 +100,10 @@ def send_email(to_addresses, subject: str, body: str) -> bool:
         print(f"[WARN] No se pudo enviar email: {exc}")
         return False
 
+# -------------------------------------------------
+# Notificaciones internas
+# -------------------------------------------------
+
 
 def _collect_emails(*lists):
     emails = []
@@ -171,7 +175,6 @@ def notify_screening_followup(fu: "ScreeningFollowup"):
         send_email(to_emails, subject, body)
     except Exception as exc:
         print(f"[WARN] No se pudo notificar screening followup: {exc}")
-
 
 DEFAULT_CATALOGS = {
     "centers": [
@@ -703,7 +706,16 @@ PATIENT_EXTRA_COLUMNS = {
 }
 
 
+def _is_sqlite_engine() -> bool:
+    try:
+        return db.engine.url.drivername.startswith("sqlite")
+    except Exception:
+        return False
+
+
 def ensure_patient_extra_columns():
+    if not _is_sqlite_engine():
+        return
     try:
         with db.engine.begin() as connection:
             existing = {
@@ -720,6 +732,8 @@ def ensure_patient_extra_columns():
 
 
 def ensure_consultation_extra_columns():
+    if not _is_sqlite_engine():
+        return
     try:
         with db.engine.begin() as connection:
             existing = {
@@ -782,6 +796,7 @@ def populate_patient_from_form(patient, form_data, creator=None):
     patient.notes_personal = (form_data.get("notes_personal") or "").strip() or None
 
     # Smoking
+    smoking_never = _checkbox_to_bool(form_data.get("smoking_never"))
     patient.smoking_current = _checkbox_to_bool(form_data.get("smoking_current"))
     patient.smoking_previous = _checkbox_to_bool(form_data.get("smoking_previous"))
     patient.smoking_start_age = _to_int(form_data.get("smoking_start_age"))
@@ -791,11 +806,18 @@ def populate_patient_from_form(patient, form_data, creator=None):
     )
     patient.smoking_years = _to_float(form_data.get("smoking_years"))
     pack_years_input = _to_float(form_data.get("smoking_pack_years"))
-    if patient.smoking_cigarettes_per_day and patient.smoking_years:
-        cigs = float(patient.smoking_cigarettes_per_day)
-        patient.smoking_pack_years = round((cigs / 20.0) * patient.smoking_years, 2)
+    if smoking_never:
+        patient.smoking_current = False
+        patient.smoking_previous = False
+        patient.smoking_pack_years = 0
+        patient.smoking_years = None
+        patient.smoking_cigarettes_per_day = None
     else:
-        patient.smoking_pack_years = pack_years_input
+        if patient.smoking_cigarettes_per_day and patient.smoking_years:
+            cigs = float(patient.smoking_cigarettes_per_day)
+            patient.smoking_pack_years = round((cigs / 20.0) * patient.smoking_years, 2)
+        else:
+            patient.smoking_pack_years = pack_years_input
     patient.notes_smoking = (form_data.get("notes_smoking") or "").strip() or None
 
     # Lists
@@ -1040,6 +1062,8 @@ def allowed_patient_file(filename):
 
 
 def ensure_study_extra_columns():
+    if not _is_sqlite_engine():
+        return
     try:
         with db.engine.begin() as connection:
             existing = {
@@ -1059,6 +1083,8 @@ def ensure_study_extra_columns():
 
 
 def ensure_medical_resource_columns():
+    if not _is_sqlite_engine():
+        return
     try:
         with db.engine.begin() as connection:
             existing = {
@@ -1074,6 +1100,8 @@ def ensure_medical_resource_columns():
 
 
 def ensure_screening_extra_columns():
+    if not _is_sqlite_engine():
+        return
     try:
         with db.engine.begin() as connection:
             existing = {
@@ -2077,14 +2105,14 @@ def patients_export_summary():
 @login_required
 def patient_new():
     form_options = patient_form_options()
-       if request.method == "POST":
+    if request.method == "POST":
         full_name = (request.form.get("full_name") or "").strip()
         dni = (request.form.get("dni") or "").strip()
         email = (request.form.get("email") or "").strip()
         consent_flag = _checkbox_to_bool(request.form.get("consent_given"))
         consent_date = (request.form.get("consent_date") or "").strip()
 
-        # Construye un paciente temporal con lo ingresado para re‑renderizar el form si falta algo
+        # Paciente temporal para re-renderizar el form con lo ingresado
         temp_patient = Patient(created_by=current_user)
         populate_patient_from_form(temp_patient, request.form, current_user)
 
@@ -2104,7 +2132,38 @@ def patient_new():
             flash("Completar campos obligatorios: " + ", ".join(missing), "danger")
             return render_template("patient_new.html", patient=temp_patient, **form_options)
 
-     
+        if dni:
+            existing = Patient.query.filter(Patient.dni == dni).first()
+            if existing:
+                flash(
+                    f"Ya existe un paciente con el DNI {dni}. Verifica antes de continuar.",
+                    "warning",
+                )
+                return redirect(url_for("patient_detail", patient_id=existing.id))
+
+        patient = Patient(created_by=current_user)
+        populate_patient_from_form(patient, request.form, current_user)
+        db.session.add(patient)
+        db.session.commit()
+
+        genogram_pdf = request.files.get("family_genogram_pdf")
+        if genogram_pdf and genogram_pdf.filename:
+            filename = secure_filename(genogram_pdf.filename)
+            if allowed_patient_file(filename):
+                unique_name = f"patient_{patient.id}_familiograma_{int(time.time())}.pdf"
+                genogram_pdf.save(os.path.join(UPLOAD_DIR, unique_name))
+                patient.family_genogram_pdf = unique_name
+                db.session.commit()
+            else:
+                flash("El familiograma solo admite PDF.", "warning")
+
+        log_action("patient_create", {"patient_id": patient.id})
+        flash("Paciente agregado correctamente.", "success")
+        return redirect(url_for("patients_list"))
+
+    return render_template("patient_new.html", patient=None, **form_options)
+
+
 @app.route("/patients/<int:patient_id>")
 @login_required
 def patient_detail(patient_id):
@@ -2366,9 +2425,7 @@ def patient_screening(patient_id):
             )
             db.session.add(fu)
             db.session.commit()
-            # NUEVO: email de control de screening
             notify_screening_followup(fu)
-
             flash("Control agregado.", "success")
             return redirect(
                 url_for("patient_screening", patient_id=patient.id, _anchor="followups")
@@ -2657,7 +2714,7 @@ def patient_delete(patient_id):
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
     try:
-        # Controles de consulta (primero, para evitar FK)
+        # Controles de consulta (primero, para evitar FK sobre consultations)
         ControlReminder.query.filter_by(patient_id=patient.id).delete()
 
         # Revisiones y comentarios
@@ -2671,7 +2728,7 @@ def patient_delete(patient_id):
                 ReviewRequest.id.in_(review_ids)
             ).delete(synchronize_session=False)
 
-        # Presentación de caso
+        # Presentaci?n de caso
         CasePresentation.query.filter_by(patient_id=patient.id).delete()
 
         # Consultas y sus estudios
@@ -3029,18 +3086,6 @@ def study_edit(study_id):
 
 # --------------- CONSULTAS -----------------------
 
-@app.route("/consultations/<int:consultation_id>/view")
-@login_required
-def consultation_view(consultation_id):
-    consultation = Consultation.query.get_or_404(consultation_id)
-    patient = consultation.patient
-    return render_template(
-        "consultation_view.html",
-        consultation=consultation,
-        patient=patient,
-        immuno_map=IMMUNO_LAB_DICT,
-        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
-    )
 
 @app.route("/patients/<int:patient_id>/consultations/new", methods=["GET", "POST"])
 @login_required
@@ -3089,7 +3134,7 @@ def consultation_new(patient_id):
         db.session.add(consultation)
         db.session.flush()  # para tener consultation.id
 
-        # Estudio asociado en la misma consulta
+        # Si cargaron datos de estudio dentro de la misma consulta, guardamos un Study asociado
         study_obj = None
         if any([study_type, study_date, study_center, study_description, study_file, study_access_code]):
             study = Study(
@@ -3118,6 +3163,7 @@ def consultation_new(patient_id):
 
         review_recips = _parse_recipient_ids(request.form.getlist("review_recipients"))
         review_message = request.form.get("review_message")
+        cr = None
         if review_recips:
             create_review_request(
                 patient,
@@ -3127,8 +3173,6 @@ def consultation_new(patient_id):
                 consultation=consultation,
                 study=study_obj,
             )
-
-        cr = None
         if control_enabled and control_date:
             cr = ControlReminder(
                 patient=patient,
@@ -3138,13 +3182,9 @@ def consultation_new(patient_id):
                 created_by=current_user,
             )
             db.session.add(cr)
-
         db.session.commit()
-
-        # NUEVO: enviar mail del control
         if cr:
             notify_control_reminder(cr, patient)
-
         flash("Consulta agregada correctamente.", "success")
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
@@ -3160,6 +3200,7 @@ def consultation_new(patient_id):
         center_options=CATALOGS.get("centers", []),
     )
 
+
 @app.route("/consultations/<int:consultation_id>/edit", methods=["GET", "POST"])
 @login_required
 def consultation_edit(consultation_id):
@@ -3174,7 +3215,9 @@ def consultation_edit(consultation_id):
         consultation.date = request.form.get("date")
         consultation.notes = request.form.get("notes")
         consultation.lab_general = (request.form.get("lab_general") or "").strip() or None
-        consultation.lab_immunology = _serialize_list(request.form.getlist("lab_immunology"))
+        consultation.lab_immunology = _serialize_list(
+            request.form.getlist("lab_immunology")
+        )
         consultation.lab_immunology_notes = (request.form.get("lab_immunology_notes") or "").strip() or None
         lab_immunology_values = {}
         for key, _ in IMMUNO_LAB_OPTIONS:
@@ -3183,6 +3226,7 @@ def consultation_edit(consultation_id):
                 lab_immunology_values[key] = val
         consultation.lab_immunology_values = _serialize_kv(lab_immunology_values)
 
+        # NO tocamos aqui los estudios ya creados; eso se maneja por study_edit
         db.session.commit()
         flash("Consulta actualizada correctamente.", "success")
         return redirect(url_for("patient_detail", patient_id=patient.id))
@@ -3195,6 +3239,20 @@ def consultation_edit(consultation_id):
         immuno_options=IMMUNO_LAB_OPTIONS,
         immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
         immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
+    )
+
+
+@app.route("/consultations/<int:consultation_id>/view")
+@login_required
+def consultation_view(consultation_id):
+    consultation = Consultation.query.get_or_404(consultation_id)
+    patient = consultation.patient
+    return render_template(
+        "consultation_view.html",
+        consultation=consultation,
+        patient=patient,
+        immuno_map=IMMUNO_LAB_DICT,
+        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
     )
 
 
