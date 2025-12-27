@@ -1062,136 +1062,126 @@ def allowed_patient_file(filename):
 
 
 def ensure_study_extra_columns():
-    if not _is_sqlite_engine():
-        return
+    """Asegura columnas extra en studies tanto en SQLite como en Postgres."""
     try:
-        with db.engine.begin() as connection:
-            existing = {
-                row[1]
-                for row in connection.execute(text("PRAGMA table_info(studies)"))
-            }
-            if "report_file" not in existing:
-                connection.execute(
-                    text("ALTER TABLE studies ADD COLUMN report_file TEXT")
-                )
-            if "access_code" not in existing:
-                connection.execute(
-                    text("ALTER TABLE studies ADD COLUMN access_code TEXT")
-                )
-            if "portal_link" not in existing:
-                connection.execute(
-                    text("ALTER TABLE studies ADD COLUMN portal_link TEXT")
-                )
+        if _is_sqlite_engine():
+            with db.engine.begin() as connection:
+                existing = {row[1] for row in connection.execute(text("PRAGMA table_info(studies)"))}
+                if "report_file" not in existing:
+                    connection.execute(text("ALTER TABLE studies ADD COLUMN report_file TEXT"))
+                if "access_code" not in existing:
+                    connection.execute(text("ALTER TABLE studies ADD COLUMN access_code TEXT"))
+                if "portal_link" not in existing:
+                    connection.execute(text("ALTER TABLE studies ADD COLUMN portal_link TEXT"))
+        else:
+            with db.engine.begin() as connection:
+                connection.execute(text("ALTER TABLE studies ADD COLUMN IF NOT EXISTS report_file TEXT"))
+                connection.execute(text("ALTER TABLE studies ADD COLUMN IF NOT EXISTS access_code TEXT"))
+                connection.execute(text("ALTER TABLE studies ADD COLUMN IF NOT EXISTS portal_link TEXT"))
     except Exception as exc:
         print(f"[WARN] No se pudo verificar columnas extra de estudios: {exc}")
 
 
 def ensure_medical_resource_columns():
-    if not _is_sqlite_engine():
-        return
+    """Asegura columnas extra en medical_resources (sqlite/postgres)."""
     try:
-        with db.engine.begin() as connection:
-            existing = {
-                row[1]
-                for row in connection.execute(text("PRAGMA table_info(medical_resources)"))
-            }
-            if "notes" not in existing:
-                connection.execute(
-                    text("ALTER TABLE medical_resources ADD COLUMN notes TEXT")
-                )
+        if _is_sqlite_engine():
+            with db.engine.begin() as connection:
+                existing = {row[1] for row in connection.execute(text("PRAGMA table_info(medical_resources)"))}
+                if "notes" not in existing:
+                    connection.execute(text("ALTER TABLE medical_resources ADD COLUMN notes TEXT"))
+        else:
+            with db.engine.begin() as connection:
+                connection.execute(text("ALTER TABLE medical_resources ADD COLUMN IF NOT EXISTS notes TEXT"))
     except Exception as exc:
         print(f"[WARN] No se pudo verificar columnas de medical_resources: {exc}")
 
 
 def ensure_screening_extra_columns():
-    if not _is_sqlite_engine():
-        return
+    """Asegura columnas extra en screenings/followups/control_reminders (sqlite/postgres)."""
     try:
-        with db.engine.begin() as connection:
-            existing = {
-                row[1]
-                for row in connection.execute(text("PRAGMA table_info(screenings)"))
-            }
-            if "study_file" not in existing:
-                connection.execute(
-                    text("ALTER TABLE screenings ADD COLUMN study_file TEXT")
-                )
-            if "screening_lung" not in existing:
-                connection.execute(
-                    text("ALTER TABLE screenings ADD COLUMN screening_lung BOOLEAN")
-                )
-            if "followup_nodule" not in existing:
-                connection.execute(
-                    text("ALTER TABLE screenings ADD COLUMN followup_nodule BOOLEAN")
-                )
-            if "ecog_status" not in existing:
-                connection.execute(
-                    text("ALTER TABLE screenings ADD COLUMN ecog_status TEXT")
-                )
-            if "extra_email" not in existing:
-                connection.execute(
-                    text("ALTER TABLE screenings ADD COLUMN extra_email TEXT")
-                )
-            if "recommendation" in existing:
-                # columna vieja, la mantenemos por compatibilidad (no se usa en UI)
-                pass
-            if "monthly_followup" in existing:
-                # columna vieja, no se usa
-                pass
-        # followups table
-        existing_fu = {
-            row[1]
-            for row in connection.execute(text("PRAGMA table_info(screening_followups)"))
-        }
-        if "created_by_id" not in existing_fu:
-            connection.execute(
-                text("ALTER TABLE screening_followups ADD COLUMN created_by_id INTEGER")
-            )
-        if "completed" not in existing_fu:
-            connection.execute(
-                text("ALTER TABLE screening_followups ADD COLUMN completed BOOLEAN DEFAULT 0")
-            )
-        if "completed_at" not in existing_fu:
-            connection.execute(
-                text("ALTER TABLE screening_followups ADD COLUMN completed_at TEXT")
-            )
-        existing_cr = {
-            row[1]
-            for row in connection.execute(text("PRAGMA table_info(control_reminders)"))
-        }
-        if "control_date" not in existing_cr:
-            connection.execute(
-                text(
-                    """
-                    CREATE TABLE IF NOT EXISTS control_reminders (
-                        id INTEGER PRIMARY KEY,
-                        patient_id INTEGER NOT NULL,
-                        consultation_id INTEGER,
-                        control_date TEXT,
-                        extra_emails TEXT,
-                        created_at TEXT,
-                        created_by_id INTEGER
+        if _is_sqlite_engine():
+            with db.engine.begin() as connection:
+                existing = {row[1] for row in connection.execute(text("PRAGMA table_info(screenings)"))}
+                if "study_file" not in existing:
+                    connection.execute(text("ALTER TABLE screenings ADD COLUMN study_file TEXT"))
+                if "screening_lung" not in existing:
+                    connection.execute(text("ALTER TABLE screenings ADD COLUMN screening_lung BOOLEAN"))
+                if "followup_nodule" not in existing:
+                    connection.execute(text("ALTER TABLE screenings ADD COLUMN followup_nodule BOOLEAN"))
+                if "ecog_status" not in existing:
+                    connection.execute(text("ALTER TABLE screenings ADD COLUMN ecog_status TEXT"))
+                if "extra_email" not in existing:
+                    connection.execute(text("ALTER TABLE screenings ADD COLUMN extra_email TEXT"))
+            with db.engine.begin() as connection:
+                existing_fu = {row[1] for row in connection.execute(text("PRAGMA table_info(screening_followups)"))}
+                if "created_by_id" not in existing_fu:
+                    connection.execute(text("ALTER TABLE screening_followups ADD COLUMN created_by_id INTEGER"))
+                if "completed" not in existing_fu:
+                    connection.execute(text("ALTER TABLE screening_followups ADD COLUMN completed BOOLEAN DEFAULT 0"))
+                if "completed_at" not in existing_fu:
+                    connection.execute(text("ALTER TABLE screening_followups ADD COLUMN completed_at TEXT"))
+            with db.engine.begin() as connection:
+                existing_cr = {row[1] for row in connection.execute(text("PRAGMA table_info(control_reminders)"))}
+                if "control_date" not in existing_cr:
+                    connection.execute(
+                        text(
+                            """
+                            CREATE TABLE IF NOT EXISTS control_reminders (
+                                id INTEGER PRIMARY KEY,
+                                patient_id INTEGER NOT NULL,
+                                consultation_id INTEGER,
+                                control_date TEXT,
+                                extra_emails TEXT,
+                                created_at TEXT,
+                                created_by_id INTEGER
+                            )
+                            """
+                        )
                     )
-                    """
-                )
-            )
+                else:
+                    if "created_by_id" not in existing_cr:
+                        connection.execute(text("ALTER TABLE control_reminders ADD COLUMN created_by_id INTEGER"))
+                    if "extra_emails" not in existing_cr:
+                        connection.execute(text("ALTER TABLE control_reminders ADD COLUMN extra_emails TEXT"))
+                    if "completed" not in existing_cr:
+                        connection.execute(text("ALTER TABLE control_reminders ADD COLUMN completed BOOLEAN DEFAULT 0"))
+                    if "completed_at" not in existing_cr:
+                        connection.execute(text("ALTER TABLE control_reminders ADD COLUMN completed_at TEXT"))
         else:
-            if "created_by_id" not in existing_cr:
+            with db.engine.begin() as connection:
+                connection.execute(text("ALTER TABLE screenings ADD COLUMN IF NOT EXISTS study_file TEXT"))
+                connection.execute(text("ALTER TABLE screenings ADD COLUMN IF NOT EXISTS screening_lung BOOLEAN"))
+                connection.execute(text("ALTER TABLE screenings ADD COLUMN IF NOT EXISTS followup_nodule BOOLEAN"))
+                connection.execute(text("ALTER TABLE screenings ADD COLUMN IF NOT EXISTS ecog_status TEXT"))
+                connection.execute(text("ALTER TABLE screenings ADD COLUMN IF NOT EXISTS extra_email TEXT"))
+                connection.execute(text("ALTER TABLE screening_followups ADD COLUMN IF NOT EXISTS created_by_id INTEGER"))
+                connection.execute(text("ALTER TABLE screening_followups ADD COLUMN IF NOT EXISTS completed BOOLEAN DEFAULT 0"))
+                connection.execute(text("ALTER TABLE screening_followups ADD COLUMN IF NOT EXISTS completed_at TEXT"))
                 connection.execute(
-                    text("ALTER TABLE control_reminders ADD COLUMN created_by_id INTEGER")
+                    text(
+                        """
+                        CREATE TABLE IF NOT EXISTS control_reminders (
+                            id SERIAL PRIMARY KEY,
+                            patient_id INTEGER NOT NULL,
+                            consultation_id INTEGER,
+                            control_date TEXT,
+                            extra_emails TEXT,
+                            created_at TEXT,
+                            created_by_id INTEGER,
+                            status TEXT,
+                            completed BOOLEAN DEFAULT 0,
+                            completed_at TEXT
+                        )
+                        """
+                    )
                 )
-            if "extra_emails" not in existing_cr:
-                connection.execute(
-                    text("ALTER TABLE control_reminders ADD COLUMN extra_emails TEXT")
-                )
-            if "completed" not in existing_cr:
-                connection.execute(
-                    text("ALTER TABLE control_reminders ADD COLUMN completed BOOLEAN DEFAULT 0")
-                )
-            if "completed_at" not in existing_cr:
-                connection.execute(
-                    text("ALTER TABLE control_reminders ADD COLUMN completed_at TEXT")
-                )
+                # columnas extra si ya existía tabla
+                connection.execute(text("ALTER TABLE control_reminders ADD COLUMN IF NOT EXISTS extra_emails TEXT"))
+                connection.execute(text("ALTER TABLE control_reminders ADD COLUMN IF NOT EXISTS created_by_id INTEGER"))
+                connection.execute(text("ALTER TABLE control_reminders ADD COLUMN IF NOT EXISTS status TEXT"))
+                connection.execute(text("ALTER TABLE control_reminders ADD COLUMN IF NOT EXISTS completed BOOLEAN DEFAULT 0"))
+                connection.execute(text("ALTER TABLE control_reminders ADD COLUMN IF NOT EXISTS completed_at TEXT"))
     except Exception as exc:
         print(f"[WARN] No se pudo verificar columnas de screenings: {exc}")
 
