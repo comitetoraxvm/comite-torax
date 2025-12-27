@@ -1078,6 +1078,10 @@ def ensure_study_extra_columns():
                 connection.execute(
                     text("ALTER TABLE studies ADD COLUMN access_code TEXT")
                 )
+            if "portal_link" not in existing:
+                connection.execute(
+                    text("ALTER TABLE studies ADD COLUMN portal_link TEXT")
+                )
     except Exception as exc:
         print(f"[WARN] No se pudo verificar columnas extra de estudios: {exc}")
 
@@ -1442,6 +1446,7 @@ class Study(db.Model):
     center = db.Column(db.String(150), nullable=True)
     description = db.Column(db.Text, nullable=True)
     access_code = db.Column(db.String(100), nullable=True)
+    portal_link = db.Column(db.String(500), nullable=True)
     report_file = db.Column(db.String(300), nullable=True)
 
     created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"))
@@ -2919,6 +2924,7 @@ def study_new(patient_id):
         center = request.form.get("center")
         description = request.form.get("description")
         access_code = (request.form.get("access_code") or "").strip() or None
+        portal_link = (request.form.get("portal_link") or "").strip() or None
         pdf_file = request.files.get("study_file")
 
         study = Study(
@@ -2931,6 +2937,7 @@ def study_new(patient_id):
             created_by=current_user,
         )
         study.access_code = access_code
+        study.portal_link = portal_link
         db.session.add(study)
         db.session.flush()
 
@@ -3055,6 +3062,7 @@ def study_edit(study_id):
         study.center = request.form.get("center")
         study.description = request.form.get("description")
         study.access_code = (request.form.get("access_code") or "").strip() or None
+        study.portal_link = (request.form.get("portal_link") or "").strip() or None
 
         pdf_file = request.files.get("study_file")
         if pdf_file and pdf_file.filename:
@@ -3104,21 +3112,9 @@ def consultation_new(patient_id):
             val = (request.form.get(f"lab_immunology_value_{key}") or "").strip()
             if val:
                 lab_immunology_values[key] = val
-        study_type = (request.form.get("study_type") or "").strip()
-        study_date = (request.form.get("study_date") or "").strip()
-        study_center = (request.form.get("study_center") or "").strip()
-        study_description = (request.form.get("study_description") or "").strip()
-        study_access_code = (request.form.get("study_access_code") or "").strip() or None
-        study_file = request.files.get("study_file")
-        control_enabled = request.form.get("control_enabled") in ("on", "true", "1")
-        control_date = (request.form.get("control_date") or "").strip() or None
-        control_extra_emails = (request.form.get("control_extra_emails") or "").strip() or None
 
         if not date:
             flash("La fecha de la consulta es obligatoria.", "danger")
-            return redirect(url_for("consultation_new", patient_id=patient.id))
-        if control_enabled and not control_date:
-            flash("Debes indicar la fecha de control para programar el recordatorio.", "danger")
             return redirect(url_for("consultation_new", patient_id=patient.id))
 
         consultation = Consultation(
@@ -3134,36 +3130,106 @@ def consultation_new(patient_id):
         db.session.add(consultation)
         db.session.flush()  # para tener consultation.id
 
-        # Si cargaron datos de estudio dentro de la misma consulta, guardamos un Study asociado
-        study_obj = None
-        if any([study_type, study_date, study_center, study_description, study_file, study_access_code]):
-            study = Study(
-                patient=patient,
-                consultation=consultation,
-                study_type=study_type or "Estudio asociado a consulta",
-                date=study_date or date,
-                center=study_center or None,
-                description=study_description or None,
-                created_by=current_user,
-            )
-            study.access_code = study_access_code
-            db.session.add(study)
-            study_obj = study
-            db.session.flush()
+        study_group = request.form.get("study_group") or "func"
+        studies_created = []
 
-            if study_file and study_file.filename:
-                filename = secure_filename(study_file.filename)
+        def add_studies_from_lists(types, dates, centers=None, accesses=None, links=None, description=None):
+            nonlocal studies_created
+            max_len = len(types) if types else 0
+            for idx in range(max_len):
+                stype = (types[idx] or "").strip()
+                sdate = (dates[idx] if dates and idx < len(dates) else "").strip()
+                center = (centers[idx] if centers and idx < len(centers) else "").strip() if centers else ""
+                access = (accesses[idx] if accesses and idx < len(accesses) else "").strip() if accesses else ""
+                link = (links[idx] if links and idx < len(links) else "").strip() if links else ""
+                if not any([stype, sdate, center, access, link]):
+                    continue
+                study = Study(
+                    patient=patient,
+                    consultation=consultation,
+                    study_type=stype or "Estudio asociado a consulta",
+                    date=sdate or date,
+                    center=center or None,
+                    description=description,
+                    created_by=current_user,
+                )
+                study.access_code = access or None
+                study.portal_link = link or None
+                db.session.add(study)
+                studies_created.append(study)
+
+        # Datos por grupo
+        func_types = request.form.getlist("func_type[]")
+        func_dates = request.form.getlist("func_date[]")
+        func_desc = (request.form.get("func_description") or "").strip() or None
+        func_file = request.files.get("func_file")
+        func_control_enabled = request.form.get("func_control_enabled") in ("on", "true", "1")
+        func_control_date = (request.form.get("func_control_date") or "").strip() or None
+        func_control_extra_emails = (request.form.get("func_control_extra_emails") or "").strip() or None
+
+        img_types = request.form.getlist("img_type[]")
+        img_dates = request.form.getlist("img_date[]")
+        img_centers = request.form.getlist("img_center[]")
+        img_access = request.form.getlist("img_access[]")
+        img_links = request.form.getlist("img_link[]")
+        img_desc = (request.form.get("img_description") or "").strip() or None
+        img_file = request.files.get("img_file")
+        img_control_enabled = request.form.get("img_control_enabled") in ("on", "true", "1")
+        img_control_date = (request.form.get("img_control_date") or "").strip() or None
+        img_control_extra_emails = (request.form.get("img_control_extra_emails") or "").strip() or None
+
+        inv_types = request.form.getlist("inv_type[]")
+        inv_dates = request.form.getlist("inv_date[]")
+        inv_desc = (request.form.get("inv_description") or "").strip() or None
+        inv_file = request.files.get("inv_file")
+
+        if study_group == "func":
+            add_studies_from_lists(func_types, func_dates, description=func_desc)
+        elif study_group == "img":
+            add_studies_from_lists(img_types, img_dates, img_centers, img_access, img_links, img_desc)
+        elif study_group == "inv":
+            add_studies_from_lists(inv_types, inv_dates, description=inv_desc)
+
+        db.session.flush()
+
+        # PDF compartido: lo asociamos al primer estudio creado del grupo
+        if studies_created:
+            upload_file = func_file if study_group == "func" else img_file if study_group == "img" else inv_file
+            if upload_file and upload_file.filename:
+                filename = secure_filename(upload_file.filename)
                 if allowed_study_file(filename):
-                    unique_name = f"study_{study.id}_{int(time.time())}.pdf"
+                    unique_name = f"study_{studies_created[0].id}_{int(time.time())}.pdf"
                     save_path = os.path.join(UPLOAD_DIR, unique_name)
-                    study_file.save(save_path)
-                    study.report_file = unique_name
+                    upload_file.save(save_path)
+                    studies_created[0].report_file = unique_name
                 else:
                     flash("Solo se permiten archivos PDF para el reporte.", "danger")
 
+        # Solicitar control (solo func e imágenes)
+        cr = None
+        if study_group == "func" and func_control_enabled and func_control_date:
+            cr = ControlReminder(
+                patient=patient,
+                consultation=consultation,
+                control_date=func_control_date,
+                extra_emails=func_control_extra_emails,
+                created_by=current_user,
+            )
+            db.session.add(cr)
+        if study_group == "img" and img_control_enabled and img_control_date:
+            cr = ControlReminder(
+                patient=patient,
+                consultation=consultation,
+                control_date=img_control_date,
+                extra_emails=img_control_extra_emails,
+                created_by=current_user,
+            )
+            db.session.add(cr)
+
+        # Solicitud de revisión (asociamos el primer estudio del grupo si existe)
         review_recips = _parse_recipient_ids(request.form.getlist("review_recipients"))
         review_message = request.form.get("review_message")
-        cr = None
+        study_for_review = studies_created[0] if studies_created else None
         if review_recips:
             create_review_request(
                 patient,
@@ -3171,17 +3237,9 @@ def consultation_new(patient_id):
                 review_recips,
                 review_message,
                 consultation=consultation,
-                study=study_obj,
+                study=study_for_review,
             )
-        if control_enabled and control_date:
-            cr = ControlReminder(
-                patient=patient,
-                consultation=consultation,
-                control_date=control_date,
-                extra_emails=control_extra_emails,
-                created_by=current_user,
-            )
-            db.session.add(cr)
+
         db.session.commit()
         if cr:
             notify_control_reminder(cr, patient)

@@ -1,353 +1,296 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Nueva consulta</h1>
+<div class="container mt-4">
+  <h2>Nueva consulta</h2>
+  <p><strong>Paciente:</strong> {{ patient.full_name }}</p>
 
-<p>
-  <strong>Paciente:</strong> {{ patient.full_name }}
-  {% if patient.dni %}(DNI: {{ patient.dni }}){% endif %}
-</p>
-
-<form method="post" enctype="multipart/form-data">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <div class="form-section">
-    <h2>Datos de la consulta</h2>
-    <label for="date">Fecha</label>
-    <input type="date" id="date" name="date" required>
-
-  <label for="notes">Clinica / notas</label>
-  <div class="voice-field">
-    <textarea id="notes" name="notes" rows="4"></textarea>
-    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes">Dictado</button>
- </div>
-  </div>
-
-  <div class="form-section">
-    <h2>Estudio asociado</h2>
-    <p class="form-help">Elige el grupo y completa solo ese bloque.</p>
-
-    <div class="study-groups">
-      <label><input type="radio" name="study_group" value="func" checked> PRUEBAS FUNCIONALES RESPIRATORIAS</label>
-      <label><input type="radio" name="study_group" value="img"> DIAGNÓSTICO POR IMÁGENES</label>
-      <label><input type="radio" name="study_group" value="inv"> PROCEDIMIENTOS INVASIVOS</label>
-    </div>
-
-    <!-- PRUEBAS FUNCIONALES -->
-    <div class="study-block" id="block_func">
-      <label for="study_type_func">Tipo de estudio</label>
-      <select id="study_type_func" name="study_type">
-        <option value="">-- Seleccionar --</option>
-        <option>Espirometría</option>
-        <option>Test de la Marcha 6m</option>
-        <option>DLCO</option>
-        <option>Volúmenes Pulmonares</option>
-      </select>
-
-      <div class="grid-2">
-        <div>
-          <label for="study_date_func">Fecha del estudio</label>
-          <input type="date" id="study_date_func" name="study_date">
+  <form method="post" enctype="multipart/form-data">
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Fecha de la consulta</label>
+            <input type="date" name="date" class="form-control" required>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Notas</label>
+            <textarea name="notes" rows="2" class="form-control"></textarea>
+          </div>
         </div>
-      </div>
 
-      <p style="margin-top:8px;">
-        <a class="btn-link btn-secondary" href="https://ae.connect.boehringer-ingelheim.com/c/eJx0klFv2yAQxz8NfkuFzwY7D35w63iL1JdWytY-RRjOCSoGBnaX7dNPOFPWPdSyTsD97v7cX7xsHsWApiHVPQHwwalFzntFAEjREgBBqaLrpxDdoW2fUgoeCEBAqb1GO_-DDV50_C2sCto6UtLTJLS5k266FQnvg3tHtUuZjzoQD_tV5_HL62V6bb_eSvAyY7DiRtvFmGtmiRg-9KCU0e9rD_7Wupen9nDr4cLpP7D7OxQdn9m33RWsukw1uFVQbTNs8qpkDGhVsuzc1KymwFLMVbllaqhz5HwUkvOBjQXPdAMUGC2hzGsGwO7Gmo1DwYcEKFpVpKTSWYtyvhscnoO2JwybFM0Z9ZQ8ykxznmcf1zv2BHof3KcwgT4KAr0IBHopjFyMUC6IjcKND-4UMGpnr7sFBxHTclysTKd-MZOzImxEIEUvtSJF1-6S7vqvo0AOBPj9ft-RoqM0vxqWyx-Hnw9tMow7v6S6ZwJ80EeF6I22b8eIMUkfh19exEiKLs9C8_nLyN4b-BMAAP__3uHA8g" target="_blank" rel="noopener">Calculadora de progresión de pruebas de función pulmonar</a>
-      </p>
-
-      <label for="study_description_func">Descripción / hallazgos</label>
-      <div class="voice-field">
-        <textarea id="study_description_func" name="study_description" rows="3"></textarea>
-        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_func">Dictado</button>
-      </div>
-
-      
-
-      <label>Subir informe (PDF)</label>
-      <input type="file" name="study_file" accept="application/pdf">
-
-      <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
-        <label>
-          <input type="checkbox" name="control_enabled" id="control_enabled_func">
-          Solicitar control (recordatorio)
-        </label>
-        <div id="control_block_func" style="display:none; margin-top:8px;">
-          <label for="control_date_func">Fecha de control</label>
-          <input type="date" id="control_date_func" name="control_date">
-
-          <label for="control_extra_emails_func">Emails adicionales (separar con coma)</label>
-          <input type="text" id="control_extra_emails_func" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
-
-          <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+        <hr>
+        <h5>Laboratorio</h5>
+        <div class="mb-2">
+          <label class="form-label">Laboratorio general</label>
+          <textarea name="lab_general" rows="2" class="form-control"></textarea>
         </div>
-      </div>
-    </div>
-
-    <!-- DIAGNÓSTICO POR IMÁGENES -->
-    <div class="study-block" id="block_img" style="display:none;">
-      <label for="study_type_img">Tipo de estudio</label>
-      <select id="study_type_img" name="study_type">
-        <option value="">-- Seleccionar --</option>
-        <option>TC Tórax</option>
-        <option>RM Tórax</option>
-        <option>PET-CT</option>
-        <option>RX</option>
-        <option>Ecografía</option>
-        <option>Ecocardiograma</option>
-        <option>Ecodoppler Angiopower</option>
-      </select>
-
-      <div class="grid-2">
-        <div>
-          <label for="study_date_img">Fecha del estudio</label>
-          <input type="date" id="study_date_img" name="study_date">
-        </div>
-        <div>
-          <label for="study_center_select">Centro</label>
-          <select id="study_center_select">
-            <option value="">-- Seleccionar --</option>
-            {% for center in center_options %}
-              <option value="{{ center }}">{{ center }}</option>
+        <div class="mb-2">
+          <label class="form-label">Autoinmunidad (seleccionar)</label>
+          <div class="row">
+            {% for value,label in immuno_options %}
+            <div class="col-md-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="lab_immunology" value="{{ value }}" id="lab_{{ value }}">
+                <label class="form-check-label" for="lab_{{ value }}">{{ label }}</label>
+              </div>
+              <input type="text" class="form-control form-control-sm mt-1" name="lab_immunology_value_{{ value }}" placeholder="Valor (opcional)">
+            </div>
             {% endfor %}
-            <option value="__otro__">Otro</option>
-          </select>
-          <input type="text" id="study_center" name="study_center" placeholder="Ej: Hospital Pasteur">
-          <p id="consult-center-link"></p>
+          </div>
         </div>
-      </div>
-
-      <label for="study_description_img">Descripción / hallazgos</label>
-      <div class="voice-field">
-        <textarea id="study_description_img" name="study_description" rows="3"></textarea>
-        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_img">Dictado</button>
-      </div>
-
-      <label>Numero de acceso</label>
-      <input type="text" name="study_access_code">
-
-      <label>Subir informe (PDF)</label>
-      <input type="file" name="study_file" accept="application/pdf">
-
-      <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
-        <label>
-          <input type="checkbox" name="control_enabled" id="control_enabled_img">
-          Solicitar control (recordatorio)
-        </label>
-        <div id="control_block_img" style="display:none; margin-top:8px;">
-          <label for="control_date_img">Fecha de control</label>
-          <input type="date" id="control_date_img" name="control_date">
-
-          <label for="control_extra_emails_img">Emails adicionales (separar con coma)</label>
-          <input type="text" id="control_extra_emails_img" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
-
-          <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+        <div class="mb-2">
+          <label class="form-label">Notas autoinmunidad</label>
+          <textarea name="lab_immunology_notes" rows="2" class="form-control"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- PROCEDIMIENTOS INVASIVOS -->
-    <div class="study-block" id="block_inv" style="display:none;">
-      <label for="study_type_inv">Tipo de estudio</label>
-      <select id="study_type_inv" name="study_type">
+    <div class="card">
+      <div class="card-body">
+        <h4>Estudio asociado</h4>
+        <p>Elige el grupo y completa solo ese bloque. Puedes agregar más de un estudio dentro del mismo grupo.</p>
+
+        <div class="mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="study_group" id="grp_func" value="func" checked>
+            <label class="form-check-label" for="grp_func">PRUEBAS FUNCIONALES RESPIRATORIAS</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="study_group" id="grp_img" value="img">
+            <label class="form-check-label" for="grp_img">DIAGNÓSTICO POR IMÁGENES</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="study_group" id="grp_inv" value="inv">
+            <label class="form-check-label" for="grp_inv">PROCEDIMIENTOS INVASIVOS</label>
+          </div>
+        </div>
+
+        <!-- Funcionales -->
+        <div id="section-func">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">Pruebas funcionales</h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRow('func')">Agregar estudio</button>
+          </div>
+          <div id="func-rows" class="mb-3"></div>
+
+          <button type="button" class="btn btn-secondary mb-3" onclick="openCalculator()">Calculadora de progresión de pruebas de función pulmonar</button>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción / hallazgos (compartida)</label>
+            <textarea name="func_description" rows="3" class="form-control"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Subir informe (PDF) (compartido)</label>
+            <input type="file" name="func_file" accept="application/pdf" class="form-control">
+          </div>
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="func_control_enabled" id="func_control_enabled" onclick="toggleControl('func')">
+              <label class="form-check-label" for="func_control_enabled">Solicitar control (recordatorio)</label>
+            </div>
+            <div id="func-control-fields" class="row g-2" style="display:none">
+              <div class="col-md-4">
+                <label class="form-label">Fecha de control</label>
+                <input type="date" name="func_control_date" class="form-control">
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Emails adicionales (separados por coma)</label>
+                <input type="text" name="func_control_extra_emails" class="form-control">
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+
+        <!-- Imágenes -->
+        <div id="section-img" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">Diagnóstico por imágenes</h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRow('img')">Agregar estudio</button>
+          </div>
+          <div id="img-rows" class="mb-3"></div>
+
+          <div class="mb-3">
+            <label class="form-label">Subir informe (PDF) (compartido)</label>
+            <input type="file" name="img_file" accept="application/pdf" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción / hallazgos (compartida)</label>
+            <textarea name="img_description" rows="3" class="form-control"></textarea>
+          </div>
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="img_control_enabled" id="img_control_enabled" onclick="toggleControl('img')">
+              <label class="form-check-label" for="img_control_enabled">Solicitar control (recordatorio)</label>
+            </div>
+            <div id="img-control-fields" class="row g-2" style="display:none">
+              <div class="col-md-4">
+                <label class="form-label">Fecha de control</label>
+                <input type="date" name="img_control_date" class="form-control">
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Emails adicionales (separados por coma)</label>
+                <input type="text" name="img_control_extra_emails" class="form-control">
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+
+        <!-- Invasivos -->
+        <div id="section-inv" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">Procedimientos invasivos</h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRow('inv')">Agregar estudio</button>
+          </div>
+          <div id="inv-rows" class="mb-3"></div>
+
+          <div class="mb-3">
+            <label class="form-label">Subir informe (PDF) (compartido)</label>
+            <input type="file" name="inv_file" accept="application/pdf" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción / hallazgos (compartida)</label>
+            <textarea name="inv_description" rows="3" class="form-control"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar consulta</button>
+        <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Templates para filas -->
+<template id="tpl-func">
+  <div class="row g-3 align-items-end mb-2 func-row">
+    <div class="col-md-6">
+      <label class="form-label">Tipo de estudio</label>
+      <select name="func_type[]" class="form-select">
         <option value="">-- Seleccionar --</option>
-        <option>Firbrobroncoscopía</option>
-        <option>Biopsia</option>
-        <option>BAL</option>
+        {% for opt in study_type_options %}
+        <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
       </select>
-
-      <div class="grid-2">
-        <div>
-          <label for="study_date_inv">Fecha del estudio</label>
-          <input type="date" id="study_date_inv" name="study_date">
-        </div>
-      </div>
-
-      <label for="study_description_inv">Descripción / hallazgos</label>
-      <div class="voice-field">
-        <textarea id="study_description_inv" name="study_description" rows="3"></textarea>
-        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_inv">Dictado</button>
-      </div>
-
-      
-
-      <label>Subir informe (PDF)</label>
-      <input type="file" name="study_file" accept="application/pdf">
-
-      
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Fecha</label>
+      <input type="date" name="func_date[]" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger w-100" onclick="removeRow(this)">Eliminar</button>
     </div>
   </div>
+</template>
 
-  <div class="form-section">
-    <h2>Laboratorio general</h2>
-    <div class="voice-field">
-      <textarea id="lab_general" name="lab_general" rows="4"></textarea>
-      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="lab_general">Dictado</button>
+<template id="tpl-img">
+  <div class="row g-3 align-items-end mb-2 img-row">
+    <div class="col-md-4">
+      <label class="form-label">Tipo de estudio</label>
+      <select name="img_type[]" class="form-select">
+        <option value="">-- Seleccionar --</option>
+        {% for opt in study_type_options %}
+        <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Fecha</label>
+      <input type="date" name="img_date[]" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Centro</label>
+      <select name="img_center[]" class="form-select">
+        <option value="">-- Seleccionar --</option>
+        {% for c in center_options %}
+        <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger w-100" onclick="removeRow(this)">Eliminar</button>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mt-2">Número de acceso</label>
+      <input type="text" name="img_access[]" class="form-control" placeholder="Ej: 123456">
+    </div>
+    <div class="col-md-8">
+      <label class="form-label mt-2">Link de acceso directo</label>
+      <input type="url" name="img_link[]" class="form-control" placeholder="Ej: https://portal.com/estudio/123">
     </div>
   </div>
+</template>
 
-  <div class="form-section">
-    <h2>Autoinmunidad</h2>
-    <p class="form-help">Marca los paraclinicos solicitados o relevantes.</p>
-    {% set core_options = immuno_core_options if immuno_core_options is defined else immuno_options %}
-    <div class="lab-grid">
-      {% for value, label in core_options %}
-        <label class="lab-row">
-          <span class="lab-label">
-            <input type="checkbox" name="lab_immunology" value="{{ value }}">
-            <span>{{ label }}</span>
-          </span>
-          <input type="text" class="lab-input" name="lab_immunology_value_{{ value }}" placeholder="Valor">
-        </label>
-      {% endfor %}
+<template id="tpl-inv">
+  <div class="row g-3 align-items-end mb-2 inv-row">
+    <div class="col-md-6">
+      <label class="form-label">Tipo de estudio</label>
+      <select name="inv_type[]" class="form-select">
+        <option value="">-- Seleccionar --</option>
+        {% for opt in study_type_options %}
+        <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+      </select>
     </div>
-    {% if immuno_rheum_options is defined and immuno_rheum_options %}
-      <details class="lab-details">
-        <summary>Desplegar panel ampliado para reumatología</summary>
-        <div class="lab-grid lab-grid--details">
-          {% for value, label in immuno_rheum_options %}
-            <label class="lab-row">
-              <span class="lab-label">
-                <input type="checkbox" name="lab_immunology" value="{{ value }}">
-                <span>{{ label }}</span>
-              </span>
-              <input type="text" class="lab-input" name="lab_immunology_value_{{ value }}" placeholder="Valor">
-            </label>
-          {% endfor %}
-        </div>
-      </details>
-    {% endif %}
-    <label for="lab_immunology_notes">Aclaraciones (dictado libre)</label>
-    <div class="voice-field">
-      <textarea id="lab_immunology_notes" name="lab_immunology_notes" rows="3"></textarea>
-      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="lab_immunology_notes">Dictado</button>
+    <div class="col-md-4">
+      <label class="form-label">Fecha</label>
+      <input type="date" name="inv_date[]" class="form-control">
     </div>
-    <style>
-      .lab-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 10px 20px;
-      }
-      .lab-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 4px 0;
-      }
-      .lab-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 500;
-      }
-      .lab-input {
-        flex: 0 0 160px;
-      }
-      .lab-details {
-        margin-top: 12px;
-      }
-      .lab-details summary {
-        cursor: pointer;
-        font-weight: 600;
-      }
-    </style>
-  </div>
-
-  {% if review_users %}
-  <div class="form-section">
-    <h2>Solicitar revision</h2>
-  <p class="form-help">Selecciona colegas para notificarles que revisen este caso y deja un mensaje breve.</p>
-  <label>Profesionales para revisar</label>
-  <select name="review_recipients" multiple size="5">
-      {% for user in review_users %}
-        <option value="{{ user.id }}">{{ user.full_name }} ({{ user.specialty or 'sin especialidad' }})</option>
-      {% endfor %}
-    </select>
-    <label>Mensaje para la revision</label>
-    <div class="voice-field">
-      <textarea id="review_message" name="review_message" rows="3"></textarea>
-      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="review_message">Dictado</button>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger w-100" onclick="removeRow(this)">Eliminar</button>
     </div>
   </div>
-  {% endif %}
+</template>
 
-<button type="submit">Guardar consulta</button>
-<a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
-</form>
+{% block scripts %}
+{{ super() }}
 <script>
-  (function() {
-    // Mostrar solo el bloque del grupo seleccionado
-    const radios = document.querySelectorAll('input[name=\"study_group\"]');
-    const blocks = {
-      func: document.getElementById('block_func'),
-      img: document.getElementById('block_img'),
-      inv: document.getElementById('block_inv')
-    };
-    function showBlock(value) {
-      Object.keys(blocks).forEach(k => {
-        if (blocks[k]) blocks[k].style.display = (k === value) ? 'block' : 'none';
-      });
-    }
-    radios.forEach(r => {
-      r.addEventListener('change', () => showBlock(r.value));
+  function switchGroup(val) {
+    document.getElementById('section-func').style.display = (val === 'func') ? 'block' : 'none';
+    document.getElementById('section-img').style.display  = (val === 'img')  ? 'block' : 'none';
+    document.getElementById('section-inv').style.display  = (val === 'inv')  ? 'block' : 'none';
+  }
+
+  function addRow(group) {
+    const tpl = document.getElementById(`tpl-${group}`);
+    if (!tpl) return;
+    const clone = tpl.content.cloneNode(true);
+    document.getElementById(`${group}-rows`).appendChild(clone);
+  }
+
+  function removeRow(btn) {
+    const row = btn.closest('.row');
+    if (row) row.remove();
+  }
+
+  function toggleControl(group) {
+    const cb = document.getElementById(`${group}_control_enabled`);
+    const box = document.getElementById(`${group}-control-fields`);
+    if (box) box.style.display = cb && cb.checked ? 'flex' : 'none';
+  }
+
+  function openCalculator() {
+    window.open("https://ae.connect.boehringer-ingelheim.com/c/eJx0klFv2yAQxz8NfkuFzwY7D35w63iL1JdWytY-RRjOCSoGBnaX7dNPOFPWPdSyTsD97v7cX7xsHsWApiHVPQHwwalFzntFAEjREgBBqaLrpxDdoW2fUgoeCEBAqb1GO_-DDV50_C2sCto6UtLTJLS5k266FQnvg3tHtUuZjzoQD_tV5_HL62V6bb_eSvAyY7DiRtvFmGtmiRg-9KCU0e9rD_7Wupen9nDr4cLpP7D7OxQdn9m33RWsukw1uFVQbTNs8qpkDGhVsuzc1KymwFLMVbllaqhz5HwUkvOBjQXPdAMUGC2hzGsGwO7Gmo1DwYcEKFpVpKTSWYtyvhscnoO2JwybFM0Z9ZQ8ykxznmcf1zv2BHof3KcwgT4KAr0IBHopjFyMUC6IjcKND-4UMGpnr7sFBxHTclysTKd-MZOzImxEIEUvtSJF1-6S7vqvo0AOBPj9ft-RoqM0vxqWyx-Hnw9tMow7v6S6ZwJ80EeF6I22b8eIMUkfh19exEiKLs9C8_nLyN4b-BMAAP__3uHA8g", "_blank");
+  }
+
+  // Inicial
+  document.addEventListener("DOMContentLoaded", function() {
+    // radios
+    document.querySelectorAll("input[name='study_group']").forEach(r => {
+      r.addEventListener("change", e => switchGroup(e.target.value));
     });
-    showBlock('func');
+    switchGroup(document.querySelector("input[name='study_group']:checked").value);
 
-    // Centro y link (solo bloque imágenes)
-    const links = {{ center_links|tojson }};
-    const select = document.getElementById('study_center_select');
-    const input = document.getElementById('study_center');
-    const display = document.getElementById('consult-center-link');
-    function updateLink() {
-      if (!input || !display) return;
-      const value = (input.value || '').trim().toLowerCase();
-      const url = links[value] || '';
-      display.innerHTML = url ? 'Portal: <a href=\"' + url + '\" target=\"_blank\">' + url + '</a>' : '';
-    }
-    function syncCenter() {
-      if (!select || !input) return;
-      if (select.value && select.value !== '__otro__') {
-        input.value = select.value;
-        input.readOnly = true;
-      } else if (select.value === '__otro__') {
-        input.readOnly = false;
-        input.value = '';
-        input.focus();
-      } else {
-        input.readOnly = false;
-        input.value = '';
-      }
-      updateLink();
-    }
-    if (select) {
-      select.addEventListener('change', syncCenter);
-      syncCenter();
-    }
-    if (input) {
-      input.addEventListener('input', updateLink);
-    }
+    // filas iniciales (una por grupo)
+    addRow('func');
+    addRow('img');
+    addRow('inv');
 
-    // Control (hay uno por bloque)
-    function toggleControl(checkId, blockId) {
-      const chk = document.getElementById(checkId);
-      const blk = document.getElementById(blockId);
-      if (chk && blk) {
-        blk.style.display = chk.checked ? 'block' : 'none';
-        chk.addEventListener('change', () => {
-          blk.style.display = chk.checked ? 'block' : 'none';
-        });
-      }
-    }
-    toggleControl('control_enabled_func','control_block_func');
-    toggleControl('control_enabled_img','control_block_img');
-    toggleControl('control_enabled_inv','control_block_inv');
-  })();
+    toggleControl('func');
+    toggleControl('img');
+  });
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-
+{% endblock %}

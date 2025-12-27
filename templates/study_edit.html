@@ -1,106 +1,104 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Editar estudio</h1>
+<div class="container mt-4">
+  <h2>Editar estudio</h2>
+  <p><strong>Paciente:</strong> {{ study.patient.full_name }} (DNI: {{ study.patient.dni or '---' }})</p>
 
-<p>
-  <strong>Paciente:</strong> {{ patient.full_name }}
-  {% if patient.dni %}(DNI: {{ patient.dni }}){% endif %}
-</p>
+  <form method="post" enctype="multipart/form-data" class="mt-3">
+    <div class="card">
+      <div class="card-body">
+        <!-- Tipo -->
+        <div class="mb-3">
+          <label for="study_type" class="form-label">Tipo de estudio</label>
+          <select name="study_type" id="study_type" class="form-select" required>
+            <option value="">-- Seleccionar --</option>
+            {% for opt in study_type_options %}
+            <option value="{{ opt }}" {% if study.study_type==opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-<form method="post" enctype="multipart/form-data">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- Fecha y centro -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="date" class="form-label">Fecha del estudio</label>
+            <input type="date" class="form-control" name="date" id="date" value="{{ study.date or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label for="center" class="form-label">Centro</label>
+            <select name="center" id="center" class="form-select">
+              <option value="">-- Seleccionar --</option>
+              {% for c in center_options %}
+              <option value="{{ c }}" {% if study.center==c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+            <input
+              type="text"
+              class="form-control mt-2"
+              name="center_text"
+              placeholder="Ej: Hospital Pasteur"
+              value="{{ study.center or '' }}"
+            >
+          </div>
+        </div>
 
-  <div class="form-section">
-    <h2>Datos del estudio</h2>
+        <!-- Acceso y link (solo imágenes) -->
+        <div class="mb-3">
+          <label for="access_code" class="form-label">Número de acceso (solo imágenes)</label>
+          <input
+            type="text"
+            class="form-control"
+            name="access_code"
+            id="access_code"
+            value="{{ study.access_code or '' }}"
+          >
+        </div>
 
-    <label for="study_type">Tipo de estudio</label>
-    <select id="study_type" name="study_type">
-      <option value="">-- Seleccionar --</option>
-      {% for option in study_type_options %}
-        <option value="{{ option }}" {% if study.study_type == option %}selected{% endif %}>{{ option }}</option>
-      {% endfor %}
-    </select>
+        <div class="mb-3">
+          <label for="portal_link" class="form-label">Link de acceso directo (solo imágenes)</label>
+          <input
+            type="url"
+            class="form-control"
+            name="portal_link"
+            id="portal_link"
+            value="{{ study.portal_link or '' }}"
+            placeholder="Ej: https://portal.com/estudio/123"
+          >
+        </div>
 
-    <div class="grid-2">
-      <div>
-        <label for="date">Fecha del estudio</label>
-        <input type="date" id="date" name="date" value="{{ study.date or '' }}">
-      </div>
-      <div>
-        <label for="center_select">Centro</label>
-        <select id="center_select">
-          <option value="">-- Seleccionar --</option>
-          {% for c in center_options %}
-            <option value="{{ c }}" {% if study.center == c %}selected{% endif %}>{{ c }}</option>
-          {% endfor %}
-          <option value="__otro__" {% if study.center and study.center not in center_options %}selected{% endif %}>Otro</option>
-        </select>
-        <input type="text" id="center" name="center" value="{{ study.center or '' }}" placeholder="Ej: Hospital Pasteur">
-        <p id="center-link"></p>
+        <!-- PDF -->
+        <div class="mb-3">
+          <label class="form-label">Subir informe (PDF)</label>
+          <input type="file" class="form-control" name="study_file" accept="application/pdf">
+          {% if study.report_file %}
+          <p class="mt-2">
+            Archivo actual:
+            <a href="{{ url_for('study_download', study_id=study.id) }}" target="_blank">
+              {{ study.report_file }}
+            </a>
+          </p>
+          {% endif %}
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción / hallazgos</label>
+          <textarea name="description" id="description" rows="4" class="form-control">{{ study.description or '' }}</textarea>
+        </div>
+
+        <!-- Control -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" value="1" id="request_review" name="request_review">
+          <label class="form-check-label" for="request_review">
+            Solicitar control (recordatorio)
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{{ url_for('patient_detail', patient_id=study.patient_id) }}" class="btn btn-secondary">Cancelar</a>
       </div>
     </div>
-
-    <label for="description">Descripción / hallazgos</label>
-    <div class="voice-field">
-      <textarea id="description" name="description" rows="4">{{ study.description or '' }}</textarea>
-      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="description">Dictado</button>
-    </div>
-
-    <label for="access_code">Número de acceso</label>
-    <input type="text" id="access_code" name="access_code" value="{{ study.access_code or '' }}">
-
-    <label>Subir informe (PDF)</label>
-    <input type="file" name="study_file" accept="application/pdf">
-    {% if study.report_file %}
-      <p>
-        Archivo actual:
-        <a href="{{ url_for('study_download', study_id=study.id) }}">Descargar</a>
-      </p>
-    {% endif %}
-  </div>
-
-  <button type="submit">Guardar cambios</button>
-  <a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
-</form>
-
-<script>
-  (function() {
-    const links = {{ center_links|tojson }};
-    const select = document.getElementById('center_select');
-    const input = document.getElementById('center');
-    const display = document.getElementById('center-link');
-
-    function updateLink() {
-      if (!input || !display) return;
-      const value = (input.value || '').trim().toLowerCase();
-      const url = links[value] || '';
-      display.innerHTML = url ? 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>' : '';
-    }
-
-    function syncCenter() {
-      if (!select || !input) return;
-      if (select.value && select.value !== '__otro__') {
-        input.value = select.value;
-        input.readOnly = true;
-      } else if (select.value === '__otro__') {
-        input.readOnly = false;
-        if (!input.value) input.value = '';
-        input.focus();
-      } else {
-        input.readOnly = false;
-      }
-      updateLink();
-    }
-
-    if (select) {
-      select.addEventListener('change', syncCenter);
-      syncCenter();
-    }
-    if (input) {
-      input.addEventListener('input', updateLink);
-      updateLink();
-    }
-  })();
-</script>
+  </form>
+</div>
 {% endblock %}
-
