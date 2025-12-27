@@ -13,11 +13,11 @@
   <p class="form-help">Completa la informacion basica del paciente para identificarlo.</p>
   <div class="grid-2">
     <div>
-      <label>Nombre y apellido</label>
+      <label>Nombre y apellido <span style="color:red">*</span></label>
       <input type="text" name="full_name" value="{{ p.full_name if p else '' }}" required>
     </div>
     <div>
-      <label>DNI</label>
+      <label>DNI <span style="color:red">*</span></label>
       <input type="text" name="dni" value="{{ p.dni if p and p.dni else '' }}" {% if p and p.dni %}readonly{% endif %} required>
     </div>
     <div>
@@ -39,7 +39,7 @@
       </select>
     </div>
     <div>
-      <label>Email</label>
+      <label>Email <span style="color:red">*</span></label>
       <input type="email" name="email" value="{{ p.email if p and p.email else '' }}">
     </div>
     <div>
@@ -79,15 +79,16 @@
     <div>
       <label>
         <input type="checkbox" name="consent_given" {% if p and p.consent_given %}checked{% endif %}>
-        Consentimiento informado firmado
+        Consentimiento informado firmado <span style="color:red">*</span>
       </label>
       <p class="form-help">Confirmas que el paciente autorizo expresamente al profesional a registrar sus datos en esta plataforma.</p>
     </div>
     <div>
-      <label>Fecha de consentimiento</label>
+      <label>Fecha de consentimiento <span style="color:red">*</span></label>
       <input type="date" name="consent_date" value="{{ p.consent_date if p and p.consent_date else '' }}">
     </div>
   </div>
+  <p class="form-help" style="color:red; font-weight:bold;">Los campos marcados con * son obligatorios.</p>
   <label>Aclaraciones (dictado libre)</label>
   <div class="voice-field">
     <textarea id="notes_personal" name="notes_personal">{{ p.notes_personal if p and p.notes_personal else '' }}</textarea>
@@ -99,6 +100,7 @@
   <h2>Tabaquismo</h2>
   <p class="form-help">Estos datos se usan para calcular el indice paquete anio.</p>
   <div class="grid-2">
+    <label><input type="checkbox" name="smoking_never" {% if p and (not p.smoking_current) and (not p.smoking_previous) %}checked{% endif %}> Nunca tabaquista</label>
     <label><input type="checkbox" name="smoking_current" {% if p and p.smoking_current %}checked{% endif %}> Fumador actual</label>
     <label><input type="checkbox" name="smoking_previous" {% if p and p.smoking_previous %}checked{% endif %}> Fumador previo</label>
     <div>

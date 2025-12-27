@@ -23,61 +23,157 @@
   </div>
 
   <div class="form-section">
-    <h2>Estudio asociado (opcional)</h2>
-    <label for="study_type">Tipo de estudio</label>
-    <select id="study_type" name="study_type">
-      <option value="">-- Seleccionar --</option>
-      {% for option in study_type_options %}
-        <option value="{{ option }}">{{ option }}</option>
-      {% endfor %}
-    </select>
+    <h2>Estudio asociado</h2>
+    <p class="form-help">Elige el grupo y completa solo ese bloque.</p>
 
-    <div class="grid-2">
-      <div>
-        <label for="study_date">Fecha del estudio</label>
-        <input type="date" id="study_date" name="study_date">
+    <div class="study-groups">
+      <label><input type="radio" name="study_group" value="func" checked> PRUEBAS FUNCIONALES RESPIRATORIAS</label>
+      <label><input type="radio" name="study_group" value="img"> DIAGNÓSTICO POR IMÁGENES</label>
+      <label><input type="radio" name="study_group" value="inv"> PROCEDIMIENTOS INVASIVOS</label>
+    </div>
+
+    <!-- PRUEBAS FUNCIONALES -->
+    <div class="study-block" id="block_func">
+      <label for="study_type_func">Tipo de estudio</label>
+      <select id="study_type_func" name="study_type">
+        <option value="">-- Seleccionar --</option>
+        <option>Espirometría</option>
+        <option>Test de la Marcha 6m</option>
+        <option>DLCO</option>
+        <option>Volúmenes Pulmonares</option>
+      </select>
+
+      <div class="grid-2">
+        <div>
+          <label for="study_date_func">Fecha del estudio</label>
+          <input type="date" id="study_date_func" name="study_date">
+        </div>
       </div>
-      <div>
-        <label for="study_center_select">Centro</label>
-        <select id="study_center_select">
-          <option value="">-- Seleccionar --</option>
-          {% for center in center_options %}
-            <option value="{{ center }}">{{ center }}</option>
-          {% endfor %}
-          <option value="__otro__">Otro</option>
-        </select>
-        <input type="text" id="study_center" name="study_center" placeholder="Ej: Hospital Pasteur">
-        <p id="consult-center-link"></p>
+
+      <p style="margin-top:8px;">
+        <a class="btn-link btn-secondary" href="https://ae.connect.boehringer-ingelheim.com/c/eJx0klFv2yAQxz8NfkuFzwY7D35w63iL1JdWytY-RRjOCSoGBnaX7dNPOFPWPdSyTsD97v7cX7xsHsWApiHVPQHwwalFzntFAEjREgBBqaLrpxDdoW2fUgoeCEBAqb1GO_-DDV50_C2sCto6UtLTJLS5k266FQnvg3tHtUuZjzoQD_tV5_HL62V6bb_eSvAyY7DiRtvFmGtmiRg-9KCU0e9rD_7Wupen9nDr4cLpP7D7OxQdn9m33RWsukw1uFVQbTNs8qpkDGhVsuzc1KymwFLMVbllaqhz5HwUkvOBjQXPdAMUGC2hzGsGwO7Gmo1DwYcEKFpVpKTSWYtyvhscnoO2JwybFM0Z9ZQ8ykxznmcf1zv2BHof3KcwgT4KAr0IBHopjFyMUC6IjcKND-4UMGpnr7sFBxHTclysTKd-MZOzImxEIEUvtSJF1-6S7vqvo0AOBPj9ft-RoqM0vxqWyx-Hnw9tMow7v6S6ZwJ80EeF6I22b8eIMUkfh19exEiKLs9C8_nLyN4b-BMAAP__3uHA8g" target="_blank" rel="noopener">Calculadora de progresión de pruebas de función pulmonar</a>
+      </p>
+
+      <label for="study_description_func">Descripción / hallazgos</label>
+      <div class="voice-field">
+        <textarea id="study_description_func" name="study_description" rows="3"></textarea>
+        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_func">Dictado</button>
+      </div>
+
+      
+
+      <label>Subir informe (PDF)</label>
+      <input type="file" name="study_file" accept="application/pdf">
+
+      <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
+        <label>
+          <input type="checkbox" name="control_enabled" id="control_enabled_func">
+          Solicitar control (recordatorio)
+        </label>
+        <div id="control_block_func" style="display:none; margin-top:8px;">
+          <label for="control_date_func">Fecha de control</label>
+          <input type="date" id="control_date_func" name="control_date">
+
+          <label for="control_extra_emails_func">Emails adicionales (separar con coma)</label>
+          <input type="text" id="control_extra_emails_func" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
+
+          <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+        </div>
       </div>
     </div>
 
-  <label for="study_description">Descripcion / hallazgos</label>
-  <div class="voice-field">
-    <textarea id="study_description" name="study_description" rows="3"></textarea>
-    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description">Dictado</button>
-  </div>
+    <!-- DIAGNÓSTICO POR IMÁGENES -->
+    <div class="study-block" id="block_img" style="display:none;">
+      <label for="study_type_img">Tipo de estudio</label>
+      <select id="study_type_img" name="study_type">
+        <option value="">-- Seleccionar --</option>
+        <option>TC Tórax</option>
+        <option>RM Tórax</option>
+        <option>PET-CT</option>
+        <option>RX</option>
+        <option>Ecografía</option>
+        <option>Ecocardiograma</option>
+        <option>Ecodoppler Angiopower</option>
+      </select>
 
-  <label>Numero de acceso</label>
-  <input type="text" name="study_access_code">
+      <div class="grid-2">
+        <div>
+          <label for="study_date_img">Fecha del estudio</label>
+          <input type="date" id="study_date_img" name="study_date">
+        </div>
+        <div>
+          <label for="study_center_select">Centro</label>
+          <select id="study_center_select">
+            <option value="">-- Seleccionar --</option>
+            {% for center in center_options %}
+              <option value="{{ center }}">{{ center }}</option>
+            {% endfor %}
+            <option value="__otro__">Otro</option>
+          </select>
+          <input type="text" id="study_center" name="study_center" placeholder="Ej: Hospital Pasteur">
+          <p id="consult-center-link"></p>
+        </div>
+      </div>
 
-  <label>Subir informe (PDF)</label>
-  <input type="file" name="study_file" accept="application/pdf">
+      <label for="study_description_img">Descripción / hallazgos</label>
+      <div class="voice-field">
+        <textarea id="study_description_img" name="study_description" rows="3"></textarea>
+        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_img">Dictado</button>
+      </div>
 
-  <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
-    <label>
-      <input type="checkbox" name="control_enabled" id="control_enabled">
-      Solicitar control (recordatorio)
-    </label>
-    <div id="control_block" style="display:none; margin-top:8px;">
-      <label for="control_date">Fecha de control</label>
-      <input type="date" id="control_date" name="control_date">
+      <label>Numero de acceso</label>
+      <input type="text" name="study_access_code">
 
-      <label for="control_extra_emails">Emails adicionales (separar con coma)</label>
-      <input type="text" id="control_extra_emails" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
+      <label>Subir informe (PDF)</label>
+      <input type="file" name="study_file" accept="application/pdf">
 
-      <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+      <div class="form-section" style="margin-top:16px; border-top:1px solid #eee; padding-top:12px;">
+        <label>
+          <input type="checkbox" name="control_enabled" id="control_enabled_img">
+          Solicitar control (recordatorio)
+        </label>
+        <div id="control_block_img" style="display:none; margin-top:8px;">
+          <label for="control_date_img">Fecha de control</label>
+          <input type="date" id="control_date_img" name="control_date">
+
+          <label for="control_extra_emails_img">Emails adicionales (separar con coma)</label>
+          <input type="text" id="control_extra_emails_img" name="control_extra_emails" placeholder="secretaria@ejemplo.com, familiar@ejemplo.com">
+
+          <p class="form-help">Se enviará recordatorio al médico que carga, al paciente y a estos correos en la fecha indicada.</p>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- PROCEDIMIENTOS INVASIVOS -->
+    <div class="study-block" id="block_inv" style="display:none;">
+      <label for="study_type_inv">Tipo de estudio</label>
+      <select id="study_type_inv" name="study_type">
+        <option value="">-- Seleccionar --</option>
+        <option>Firbrobroncoscopía</option>
+        <option>Biopsia</option>
+        <option>BAL</option>
+      </select>
+
+      <div class="grid-2">
+        <div>
+          <label for="study_date_inv">Fecha del estudio</label>
+          <input type="date" id="study_date_inv" name="study_date">
+        </div>
+      </div>
+
+      <label for="study_description_inv">Descripción / hallazgos</label>
+      <div class="voice-field">
+        <textarea id="study_description_inv" name="study_description" rows="3"></textarea>
+        <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="study_description_inv">Dictado</button>
+      </div>
+
+      
+
+      <label>Subir informe (PDF)</label>
+      <input type="file" name="study_file" accept="application/pdf">
+
+      
+    </div>
   </div>
 
   <div class="form-section">
@@ -179,6 +275,24 @@
 </form>
 <script>
   (function() {
+    // Mostrar solo el bloque del grupo seleccionado
+    const radios = document.querySelectorAll('input[name=\"study_group\"]');
+    const blocks = {
+      func: document.getElementById('block_func'),
+      img: document.getElementById('block_img'),
+      inv: document.getElementById('block_inv')
+    };
+    function showBlock(value) {
+      Object.keys(blocks).forEach(k => {
+        if (blocks[k]) blocks[k].style.display = (k === value) ? 'block' : 'none';
+      });
+    }
+    radios.forEach(r => {
+      r.addEventListener('change', () => showBlock(r.value));
+    });
+    showBlock('func');
+
+    // Centro y link (solo bloque imágenes)
     const links = {{ center_links|tojson }};
     const select = document.getElementById('study_center_select');
     const input = document.getElementById('study_center');
@@ -187,7 +301,7 @@
       if (!input || !display) return;
       const value = (input.value || '').trim().toLowerCase();
       const url = links[value] || '';
-      display.innerHTML = url ? 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>' : '';
+      display.innerHTML = url ? 'Portal: <a href=\"' + url + '\" target=\"_blank\">' + url + '</a>' : '';
     }
     function syncCenter() {
       if (!select || !input) return;
@@ -212,16 +326,28 @@
       input.addEventListener('input', updateLink);
     }
 
-    const ctrlCheckbox = document.getElementById('control_enabled');
-    const ctrlBlock = document.getElementById('control_block');
-    function toggleControl() {
-      if (!ctrlCheckbox || !ctrlBlock) return;
-      ctrlBlock.style.display = ctrlCheckbox.checked ? 'block' : 'none';
+    // Control (hay uno por bloque)
+    function toggleControl(checkId, blockId) {
+      const chk = document.getElementById(checkId);
+      const blk = document.getElementById(blockId);
+      if (chk && blk) {
+        blk.style.display = chk.checked ? 'block' : 'none';
+        chk.addEventListener('change', () => {
+          blk.style.display = chk.checked ? 'block' : 'none';
+        });
+      }
     }
-    if (ctrlCheckbox) {
-      ctrlCheckbox.addEventListener('change', toggleControl);
-      toggleControl();
-    }
+    toggleControl('control_enabled_func','control_block_func');
+    toggleControl('control_enabled_img','control_block_img');
+    toggleControl('control_enabled_inv','control_block_inv');
   })();
 </script>
 {% endblock %}
+
+
+
+
+
+
+
+
