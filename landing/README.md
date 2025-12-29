@@ -21,4 +21,8 @@ server {
 }
 ```
 
+<<<<<<< HEAD
 El sitio publico puede ser accesible para pacientes o colegas, mientras que la app requiere login y permanece en otra URL (p. ej. `app.comite`). Ajusta los estilos y contenido segun lo necesites.
+=======
+El sitio publico puede ser accesible para pacientes o colegas, mientras que la app requiere login y permanece en otra URL (p. ej. `app.comite`). Ajusta los estilos y contenido segun lo necesites.
+>>>>>>> ca39a71e6698f6d4ec1a9a65577646ea83648565
