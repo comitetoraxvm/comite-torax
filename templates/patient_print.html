@@ -1,0 +1,159 @@
+{% extends "base_print.html" %}
+{% block content %}
+<h1>Historia clinica - {{ patient.full_name }}</h1>
+<p class="meta">
+  DNI: {{ patient.dni or '---' }} |
+  Edad: {{ patient.age or '---' }} |
+  Sexo: {{ patient.sex or '---' }} |
+  Centro: {{ patient.center or '---' }}
+</p>
+<p class="meta">
+  Ciudad: {{ patient.city or '---' }} |
+  Telefono: {{ patient.phone or '---' }} |
+  Obra social: {{ patient.health_insurance or '---' }} ({{ patient.health_insurance_number or 'sin nro' }}) |
+  Primera consulta: {{ patient.first_consultation_date or '---' }}
+</p>
+<p class="meta">
+  Creado por: {{ patient.created_by.full_name if patient.created_by else '---' }}
+  {% if patient.created_at %}el {{ patient.created_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
+  |
+  Ultima actualizacion:
+  {% if patient.updated_at %}
+    {{ patient.updated_at.strftime('%Y-%m-%d %H:%M') }}
+    {% if patient.updated_by %}por {{ patient.updated_by.full_name }}{% endif %}
+  {% else %}
+    ---
+  {% endif %}
+</p>
+<p class="meta">
+  Consentimiento informado:
+  {% if patient.consent_given %}
+    Otorgado el {{ patient.consent_date or '---' }}
+  {% else %}
+    NO registrado
+  {% endif %}
+</p>
+
+<div class="section">
+  <h2>Tabaquismo</h2>
+  <p>
+    Actual: {{ 'Si' if patient.smoking_current else 'No' }} |
+    Previo: {{ 'Si' if patient.smoking_previous else 'No' }} |
+    Edad inicio: {{ patient.smoking_start_age or '---' }} |
+    Edad cese: {{ patient.smoking_end_age or '---' }}<br>
+    Cigarrillos/dia: {{ patient.smoking_cigarettes_per_day or '---' }} |
+    Anos fumados: {{ patient.smoking_years or '---' }} |
+    IPA: {{ patient.smoking_pack_years or '---' }}
+  </p>
+</div>
+
+<div class="section">
+  <h2>Antecedentes y sintomas</h2>
+  <p><strong>Respiratorios:</strong> {{ (patient.respiratory_conditions|as_list)|join(', ') if patient.respiratory_conditions else '---' }}</p>
+  <p><strong>Autoinmunes:</strong> {{ (patient.autoimmune_conditions|as_list)|join(', ') if patient.autoimmune_conditions else '---' }}{% if patient.autoimmune_other %}, Otro: {{ patient.autoimmune_other }}{% endif %}</p>
+  <p><strong>Sintomas sistemicos:</strong> {{ (patient.systemic_symptoms|as_list)|join(', ') if patient.systemic_symptoms else '---' }}</p>
+  <p><strong>Antecedentes generales:</strong><br>{{ patient.antecedentes|nl2br if patient.antecedentes else '---' }}</p>
+  <p><strong>Diagnosticos establecidos / probables:</strong><br>{{ patient.diagnoses|nl2br if patient.diagnoses else '---' }}</p>
+</div>
+
+<div class="section">
+  <h2>Historia laboral y exposiciones</h2>
+  <p><strong>Exposiciones laborales:</strong> {{ (patient.occupational_exposure_types|as_list)|join(', ') if patient.occupational_exposure_types else '---' }}</p>
+  <p><strong>Trabajos:</strong> {{ (patient.occupational_jobs|as_list)|join(', ') if patient.occupational_jobs else '---' }}</p>
+  <p>Accidente por inhalacion: {{ 'Si' if patient.occupational_accident else 'No' }} {% if patient.occupational_accident_when %}({{ patient.occupational_accident_when }}){% endif %}</p>
+  <p>Abandono laboral por respiratorio: {{ 'Si' if patient.occupational_leave_due_to_breathing else 'No' }}</p>
+  <p>Anos / detalle: {{ patient.occupational_years or '---' }}</p>
+  <p><strong>Exposiciones domiciliarias:</strong> {{ (patient.domestic_exposures|as_list)|join(', ') if patient.domestic_exposures else '---' }}</p>
+  {% if patient.domestic_exposures_details %}
+    <p>Detalle: {{ patient.domestic_exposures_details }}</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Drogas y medicaciones</h2>
+  <p><strong>Drogas ilicitas:</strong> {{ (patient.drug_use|as_list)|join(', ') if patient.drug_use else '---' }}</p>
+  <p><strong>Farmacos neumotoxicos:</strong> {{ (patient.pneumotoxic_drugs|as_list)|join(', ') if patient.pneumotoxic_drugs else '---' }}</p>
+  <p><strong>Medicaciones actuales:</strong><br>{{ patient.current_medications|nl2br if patient.current_medications else '---' }}</p>
+  <p><strong>Medicaciones previas:</strong><br>{{ patient.previous_medications|nl2br if patient.previous_medications else '---' }}</p>
+</div>
+
+<div class="section">
+  <h2>Historia familiar</h2>
+  <p>Padre: {{ patient.family_history_father or '---' }}</p>
+  <p>Madre: {{ patient.family_history_mother or '---' }}</p>
+  <p>Hermanos: {{ patient.family_history_siblings or '---' }}</p>
+  <p>Hijos: {{ patient.family_history_children or '---' }}</p>
+  {% if patient.notes_family_history %}
+    <p><strong>Aclaraciones:</strong><br>{{ patient.notes_family_history|nl2br }}</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Sintomas respiratorios y examen fisico</h2>
+  <p>
+    Tos: {{ 'Si' if patient.symptom_cough else 'No' }} |
+    mMRC: {{ patient.symptom_mmrc if patient.symptom_mmrc is not none else '---' }} |
+    Tiempo evolucion: {{ patient.symptom_duration_months or '---' }} meses
+  </p>
+  <p>
+    Peso: {{ patient.weight_kg or '---' }} kg |
+    Talla: {{ patient.height_cm or '---' }} cm |
+    BMI: {{ patient.bmi or '---' }}
+  </p>
+  <p>
+    Crepitantes velcro: {{ 'Si' if patient.physical_crepitaciones_velcro else 'No' }} |
+    Crepitantes: {{ 'Si' if patient.physical_crepitaciones else 'No' }} |
+    Roncus: {{ 'Si' if patient.physical_roncus else 'No' }} |
+    Sibilancias: {{ 'Si' if patient.physical_wheezing else 'No' }} |
+    Clubbing: {{ 'Si' if patient.physical_clubbing else 'No' }} |
+    Signos HTP: {{ 'Si' if patient.physical_pulmonary_hypertension_signs else 'No' }}
+  </p>
+</div>
+
+<div class="section">
+  <h2>Consultas</h2>
+  {% if consultations %}
+    <ul>
+      {% for c in consultations %}
+        <li>
+          <strong>Fecha:</strong> {{ c.date or '---' }}<br>
+          {% if c.notes %}
+            {{ c.notes | nl2br }}<br>
+          {% endif %}
+          {% if c.studies %}
+            <strong>Estudios asociados:</strong>
+            <ul>
+              {% for s in c.studies %}
+                <li>
+                  {{ s.study_type or 'Estudio' }} - {{ s.date or 'sin fecha' }}
+                  {% if s.description %}: {{ s.description }}{% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Sin consultas registradas.</em></p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Estudios</h2>
+  {% if studies %}
+    <ul>
+      {% for s in studies %}
+        <li>
+          <strong>{{ s.study_type or 'Estudio' }}</strong>
+          {% if s.date %}- {{ s.date }}{% endif %}
+          {% if s.center %} - {{ s.center }}{% endif %}
+          {% if s.description %}<br>{{ s.description | nl2br }}{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Sin estudios cargados.</em></p>
+  {% endif %}
+</div>
+{% endblock %}

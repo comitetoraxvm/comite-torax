@@ -1,0 +1,453 @@
+{% set p = patient %}
+{% set resp_selected = p.respiratory_conditions|as_list if p else [] %}
+{% set autoimmune_selected = p.autoimmune_conditions|as_list if p else [] %}
+{% set systemic_selected = p.systemic_symptoms|as_list if p else [] %}
+{% set occupational_types = p.occupational_exposure_types|as_list if p else [] %}
+{% set occupational_jobs = p.occupational_jobs|as_list if p else [] %}
+{% set domestic_selected = p.domestic_exposures|as_list if p else [] %}
+{% set drug_selected = p.drug_use|as_list if p else [] %}
+{% set pneumo_selected = p.pneumotoxic_drugs|as_list if p else [] %}
+
+<div class="form-section">
+  <h2>Datos personales</h2>
+  <p class="form-help">Completa la informacion basica del paciente para identificarlo.</p>
+  <div class="grid-2">
+    <div>
+      <label>Nombre y apellido <span style="color:red">*</span></label>
+      <input type="text" name="full_name" value="{{ p.full_name if p else '' }}" required>
+    </div>
+    <div>
+      <label>DNI <span style="color:red">*</span></label>
+      <input type="text" name="dni" value="{{ p.dni if p and p.dni else '' }}" {% if p and p.dni %}readonly{% endif %} required>
+    </div>
+    <div>
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="birth_date" name="birth_date" value="{{ p.birth_date if p and p.birth_date else '' }}">
+    </div>
+    <div>
+      <label>Edad</label>
+      <input type="number" id="age" name="age" value="{{ p.age if p and p.age is not none else '' }}" min="0">
+    </div>
+    <div>
+      <label>Sexo</label>
+      <select name="sex">
+        {% set sex_value = p.sex if p else '' %}
+        <option value="">-- Seleccionar --</option>
+        <option value="Masculino" {% if sex_value == 'Masculino' %}selected{% endif %}>Masculino</option>
+        <option value="Femenino" {% if sex_value == 'Femenino' %}selected{% endif %}>Femenino</option>
+        <option value="Otro" {% if sex_value == 'Otro' %}selected{% endif %}>Otro</option>
+      </select>
+    </div>
+    <div>
+      <label>Email <span style="color:red">*</span></label>
+      <input type="email" name="email" value="{{ p.email if p and p.email else '' }}">
+    </div>
+    <div>
+      <label>Centro donde se atiende</label>
+      <select name="center">
+        {% set center_value = p.center if p else '' %}
+        <option value="">-- Seleccionar --</option>
+        {% for center in center_options %}
+          <option value="{{ center }}" {% if center_value == center %}selected{% endif %}>{{ center }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Telefono</label>
+      <input type="text" name="phone" value="{{ p.phone if p and p.phone else '' }}">
+    </div>
+    <div>
+      <label>Domicilio</label>
+      <input type="text" name="address" value="{{ p.address if p and p.address else '' }}">
+    </div>
+    <div>
+      <label>Ciudad / Localidad</label>
+      <input type="text" name="city" value="{{ p.city if p and p.city else '' }}">
+    </div>
+    <div>
+      <label>Obra social</label>
+      <input type="text" name="health_insurance" value="{{ p.health_insurance if p and p.health_insurance else '' }}">
+    </div>
+    <div>
+      <label>Nro de afiliado / socio</label>
+      <input type="text" name="health_insurance_number" value="{{ p.health_insurance_number if p and p.health_insurance_number else '' }}">
+    </div>
+    <div>
+      <label>Fecha de primera consulta en comite</label>
+      <input type="date" name="first_consultation_date" value="{{ p.first_consultation_date if p and p.first_consultation_date else '' }}">
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" name="consent_given" {% if p and p.consent_given %}checked{% endif %}>
+        Consentimiento informado firmado <span style="color:red">*</span>
+      </label>
+      <p class="form-help">Confirmas que el paciente autorizo expresamente al profesional a registrar sus datos en esta plataforma.</p>
+    </div>
+    <div>
+      <label>Fecha de consentimiento <span style="color:red">*</span></label>
+      <input type="date" name="consent_date" value="{{ p.consent_date if p and p.consent_date else '' }}">
+    </div>
+  </div>
+  <p class="form-help" style="color:red; font-weight:bold;">Los campos marcados con * son obligatorios.</p>
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_personal" name="notes_personal">{{ p.notes_personal if p and p.notes_personal else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_personal">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Tabaquismo</h2>
+  <p class="form-help">Estos datos se usan para calcular el indice paquete anio.</p>
+  <div class="grid-2">
+    <label><input type="checkbox" name="smoking_never" {% if p and (not p.smoking_current) and (not p.smoking_previous) %}checked{% endif %}> Nunca tabaquista</label>
+    <label><input type="checkbox" name="smoking_current" {% if p and p.smoking_current %}checked{% endif %}> Fumador actual</label>
+    <label><input type="checkbox" name="smoking_previous" {% if p and p.smoking_previous %}checked{% endif %}> Fumador previo</label>
+    <div>
+      <label>Edad de inicio</label>
+      <input type="number" name="smoking_start_age" value="{{ p.smoking_start_age if p and p.smoking_start_age is not none else '' }}" min="0">
+    </div>
+    <div>
+      <label>Edad de cese</label>
+      <input type="number" name="smoking_end_age" value="{{ p.smoking_end_age if p and p.smoking_end_age is not none else '' }}" min="0">
+    </div>
+    <div>
+      <label>Cigarrillos por dia</label>
+      <input type="number" id="smoking_cigarettes_per_day" name="smoking_cigarettes_per_day" value="{{ p.smoking_cigarettes_per_day if p and p.smoking_cigarettes_per_day is not none else '' }}" min="0">
+    </div>
+    <div>
+      <label>Anios que fumo</label>
+      <input type="number" id="smoking_years" name="smoking_years" value="{{ p.smoking_years if p and p.smoking_years is not none else '' }}" min="0" step="0.1">
+    </div>
+    <div>
+      <label>IPA (pack-years)</label>
+      <input type="number" id="smoking_pack_years" name="smoking_pack_years" step="0.1" value="{{ p.smoking_pack_years if p and p.smoking_pack_years is not none else '' }}" min="0" readonly>
+    </div>
+  </div>
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_smoking" name="notes_smoking">{{ p.notes_smoking if p and p.notes_smoking else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_smoking">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Antecedentes respiratorios y comorbilidades</h2>
+  <p class="form-help">Marca todas las condiciones que apliquen y agrega detalles generales.</p>
+  <div class="checkbox-grid">
+    {% for value, label in respiratory_options %}
+      <label>
+        <input type="checkbox" name="respiratory_conditions" value="{{ value }}" {% if value in resp_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <label>Antecedentes generales / resumen libre</label>
+  <div class="voice-field">
+    <textarea id="antecedentes" name="antecedentes">{{ p.antecedentes if p and p.antecedentes else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="antecedentes">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Enfermedades autoinmunes</h2>
+  <p class="form-help">Selecciona enfermedades diagnosticadas y detalla otras si es necesario.</p>
+  <div class="checkbox-grid">
+    {% for value, label in autoimmune_options %}
+      <label>
+        <input type="checkbox" name="autoimmune_conditions" value="{{ value }}" {% if value in autoimmune_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <label>Otra</label>
+  <input type="text" name="autoimmune_other" value="{{ p.autoimmune_other if p and p.autoimmune_other else '' }}">
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_autoimmune" name="notes_autoimmune">{{ p.notes_autoimmune if p and p.notes_autoimmune else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_autoimmune">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Signos / sintomas sistemicos</h2>
+  <p class="form-help">Marca sintomas asociados a sospecha inmunologica o sistemica.</p>
+  <div class="checkbox-grid">
+    {% for value, label in symptom_options %}
+      <label>
+        <input type="checkbox" name="systemic_symptoms" value="{{ value }}" {% if value in systemic_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_systemic" name="notes_systemic">{{ p.notes_systemic if p and p.notes_systemic else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_systemic">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Historia laboral y exposiciones</h2>
+  <p class="form-help">Registra el tipo de trabajos y exposiciones posibles para correlacionar con la patologia.</p>
+  <p><strong>Exposicion a:</strong></p>
+  <div class="checkbox-grid">
+    {% for value, label in occupational_exposure_options %}
+      <label>
+        <input type="checkbox" name="occupational_exposure_types" value="{{ value }}" {% if value in occupational_types %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <p><strong>Trabajos / rubros:</strong></p>
+  <div class="checkbox-grid">
+    {% for value, label in occupational_job_options %}
+      <label>
+        <input type="checkbox" name="occupational_jobs" value="{{ value }}" {% if value in occupational_jobs %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <div class="grid-2">
+    <div>
+      <label>Anos de exposicion (detalle libre)</label>
+      <input type="text" name="occupational_years" value="{{ p.occupational_years if p and p.occupational_years else '' }}">
+    </div>
+    <div>
+      <label>Accidente por inhalacion</label>
+      <input type="text" name="occupational_accident_when" placeholder="Ej: fecha / descripcion" value="{{ p.occupational_accident_when if p and p.occupational_accident_when else '' }}">
+    </div>
+  </div>
+  <label><input type="checkbox" name="occupational_accident" {% if p and p.occupational_accident %}checked{% endif %}> Hubo accidente por inhalacion</label>
+  <label><input type="checkbox" name="occupational_leave_due_to_breathing" {% if p and p.occupational_leave_due_to_breathing %}checked{% endif %}> Abandono laboral por problemas respiratorios</label>
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_exposures" name="notes_exposures">{{ p.notes_exposures if p and p.notes_exposures else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_exposures">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Exposiciones domiciliarias</h2>
+  <p class="form-help">Anota agentes ambientales dentro del hogar que puedan gatillar sintomas.</p>
+  <div class="checkbox-grid">
+    {% for value, label in domestic_exposure_options %}
+      <label>
+        <input type="checkbox" name="domestic_exposures" value="{{ value }}" {% if value in domestic_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <label>Detalle adicional</label>
+  <div class="voice-field">
+    <textarea id="domestic_exposures_details" name="domestic_exposures_details">{{ p.domestic_exposures_details if p and p.domestic_exposures_details else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="domestic_exposures_details">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Drogas y medicaciones</h2>
+  <p class="form-help">Detalle de drogas recreativas y tratamientos actuales o previos.</p>
+  <p><strong>Drogas ilicitas:</strong></p>
+  <div class="checkbox-grid">
+    {% for value, label in illicit_drug_options %}
+      <label>
+        <input type="checkbox" name="drug_use" value="{{ value }}" {% if value in drug_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+  <label>Medicaciones actuales</label>
+  <div class="voice-field">
+    <textarea id="current_medications" name="current_medications">{{ p.current_medications if p and p.current_medications else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="current_medications">Dictado</button>
+  </div>
+  <label>Medicaciones previas</label>
+  <div class="voice-field">
+    <textarea id="previous_medications" name="previous_medications">{{ p.previous_medications if p and p.previous_medications else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="previous_medications">Dictado</button>
+  </div>
+  <p><strong>Farmacos neumotoxicos:</strong></p>
+  <div class="checkbox-grid">
+    {% for value, label in pneumotoxic_drug_options %}
+      <label>
+        <input type="checkbox" name="pneumotoxic_drugs" value="{{ value }}" {% if value in pneumo_selected %}checked{% endif %}>
+        {{ label }}
+      </label>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Historia familiar</h2>
+  <p class="form-help">Registra antecedentes respiratorios o autoinmunes en la familia.</p>
+  <div class="grid-2">
+    <div>
+      <label>Padre</label>
+      <input type="text" name="family_history_father" value="{{ p.family_history_father if p and p.family_history_father else '' }}">
+    </div>
+    <div>
+      <label>Madre</label>
+      <input type="text" name="family_history_mother" value="{{ p.family_history_mother if p and p.family_history_mother else '' }}">
+    </div>
+    <div>
+      <label>Hermanos</label>
+      <input type="text" name="family_history_siblings" value="{{ p.family_history_siblings if p and p.family_history_siblings else '' }}">
+    </div>
+    <div>
+      <label>Hijos</label>
+      <input type="text" name="family_history_children" value="{{ p.family_history_children if p and p.family_history_children else '' }}">
+    </div>
+  </div>
+  <p style="margin-top: 8px;">
+    <a href="https://concepto.de/wp-content/uploads/2023/03/7.-Familiograma-II-simbologia-2048x1243.jpg" target="_blank" rel="noopener">Ver simbología de familiograma (guía)</a>
+  </p>
+  <label>Adjuntar PDF de familiograma</label>
+  <input type="file" name="family_genogram_pdf" accept="application/pdf">
+  {% if p and p.family_genogram_pdf %}
+    <p style="margin-top:6px;">
+      Archivo actual:
+      <a href="{{ url_for('patient_family_genogram_download', patient_id=p.id) }}">Descargar PDF</a>
+    </p>
+  {% endif %}
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_family_history" name="notes_family_history">{{ p.notes_family_history if p and p.notes_family_history else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_family_history">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Sintomas respiratorios y examen fisico</h2>
+  <p class="form-help">Indica severidad de disnea, evolucion y hallazgos al examen.</p>
+  <div class="grid-2">
+    <label><input type="checkbox" name="symptom_cough" {% if p and p.symptom_cough %}checked{% endif %}> Tos</label>
+    <div>
+      <label>mMRC</label>
+      <select name="symptom_mmrc">
+        {% set mmrc_value = p.symptom_mmrc if p and p.symptom_mmrc is not none else '' %}
+        <option value="">--</option>
+        {% for value in mmrc_options %}
+          <option value="{{ value }}" {% if mmrc_value == value %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Tiempo de evolucion (meses)</label>
+      <input type="number" name="symptom_duration_months" min="0" value="{{ p.symptom_duration_months if p and p.symptom_duration_months is not none else '' }}">
+    </div>
+    <div>
+      <label>Peso (kg)</label>
+      <input type="number" step="0.1" id="weight_kg" name="weight_kg" min="0" value="{{ p.weight_kg if p and p.weight_kg is not none else '' }}">
+    </div>
+    <div>
+      <label>Talla (cm)</label>
+      <input type="number" step="0.1" id="height_cm" name="height_cm" min="0" value="{{ p.height_cm if p and p.height_cm is not none else '' }}">
+    </div>
+    <div>
+      <label>BMI (calculado)</label>
+      <input type="text" id="bmi_display" value="{{ p.bmi if p and p.bmi is not none else '' }}" placeholder="Se calcula automaticamente" readonly>
+    </div>
+  </div>
+  <div class="checkbox-grid">
+    <label><input type="checkbox" name="physical_crepitaciones_velcro" {% if p and p.physical_crepitaciones_velcro %}checked{% endif %}> Crepitantes tipo velcro</label>
+    <label><input type="checkbox" name="physical_crepitaciones" {% if p and p.physical_crepitaciones %}checked{% endif %}> Crepitantes</label>
+    <label><input type="checkbox" name="physical_roncus" {% if p and p.physical_roncus %}checked{% endif %}> Roncus</label>
+    <label><input type="checkbox" name="physical_wheezing" {% if p and p.physical_wheezing %}checked{% endif %}> Sibilancias</label>
+    <label><input type="checkbox" name="physical_clubbing" {% if p and p.physical_clubbing %}checked{% endif %}> Clubbing</label>
+    <label><input type="checkbox" name="physical_pulmonary_hypertension_signs" {% if p and p.physical_pulmonary_hypertension_signs %}checked{% endif %}> Signos de hipertension pulmonar</label>
+  </div>
+  <label>Aclaraciones (dictado libre)</label>
+  <div class="voice-field">
+    <textarea id="notes_respiratory_exam" name="notes_respiratory_exam">{{ p.notes_respiratory_exam if p and p.notes_respiratory_exam else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="notes_respiratory_exam">Dictado</button>
+  </div>
+</div>
+
+<div class="form-section">
+  <h2>Diagnosticos establecidos / probables</h2>
+  <p class="form-help">Lista diagnósticos confirmados y sospechas clínicas.</p>
+  <div class="voice-field">
+    <textarea id="diagnoses" name="diagnoses" placeholder="Ej: EPID fibrosante, asma, EPOC">{{ p.diagnoses if p and p.diagnoses else '' }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="diagnoses">Dictado</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const birthInput = document.getElementById('birth_date');
+  const ageInput = document.getElementById('age');
+  const cigsInput = document.getElementById('smoking_cigarettes_per_day');
+  const yearsInput = document.getElementById('smoking_years');
+  const packInput = document.getElementById('smoking_pack_years');
+  const weightInput = document.getElementById('weight_kg');
+  const heightInput = document.getElementById('height_cm');
+  const bmiInput = document.getElementById('bmi_display');
+
+  function calculateAgeFromInput() {
+    if (!birthInput || !ageInput || !birthInput.value) {
+      return;
+    }
+    const birthDate = new Date(birthInput.value);
+    if (Number.isNaN(birthDate.getTime())) {
+      return;
+    }
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age >= 0) {
+      ageInput.value = age;
+    }
+  }
+
+  function calculatePackYears() {
+    if (!cigsInput || !yearsInput || !packInput) {
+      return;
+    }
+    const cigs = parseFloat(cigsInput.value);
+    const years = parseFloat(yearsInput.value);
+    if (!Number.isFinite(cigs) || !Number.isFinite(years) || cigs <= 0 || years <= 0) {
+      packInput.value = '';
+      return;
+    }
+    const ipa = (cigs / 20) * years;
+    packInput.value = ipa.toFixed(2);
+  }
+
+  function calculateBmi() {
+    if (!weightInput || !heightInput || !bmiInput) {
+      return;
+    }
+    const weight = parseFloat(weightInput.value);
+    const heightCm = parseFloat(heightInput.value);
+    if (!Number.isFinite(weight) || !Number.isFinite(heightCm) || weight <= 0 || heightCm <= 0) {
+      bmiInput.value = '';
+      return;
+    }
+    const heightM = heightCm / 100;
+    const bmi = weight / (heightM * heightM);
+    bmiInput.value = bmi.toFixed(2);
+  }
+
+  if (birthInput && ageInput) {
+    birthInput.addEventListener('change', calculateAgeFromInput);
+    birthInput.addEventListener('blur', calculateAgeFromInput);
+    calculateAgeFromInput();
+  }
+
+  if (cigsInput && yearsInput) {
+    cigsInput.addEventListener('input', calculatePackYears);
+    yearsInput.addEventListener('input', calculatePackYears);
+    calculatePackYears();
+  }
+
+  if (weightInput && heightInput && bmiInput) {
+    weightInput.addEventListener('input', calculateBmi);
+    heightInput.addEventListener('input', calculateBmi);
+    calculateBmi();
+  }
+});
+</script>

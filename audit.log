@@ -1,0 +1,255 @@
+{"timestamp": "2025-11-21T01:21:33.466388", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-26T13:29:56.451119", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-26T14:38:45.135724", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-26T19:08:07.664194", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-26T19:09:01.432463", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-26T19:09:54.035007", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-29T18:32:50.351925", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:11:53.342515", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:21:50.063751", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:25:28.492302", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:25:37.209324", "action": "user_approve", "details": {"target_user_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:27:11.062413", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [2], "review_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:27:40.081352", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-11-30T22:27:59.329989", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-11-30T22:28:22.878886", "action": "review_request_resolved", "details": {"review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-11-30T22:35:52.998565", "action": "review_comment_add", "details": {"review_id": 1, "user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-01T13:36:26.315608", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-01T13:38:28.651694", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-02T18:57:56.465827", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:01:45.390293", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:10:32.852565", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [2], "review_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:10:43.285125", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:11:04.628123", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:12:27.745855", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:12:58.310962", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:18:11.101543", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:18:13.605558", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-02T19:19:20.006804", "action": "patients_export_summary", "details": {"count": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T14:08:15.182350", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T15:02:54.464175", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T15:03:40.408299", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T15:04:24.855919", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T15:06:19.684807", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-03T22:10:37.143711", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T22:10:55.609241", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T22:11:10.162174", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-03T22:48:21.494903", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-03T22:48:26.858017", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T22:54:34.254101", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T23:12:25.188925", "action": "patients_export_summary", "details": {"count": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T23:42:54.572161", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T23:46:59.542993", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-03T23:47:01.102622", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T20:36:35.595535", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T20:42:01.946170", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:05:09.698165", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:08:58.413349", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:09:27.218817", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:11:20.948933", "action": "patient_create", "details": {"patient_id": 3}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:12:00.353421", "action": "review_request_create", "details": {"patient_id": 3, "recipients": [1], "review_id": 3}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:14:00.849653", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:14:02.854720", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:14:53.210873", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:18:14.452065", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:19:17.257027", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 4}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:19:17.299684", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 5}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:20:27.546352", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:20:31.069450", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:24:17.107718", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-05T21:24:30.128841", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:25:05.874996", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 6}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:25:50.432664", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 7}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:29:19.312780", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 8}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:30:07.497495", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-05T21:30:11.124929", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T18:42:08.080028", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T18:44:12.809782", "action": "review_request_create", "details": {"patient_id": 2, "recipients": [1], "review_id": 9}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T18:45:12.319700", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T18:45:15.386757", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T18:54:00.107564", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T18:54:25.026696", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T18:54:36.941292", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:10:14.329003", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:20:28.768557", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:20:31.622279", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:21:36.103087", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [1], "review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:21:49.889061", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:22:02.794181", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:22:19.936499", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:22:21.729851", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:22:33.317719", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:22:34.645691", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:25:16.849831", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:25:20.992500", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:26:05.055598", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:48:54.747731", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:48:56.748925", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:49:03.386277", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:49:07.046860", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:49:26.510376", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [1], "review_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:49:50.383412", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:49:53.584710", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:56:22.985681", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:56:24.771311", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:57:15.060157", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [2], "review_id": 3}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:57:41.264854", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T19:57:45.882727", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T19:58:56.766845", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:00:18.404056", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:01:44.138649", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:02:00.758980", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:02:03.972138", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:02:06.438070", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:02:15.490170", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:02:18.333665", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:03:10.533108", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:03:11.805848", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:04:04.056970", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:04:55.083269", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:05:17.367744", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:05:35.599185", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [2], "review_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:05:43.689184", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:05:47.237804", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:05:50.602420", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:05:57.506879", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:17:23.493369", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:17:28.226145", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:17:31.067905", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:17:43.800022", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:18:05.062798", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [1], "review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:18:13.179066", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:18:16.452099", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:34:24.805627", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:34:36.814166", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:34:54.039171", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:35:07.998200", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [1], "review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:35:15.562256", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:35:18.390031", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:35:19.731327", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-07T20:35:22.804893", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:35:50.368636", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:35:51.850013", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:46:38.681234", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:46:51.179027", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T20:46:55.910420", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:04:51.578761", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:09:13.893634", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:09:16.639200", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:11:01.388061", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:13:11.389276", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:13:13.316761", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:15:12.896380", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:23:56.588680", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:23:58.296948", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:24:23.327533", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:27:01.072255", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:31:04.598227", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:31:15.304188", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:32:23.209322", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:38:32.431263", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:38:34.270714", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-07T21:40:27.816159", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:00:07.231367", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:03:30.489575", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:03:32.600258", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:04:53.094431", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:04:54.588087", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:05:40.813959", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:07:02.411671", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:15:06.883465", "action": "patient_create", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:16:49.426963", "action": "patient_update", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:16:56.927314", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:17:49.847984", "action": "patient_update", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-09T19:31:23.129308", "action": "patient_update", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-16T14:42:10.345847", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T12:45:40.459443", "action": "patient_print", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T16:15:49.523919", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T16:15:51.563353", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T16:25:14.343533", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T16:25:23.665092", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T16:25:56.596391", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T17:12:30.872128", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T17:22:26.748637", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T17:22:30.534282", "action": "patient_delete", "details": {"patient_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T19:23:44.405277", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T19:23:46.295076", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T19:24:59.415883", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-17T19:25:02.880246", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-17T19:26:57.758293", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-17T19:27:22.801401", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-17T19:27:24.767049", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T15:22:25.932662", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T15:22:27.272828", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T15:31:58.209546", "action": "patient_update", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T15:54:22.908107", "action": "patient_update", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T22:32:55.508216", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-19T22:32:59.568262", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-19T22:33:26.196232", "action": "user_approve", "details": {"target_user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-19T22:36:02.288582", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-19T22:36:05.691486", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-20T13:13:46.580343", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-20T14:29:06.313239", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-20T14:29:09.655450", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-20T14:29:32.854609", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-20T14:29:39.409343", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-20T14:30:14.215654", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-20T14:30:17.251693", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T15:07:07.404342", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T15:07:34.984848", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T15:07:38.102873", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T21:23:11.511258", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T21:23:15.168290", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T21:23:58.210033", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T21:51:34.808930", "action": "patient_print", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T22:25:20.028248", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T22:25:23.016102", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T22:26:26.965869", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [2], "review_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T22:27:32.000211", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-22T22:27:34.715740", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-22T22:27:39.283131", "action": "review_request_resolved", "details": {"review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T10:37:15.873013", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T10:37:19.302545", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T10:56:34.738055", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:19:27.010757", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:22:00.630277", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [2], "review_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:23:05.333975", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:23:08.483450", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:26:10.578848", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:26:13.143628", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:26:51.264398", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:26:55.109785", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:38:12.928126", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:38:14.374387", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:38:15.942679", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:38:18.594379", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:49:53.286457", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T14:49:56.932024", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:50:06.254554", "action": "review_comment_add", "details": {"review_id": 1, "user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:50:06.276062", "action": "review_comment_add", "details": {"review_id": 1, "user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:50:15.597470", "action": "review_comment_add", "details": {"review_id": 1, "user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:59:18.720162", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:59:32.402656", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:59:45.722933", "action": "user_logout", "details": {"user_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T14:59:48.074234", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T15:13:34.985153", "action": "review_request_create", "details": {"patient_id": 1, "recipients": [2], "review_id": 2}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T15:15:55.112344", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-23T15:15:58.496493", "action": "user_login", "details": {"user_id": 2, "method": "password"}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T15:35:31.348257", "action": "patient_print", "details": {"patient_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T15:37:55.101927", "action": "review_request_resolved", "details": {"review_id": 2}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-23T15:37:56.574547", "action": "review_request_resolved", "details": {"review_id": 1}, "actor": {"id": 2, "name": "Somale Julia"}}
+{"timestamp": "2025-12-26T23:47:01.571144", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-26T23:57:39.306123", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-26T23:57:49.315991", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-26T23:59:14.536508", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:02:22.798157", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:08:47.610402", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:10:21.013010", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:23:30.966759", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:23:58.609247", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:26:43.713367", "action": "user_logout", "details": {"user_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:26:45.149931", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:26:54.471199", "action": "patient_delete", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T00:27:17.539345", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-27T12:45:19.978103", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-29T02:38:25.170427", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}

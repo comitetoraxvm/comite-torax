@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Editar paciente</h1>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% include "patient_form_fields.html" %}
+
+  <button type="submit">Guardar cambios</button>
+  <a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
+</form>
+{% endblock %}

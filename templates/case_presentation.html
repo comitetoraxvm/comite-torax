@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Presentacion de Caso Clinico</h1>
+<p>Paciente: <strong>{{ patient.full_name }}</strong> | DNI: {{ patient.dni or '---' }}</p>
+
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="form-section">
+    <h2>Presentacion inicial</h2>
+    <textarea name="intro" rows="10">{{ presentation.intro or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Examen fisico</h2>
+    <textarea name="physical_exam" rows="8">{{ presentation.physical_exam or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Estudio funcional respiratorio</h2>
+    <textarea name="respiratory_tests" rows="6">{{ presentation.respiratory_tests or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Laboratorio inmunologico</h2>
+    <textarea name="immunology" rows="8">{{ presentation.immunology or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Historia de exposicion</h2>
+    <textarea name="exposures" rows="8">{{ presentation.exposures or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Estudios de imagen / espirometrias</h2>
+    <textarea name="imaging" rows="8">{{ presentation.imaging or '' }}</textarea>
+  </div>
+
+  <div class="form-section">
+    <h2>Notas complementarias</h2>
+    <textarea name="notes" rows="6">{{ presentation.notes or '' }}</textarea>
+  </div>
+
+  <button type="submit" name="action" value="save">Guardar</button>
+  <button type="submit" name="action" value="download_word">Descargar Word</button>
+  <button type="button" onclick="window.print()">Descargar PDF</button>
+</form>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Editar control (screening)</h1>
+
+<p>
+  <strong>Paciente:</strong> {{ followup.screening.patient.full_name }}
+  {% if followup.screening.patient.dni %}(DNI: {{ followup.screening.patient.dni }}){% endif %}
+</p>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="form-section">
+    <h2>Datos del control</h2>
+    <div class="grid-2">
+      <div>
+        <label for="study_type">Tipo de estudio</label>
+        <input type="text" id="study_type" name="study_type" value="{{ followup.study_type or '' }}" required>
+      </div>
+      <div>
+        <label for="study_date">Fecha del estudio</label>
+        <input type="date" id="study_date" name="study_date" value="{{ followup.study_date or '' }}" required>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="study_center">Lugar de realización</label>
+        <input type="text" id="study_center" name="study_center" value="{{ followup.study_center or '' }}">
+      </div>
+      <div>
+        <label for="study_number">Número de estudio / ID</label>
+        <input type="text" id="study_number" name="study_number" value="{{ followup.study_number or '' }}">
+      </div>
+    </div>
+
+    <label for="findings">Hallazgos / Observaciones</label>
+    <div class="voice-field">
+      <textarea id="findings" name="findings" rows="3">{{ followup.findings or '' }}</textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="findings">Dictado</button>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="lung_rads">Lung-RADS</label>
+        <input type="text" id="lung_rads" name="lung_rads" value="{{ followup.lung_rads or '' }}" placeholder="Ej: 2, 3, 4A...">
+      </div>
+      <div>
+        <label for="next_control_date">Próximo control sugerido</label>
+        <input type="date" id="next_control_date" name="next_control_date" value="{{ followup.next_control_date or '' }}">
+      </div>
+    </div>
+
+    <label for="file">Subir informe (PDF/imagen)</label>
+    <input type="file" id="file" name="file" accept=".pdf,.png,.jpg,.jpeg">
+    {% if followup.file_name %}
+      <p>Archivo actual: <a href="{{ url_for('screening_followup_file', followup_id=followup.id) }}">Descargar</a></p>
+    {% endif %}
+  </div>
+
+  <button type="submit">Guardar</button>
+  <a class="btn-link btn-secondary" href="{{ url_for('patient_screening', patient_id=followup.screening.patient_id) }}">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,11 @@
+[WARN] No se pudo verificar columnas de screenings: This Connection is closed
+[INFO] La base no cambio desde el ultimo backup. No se crea copia nueva.
+ * Serving Flask app 'app'
+ * Debug mode: on
+[WARN] No se pudo verificar columnas de screenings: This Connection is closed
+[INFO] La base no cambio desde el ultimo backup. No se crea copia nueva.
+[WARN] No se pudo verificar columnas de screenings: This Connection is closed
+[WARN] No se pudo verificar columnas de screenings: This Connection is closed
+[OK] Backup automatico creado: comite_auto_20251226_142426.db
+[WARN] No se pudo verificar columnas de screenings: This Connection is closed
+[INFO] La base no cambio desde el ultimo backup. No se crea copia nueva.

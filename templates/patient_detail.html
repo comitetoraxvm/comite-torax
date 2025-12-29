@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set resp = patient.respiratory_conditions|as_list %}
+{% set autoimmune = patient.autoimmune_conditions|as_list %}
+{% set systemic = patient.systemic_symptoms|as_list %}
+{% set occ_types = patient.occupational_exposure_types|as_list %}
+{% set occ_jobs = patient.occupational_jobs|as_list %}
+{% set domestic = patient.domestic_exposures|as_list %}
+{% set drugs = patient.drug_use|as_list %}
+{% set pneumotoxic = patient.pneumotoxic_drugs|as_list %}
+
+<h1>Ficha del paciente</h1>
+
+<p>
+  <strong>{{ patient.full_name }}</strong><br>
+  DNI: {{ patient.dni or '---' }} |
+  Edad: {{ patient.age or '---' }} |
+  Sexo: {{ patient.sex or '---' }} |
+  Centro: {{ patient.center or '---' }}<br>
+  Ciudad: {{ patient.city or '---' }} |
+  Domicilio: {{ patient.address or '---' }}<br>
+  Telefono: {{ patient.phone or '---' }} |
+  Obra social: {{ patient.health_insurance or '---' }} ({{ patient.health_insurance_number or 'sin nro' }})<br>
+  Primera consulta en comite: {{ patient.first_consultation_date or '---' }}
+</p>
+
+{% if pending_reviews %}
+<div class="form-section">
+  <h2>Revisiones pendientes</h2>
+  <ul>
+    {% for item in pending_reviews %}
+      {% set review = item.review %}
+      <li>
+        Solicitado por {{ review.created_by.full_name }} el {{ review.created_at.strftime('%Y-%m-%d %H:%M') }}<br>
+        {% if review.message %}
+          <em>{{ review.message }}</em><br>
+        {% endif %}
+        Destinatarios:
+        {% if item.recipients %}
+          {{ item.recipients | map(attribute='full_name') | join(', ') }}
+        {% else %}
+          (sin destinatarios)
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  <a class="btn-link" href="{{ url_for('reviews_inbox') }}">Ir a revisiones</a>
+</div>
+{% endif %}
+
+{% if all_reviews %}
+<div class="form-section">
+  <h2>Historial de revisiones</h2>
+  <ul>
+    {% for item in all_reviews %}
+      {% set review = item.review %}
+      <li>
+        {{ review.created_at.strftime('%Y-%m-%d %H:%M') }} - {{ review.created_by.full_name }} solicitó revisión
+        {% if item.recipients %}
+          (destinatarios: {{ item.recipients | map(attribute='full_name') | join(', ') }})
+        {% endif %}
+        - Estado: {{ review.status }}
+        {% if review.resolved_at %}(cerrado {{ review.resolved_at.strftime('%Y-%m-%d %H:%M') }}){% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<p class="meta">
+  Consentimiento informado:
+  {% if patient.consent_given %}
+    Otorgado el {{ patient.consent_date or '---' }}
+  {% else %}
+    <strong>NO registrado</strong>
+  {% endif %}
+</p>
+
+{% if patient.email %}
+<p class="meta"><strong>Email:</strong> {{ patient.email }}</p>
+{% endif %}
+
+<p class="meta">
+  Registrado por: {{ patient.created_by.full_name if patient.created_by else '---' }}
+  {% if patient.created_at %}el {{ patient.created_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
+  |
+  Ultima actualizacion:
+  {% if patient.updated_at %}
+    {{ patient.updated_at.strftime('%Y-%m-%d %H:%M') }}
+    {% if patient.updated_by %}por {{ patient.updated_by.full_name }}{% endif %}
+  {% else %}
+    ---
+  {% endif %}
+</p>
+
+  <p>
+  <a class="btn-link" href="{{ url_for('patient_edit', patient_id=patient.id) }}">Editar datos</a>
+  <a class="btn-link btn-secondary" href="{{ url_for('patients_list') }}">Volver al listado</a>
+  <a class="btn-link" href="{{ url_for('consultation_new', patient_id=patient.id) }}">Nueva consulta</a>
+  <a class="btn-link" href="{{ url_for('patient_print', patient_id=patient.id) }}" target="_blank">Vista imprimible</a>
+  <a class="btn-link" href="{{ url_for('patient_case_presentation', patient_id=patient.id) }}" target="_blank">Presentacion de caso clinico</a>
+  <a class="btn-link" href="{{ url_for('patient_screening', patient_id=patient.id) }}">Screening</a>
+  {% if current_user.role == 'admin' %}
+    <form method="post" action="{{ url_for('patient_delete', patient_id=patient.id) }}" style="display:inline" onsubmit="return confirm('Seguro que deseas eliminar este paciente y todos sus registros asociados?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn-link btn-secondary" style="background:#c0392b">Eliminar paciente</button>
+    </form>
+  {% endif %}
+</p>
+
+<div class="form-section">
+  <h2>Tabaquismo</h2>
+  <p>
+    Actual: {{ 'Si' if patient.smoking_current else 'No' }} |
+    Previo: {{ 'Si' if patient.smoking_previous else 'No' }}<br>
+    Edad inicio: {{ patient.smoking_start_age or '---' }} |
+    Edad cese: {{ patient.smoking_end_age or '---' }}<br>
+    Cigarrillos/dia: {{ patient.smoking_cigarettes_per_day or '---' }} |
+    Anios fumados: {{ patient.smoking_years or '---' }} |
+    IPA: {{ patient.smoking_pack_years or '---' }}
+  </p>
+</div>
+
+<div class="form-section">
+  <h2>Antecedentes y sintomas</h2>
+  <p><strong>Respiratorios / comorbilidades:</strong> {{ resp|join(', ') if resp else '---' }}</p>
+  <p><strong>Autoinmunes:</strong> {{ autoimmune|join(', ') if autoimmune else '---' }}{% if patient.autoimmune_other %}, Otro: {{ patient.autoimmune_other }}{% endif %}</p>
+  <p><strong>Sintomas sistemicos:</strong> {{ systemic|join(', ') if systemic else '---' }}</p>
+  <p><strong>Antecedentes generales:</strong><br>{{ patient.antecedentes|nl2br if patient.antecedentes else '---' }}</p>
+  <p><strong>Diagnosticos establecidos / probables:</strong><br>{{ patient.diagnoses|nl2br if patient.diagnoses else '---' }}</p>
+</div>
+
+<div class="form-section">
+  <h2>Historia laboral y exposiciones</h2>
+  <p><strong>Exposiciones:</strong> {{ occ_types|join(', ') if occ_types else '---' }}</p>
+  <p><strong>Trabajos:</strong> {{ occ_jobs|join(', ') if occ_jobs else '---' }}</p>
+  <p>
+    Accidente por inhalacion: {{ 'Si' if patient.occupational_accident else 'No' }}
+    {% if patient.occupational_accident_when %} ({{ patient.occupational_accident_when }}){% endif %}
+  </p>
+  <p>Abandono laboral por respiratorio: {{ 'Si' if patient.occupational_leave_due_to_breathing else 'No' }}</p>
+  <p>Anios / detalle: {{ patient.occupational_years or '---' }}</p>
+  <p><strong>Exposiciones domiciliarias:</strong> {{ domestic|join(', ') if domestic else '---' }}</p>
+  {% if patient.domestic_exposures_details %}
+    <p>Detalle: {{ patient.domestic_exposures_details }}</p>
+  {% endif %}
+</div>
+
+<div class="form-section">
+  <h2>Drogas y medicaciones</h2>
+  <p><strong>Drogas ilicitas:</strong> {{ drugs|join(', ') if drugs else '---' }}</p>
+  <p><strong>Farmacos neumotoxicos:</strong> {{ pneumotoxic|join(', ') if pneumotoxic else '---' }}</p>
+  <p><strong>Medicaciones actuales:</strong><br>{{ patient.current_medications|nl2br if patient.current_medications else '---' }}</p>
+  <p><strong>Medicaciones previas:</strong><br>{{ patient.previous_medications|nl2br if patient.previous_medications else '---' }}</p>
+</div>
+
+<div class="form-section">
+  <h2>Historia familiar</h2>
+  <p>Padre: {{ patient.family_history_father or '---' }}</p>
+  <p>Madre: {{ patient.family_history_mother or '---' }}</p>
+  <p>Hermanos: {{ patient.family_history_siblings or '---' }}</p>
+  <p>Hijos: {{ patient.family_history_children or '---' }}</p>
+  {% if patient.notes_family_history %}
+    <p><strong>Aclaraciones:</strong><br>{{ patient.notes_family_history|nl2br }}</p>
+  {% endif %}
+</div>
+
+<div class="form-section">
+  <h2>Sintomas respiratorios y examen fisico</h2>
+  <p>
+    Tos: {{ 'Si' if patient.symptom_cough else 'No' }} |
+    mMRC: {{ patient.symptom_mmrc if patient.symptom_mmrc is not none else '---' }} |
+    Tiempo evolucion: {{ patient.symptom_duration_months or '---' }} meses
+  </p>
+  <p>
+    Peso: {{ patient.weight_kg or '---' }} kg |
+    Talla: {{ patient.height_cm or '---' }} cm |
+    BMI: {{ patient.bmi or '---' }}
+  </p>
+  <p>
+    Crepitantes velcro: {{ 'Si' if patient.physical_crepitaciones_velcro else 'No' }} |
+    Crepitantes: {{ 'Si' if patient.physical_crepitaciones else 'No' }} |
+    Roncus: {{ 'Si' if patient.physical_roncus else 'No' }} |
+    Sibilancias: {{ 'Si' if patient.physical_wheezing else 'No' }} |
+    Clubbing: {{ 'Si' if patient.physical_clubbing else 'No' }} |
+    Signos HTP: {{ 'Si' if patient.physical_pulmonary_hypertension_signs else 'No' }}
+  </p>
+</div>
+
+<div class="form-section">
+  <h2>Consultas</h2>
+  {% if consultations %}
+    <ul>
+      {% for c in consultations %}
+        <li>
+          <strong>Fecha:</strong> {{ c.date or '---' }}<br>
+        {% if c.notes %}
+          <strong>Notas:</strong>
+          {{ c.notes[:100] }}{% if c.notes|length > 100 %}...{% endif %}<br>
+        {% endif %}
+        {% if c.created_by %}
+          <small>Creado por: {{ c.created_by.full_name or c.created_by.email }}</small><br>
+        {% endif %}
+        <a href="{{ url_for('consultation_view', consultation_id=c.id) }}">Ver consulta</a>
+        {% if not c.created_by_id or c.created_by_id == current_user.id %}
+          | <a href="{{ url_for('consultation_edit', consultation_id=c.id) }}">Editar</a>
+        {% else %}
+          | <small>Solo edita quien la creó.</small>
+        {% endif %}
+        </li>
+        <hr>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Sin consultas registradas aún.</em></p>
+  {% endif %}
+</div>
+
+<div class="form-section">
+  <h2>Estudios</h2>
+  {% if studies %}
+    <ul>
+      {% for s in studies %}
+        <li>
+          <strong>{{ s.study_type or 'Estudio' }}</strong>
+          {% if s.date %}- {{ s.date }}{% endif %}
+          {% if s.center %} - {{ s.center }}{% endif %}
+          <br>
+        {% if s.description %}
+          {{ s.description | nl2br }}
+        {% else %}
+          <em>Sin descripcion.</em>
+        {% endif %}
+        <br>
+        {% set portal_url = center_links.get((s.center or '')|lower) %}
+        {% if portal_url %}
+          Portal: <a href="{{ portal_url }}" target="_blank">{{ portal_url }}</a>
+          {% if s.access_code %}| Numero acceso: {{ s.access_code }}{% endif %}
+          <br>
+        {% elif s.access_code %}
+          Numero acceso: {{ s.access_code }}<br>
+        {% endif %}
+        {% if s.report_file %}
+          <a href="{{ url_for('study_download', study_id=s.id) }}" target="_blank">Ver PDF</a> |
+        {% endif %}
+        <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Sin estudios cargados aún.</em></p>
+  {% endif %}
+</div>
+
+{% if patient.screening %}
+<div class="form-section">
+  <h2 id="controles">Controles (screening)</h2>
+  {% set fu_list = patient.screening.followups.order_by(ScreeningFollowup.study_date.desc().nullslast(), ScreeningFollowup.created_at.desc()).all() %}
+  {% if fu_list %}
+    <ul>
+      {% for fu in fu_list %}
+        <li>
+          <strong>{{ fu.study_type or 'Estudio' }}</strong>
+          {% if fu.study_date %} - {{ fu.study_date }}{% endif %}
+          {% if fu.study_center %} - {{ fu.study_center }}{% endif %}
+          {% if fu.lung_rads %} - Lung-RADS: {{ fu.lung_rads }}{% endif %}
+          {% if fu.next_control_date %} - Próximo: {{ fu.next_control_date }}{% endif %}
+          {% if fu.file_name %} - <a href="{{ url_for('screening_followup_file', followup_id=fu.id) }}">Archivo</a>{% endif %}
+          {% if fu.findings %}<br><small>{{ fu.findings }}</small>{% endif %}
+          {% if not fu.completed %}
+            <div style="margin-top:4px;">
+              <a class="btn-link btn-secondary" href="{{ url_for('screening_followup_edit', followup_id=fu.id) }}">Editar</a>
+              <form method="post" action="{{ url_for('screening_followup_complete', followup_id=fu.id) }}" style="display:inline" onsubmit="return confirm('¿Marcar este control como finalizado?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="next" value="{{ url_for('patient_detail', patient_id=patient.id, _anchor='controles') }}">
+                <button type="submit" class="btn-link btn-secondary">Finalizar</button>
+              </form>
+            </div>
+          {% else %}
+            <div><small>Finalizado el {{ fu.completed_at.strftime('%Y-%m-%d') if fu.completed_at else '' }}</small></div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay controles de screening cargados.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if control_reminders is defined and control_reminders %}
+<div class="form-section">
+  <h2>Controles solicitados en consulta</h2>
+  <ul>
+    {% for cr in control_reminders %}
+      <li>
+        <strong>Fecha:</strong> {{ cr.control_date or 'sin fecha' }}
+        {% if cr.consultation_id %}- Consulta #{{ cr.consultation_id }}{% endif %}
+        {% if cr.extra_emails %}<br><small>Emails extra: {{ cr.extra_emails }}</small>{% endif %}
+        {% if cr.created_by %}<br><small>Creado por: {{ cr.created_by.full_name or cr.created_by.email }}</small>{% endif %}
+        {% if cr.completed %}
+          <div><small>Finalizado el {{ cr.completed_at.strftime('%Y-%m-%d') if cr.completed_at else '' }}</small></div>
+        {% else %}
+          <form method="post" action="{{ url_for('control_reminder_complete', reminder_id=cr.id) }}" style="display:inline" onsubmit="return confirm('¿Marcar este control como finalizado?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="next" value="{{ url_for('patient_detail', patient_id=patient.id, _anchor='controles') }}">
+            <button type="submit" class="btn-link btn-secondary">Finalizar</button>
+          </form>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% endblock %}

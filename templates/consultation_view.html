@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Consulta</h1>
+<p><strong>Paciente:</strong> <a href="{{ url_for('patient_detail', patient_id=patient.id) }}">{{ patient.full_name }}</a></p>
+<p><strong>Fecha:</strong> {{ consultation.date or '---' }}</p>
+{% if consultation.notes %}
+  <p><strong>Notas:</strong><br>{{ consultation.notes | nl2br }}</p>
+{% endif %}
+{% if consultation.lab_general %}
+  <p><strong>Laboratorio general:</strong><br>{{ consultation.lab_general | nl2br }}</p>
+{% endif %}
+
+{% set labs = consultation.lab_immunology|as_list %}
+{% if labs %}
+  <div class="form-section">
+    <h3>Autoinmunidad</h3>
+    <ul>
+      {% for code in labs %}
+        <li>
+          {{ immuno_map.get(code, code) }}
+          {% if immuno_values.get(code) %}
+            : <strong>{{ immuno_values.get(code) }}</strong>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if consultation.lab_immunology_notes %}
+  <p><strong>Notas de autoinmunidad:</strong><br>{{ consultation.lab_immunology_notes | nl2br }}</p>
+{% endif %}
+
+<p><a href="{{ url_for('patient_detail', patient_id=patient.id) }}">Volver al paciente</a></p>
+{% endblock %}
