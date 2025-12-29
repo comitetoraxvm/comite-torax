@@ -2,15 +2,14 @@
 
 {% block content %}
 <div class="container my-4">
-  <!-- Paciente -->
+
+  <!-- Card: Paciente -->
   <div class="card mb-3">
     <div class="card-body">
       <h3 class="card-title">Nueva consulta</h3>
       <p class="mb-1">
-        Paciente:
-        <strong>{{ patient.full_name }}</strong>
-        — DNI:
-        <strong>{{ patient.dni or "" }}</strong>
+        Paciente: <strong>{{ patient.full_name }}</strong>
+        — DNI: <strong>{{ patient.dni or "" }}</strong>
       </p>
       {% if patient.age %}
       <p class="mb-0">Edad: {{ patient.age }}</p>
@@ -21,7 +20,7 @@
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <!-- Datos de la consulta -->
+    <!-- Datos consulta -->
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Datos de la consulta</h5>
@@ -41,148 +40,99 @@
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Estudio asociado</h5>
-        <p class="text-muted mb-2">
-          Elige el grupo y completa solo ese bloque. Puedes seleccionar más de uno si corresponde.
-        </p>
+        <p class="text-muted mb-2">Elige el grupo y completa solo ese bloque.</p>
 
         <div class="form-check">
-          <input class="form-check-input group-toggle" type="checkbox" id="chk-func" data-target="#func-block" data-group="func">
-          <label class="form-check-label font-weight-bold" for="chk-func">
-            Pruebas funcionales respiratorias
-          </label>
+          <input class="form-check-input group-toggle" type="radio" name="study_group" id="grp-func" value="func">
+          <label class="form-check-label font-weight-bold" for="grp-func">Pruebas funcionales respiratorias</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input group-toggle" type="checkbox" id="chk-img" data-target="#img-block" data-group="img">
-          <label class="form-check-label font-weight-bold" for="chk-img">
-            Diagnóstico por imágenes
-          </label>
+          <input class="form-check-input group-toggle" type="radio" name="study_group" id="grp-img" value="img">
+          <label class="form-check-label font-weight-bold" for="grp-img">Diagnóstico por imágenes</label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input group-toggle" type="checkbox" id="chk-inv" data-target="#inv-block" data-group="inv">
-          <label class="form-check-label font-weight-bold" for="chk-inv">
-            Procedimientos invasivos
-          </label>
+        <div class="form-check mb-3">
+          <input class="form-check-input group-toggle" type="radio" name="study_group" id="grp-inv" value="inv">
+          <label class="form-check-label font-weight-bold" for="grp-inv">Procedimientos invasivos</label>
         </div>
 
-        <!-- Funcionales -->
-        <div id="func-block" class="mt-3 d-none">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0">Pruebas funcionales respiratorias</h6>
-            <button class="btn btn-link btn-sm add-row-btn" type="button" data-group="func">
-              Agregar otro estudio
-            </button>
+        <!-- Campos compartidos; se muestran según grupo -->
+        <div id="studies-block" class="d-none">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="study_type">Tipo de estudio</label>
+              <select id="study_type" name="study_type" class="form-control">
+                <option value="">-- Seleccionar --</option>
+                <!-- funcionales -->
+                <option data-group="func">Espirometría</option>
+                <option data-group="func">Test de la Marcha 6m</option>
+                <option data-group="func">DLCO</option>
+                <option data-group="func">Volúmenes pulmonares</option>
+                <!-- imágenes -->
+                <option data-group="img">TC Tórax</option>
+                <option data-group="img">RM Tórax</option>
+                <option data-group="img">PET-CT</option>
+                <option data-group="img">RX</option>
+                <option data-group="img">Ecografía</option>
+                <option data-group="img">Ecocardiograma</option>
+                <option data-group="img">Ecodoppler Angiopower</option>
+                <!-- invasivos -->
+                <option data-group="inv">Fibrobroncoscopía</option>
+                <option data-group="inv">Biopsia</option>
+                <option data-group="inv">BAL</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="study_date">Fecha del estudio</label>
+              <input id="study_date" name="study_date" type="date" class="form-control">
+            </div>
           </div>
-          <div id="func-rows"></div>
 
-          <button
-            type="button"
-            class="btn btn-secondary btn-sm mb-3"
-            onclick="window.open('https://ae.connect.boehringer-ingelheim.com/c/eJx0klFv2yAQxz8NfkuFzwY7D35w63iL1JdWytY-RRjOCSoGBnaX7dNPOFPWPdSyTsD97v7cX7xsHsWApiHVPQHwwalFzntFAEjREgBBqaLrpxDdoW2fUgoeCEBAqb1GO_-DDV50_C2sCto6UtLTJLS5k266FQnvg3tHtUuZjzoQD_tV5_HL62V6bb_eSvAyY7DiRtvFmGtmiRg-9KCU0e9rD_7Wupen9nDr4cLpP7D7OxQdn9m33RWsukw1uFVQbTNs8qpkDGhVsuzc1KymwFLMVbllaqhz5HwUkvOBjQXPdAMUGC2hzGsGwO7Gmo1DwYcEKFpVpKTSWYtyvhscnoO2JwybFM0Z9ZQ8ykxznmcf1zv2BHof3KcwgT4KAr0IBHopjFyMUC6IjcKND-4UMGpnr7sFBxHTclysTKd-MZOzImxEIEUvtSJF1-6S7vqvo0AOBPj9ft-RoqM0vxqWyx-Hnw9tMow7v6S6ZwJ80EeF6I22b8eIMUkfh19exEiKLs9C8_nLyN4b-BMAAP__3uHA8g', '_blank')">
-            Calculadora de progresión de pruebas de función pulmonar
-          </button>
+          <div class="form-row" id="row-center">
+            <div class="form-group col-md-12">
+              <label for="study_center">Centro</label>
+              <select id="study_center" name="study_center" class="form-control">
+                <option value="">-- Seleccionar --</option>
+                {% for c in center_options %}
+                <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+              </select>
+              <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+            </div>
+          </div>
+
+          <div id="row-access" class="form-group">
+            <label for="study_access_code">Número de acceso</label>
+            <input id="study_access_code" name="study_access_code" type="text" class="form-control">
+          </div>
+          <div id="row-portal" class="form-group">
+            <label for="study_portal_link">Link de ingreso directo</label>
+            <input id="study_portal_link" name="study_portal_link" type="url" class="form-control">
+          </div>
 
           <div class="form-group">
-            <label>Descripción / hallazgos</label>
-            <textarea name="study_description" class="form-control" rows="3"></textarea>
+            <label for="study_description">Descripción / hallazgos</label>
+            <textarea id="study_description" name="study_description" class="form-control" rows="3"></textarea>
             <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
           </div>
 
           <div class="form-group">
-            <label>Subir informe (PDF)</label>
-            <input type="file" name="study_file" accept="application/pdf">
+            <label for="study_file">Subir informe (PDF)</label>
+            <input id="study_file" type="file" name="study_file" accept="application/pdf">
           </div>
 
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="control-enabled" name="control_enabled">
-            <label class="form-check-label" for="control-enabled">
-              Solicitar control (recordatorio)
-            </label>
+          <div id="row-control" class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="control_enabled" name="control_enabled">
+            <label class="form-check-label" for="control_enabled">Solicitar control (recordatorio)</label>
           </div>
           <div id="control-fields" class="form-row d-none">
             <div class="form-group col-md-4">
-              <label for="control-date">Fecha de control</label>
-              <input id="control-date" name="control_date" type="date" class="form-control">
+              <label for="control_date">Fecha de control</label>
+              <input id="control_date" name="control_date" type="date" class="form-control">
             </div>
             <div class="form-group col-md-8">
-              <label for="control-extra">Emails adicionales</label>
-              <input
-                id="control-extra"
-                name="control_extra_emails"
-                type="text"
-                class="form-control"
-                placeholder="Correos separados por coma"
-              >
+              <label for="control_extra_emails">Emails adicionales</label>
+              <input id="control_extra_emails" name="control_extra_emails" type="text" class="form-control" placeholder="Correos separados por coma">
             </div>
-          </div>
-        </div>
-
-        <!-- Diagnóstico por imágenes -->
-        <div id="img-block" class="mt-3 d-none">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0">Diagnóstico por imágenes</h6>
-            <button class="btn btn-link btn-sm add-row-btn" type="button" data-group="img">
-              Agregar otro estudio
-            </button>
-          </div>
-          <div id="img-rows"></div>
-
-          <div class="form-group">
-            <label for="img-access">Número de acceso</label>
-            <input id="img-access" name="study_access_code" type="text" class="form-control" placeholder="Código / número de acceso">
-          </div>
-          <div class="form-group">
-            <label for="img-link">Link de ingreso directo</label>
-            <input id="img-link" name="study_portal_link" type="url" class="form-control" placeholder="URL del estudio">
-          </div>
-
-          <div class="form-group">
-            <label>Subir informe (PDF)</label>
-            <input type="file" name="study_file" accept="application/pdf">
-          </div>
-
-          <div class="form-group">
-            <label>Descripción / hallazgos</label>
-            <textarea name="study_description" class="form-control" rows="3"></textarea>
-            <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-          </div>
-
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="img-control-enabled" name="control_enabled">
-            <label class="form-check-label" for="img-control-enabled">
-              Solicitar control (recordatorio)
-            </label>
-          </div>
-          <div id="img-control-fields" class="form-row d-none">
-            <div class="form-group col-md-4">
-              <label for="img-control-date">Fecha de control</label>
-              <input id="img-control-date" name="control_date" type="date" class="form-control">
-            </div>
-            <div class="form-group col-md-8">
-              <label for="img-control-extra">Emails adicionales</label>
-              <input id="img-control-extra" name="control_extra_emails" type="text" class="form-control" placeholder="Correos separados por coma">
-            </div>
-          </div>
-        </div>
-
-        <!-- Procedimientos invasivos -->
-        <div id="inv-block" class="mt-3 d-none">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0">Procedimientos invasivos</h6>
-            <button class="btn btn-link btn-sm add-row-btn" type="button" data-group="inv">
-              Agregar otro estudio
-            </button>
-          </div>
-          <div id="inv-rows"></div>
-
-          <div class="form-group">
-            <label>Descripción / hallazgos</label>
-            <textarea name="inv_description" class="form-control" rows="3"></textarea>
-            <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-          </div>
-
-          <div class="form-group">
-            <label>Subir informe (PDF)</label>
-            <input type="file" name="inv_file" accept="application/pdf">
           </div>
         </div>
       </div>
@@ -197,210 +147,90 @@
           <textarea id="lab_general" name="lab_general" class="form-control" rows="2"></textarea>
           <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
         </div>
-
         <div class="form-group">
-          <label class="d-block">Autoinmunidad</label>
+          <label>Autoinmunidad</label>
           <div class="row">
+            {% for opt in immuno_options %}
             <div class="col-md-6">
-              {% for value, label in immuno_core_options %}
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="lab_{{ value }}" name="lab_immunology" value="{{ value }}">
-                <label class="form-check-label" for="lab_{{ value }}">{{ label }}</label>
-                <input type="text" name="lab_immunology_value_{{ value }}" class="form-control form-control-sm mt-1" placeholder="Valor">
+                <input class="form-check-input" type="checkbox" name="lab_immunology" value="{{ opt[0] }}" id="im-{{ opt[0] }}">
+                <label class="form-check-label" for="im-{{ opt[0] }}">{{ opt[1] }}</label>
               </div>
-              {% endfor %}
             </div>
-            <div class="col-md-6">
-              <details class="mb-2">
-                <summary>Panel ampliado (reumatología)</summary>
-                {% for value, label in immuno_rheum_options %}
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="lab_{{ value }}" name="lab_immunology" value="{{ value }}">
-                  <label class="form-check-label" for="lab_{{ value }}">{{ label }}</label>
-                  <input type="text" name="lab_immunology_value_{{ value }}" class="form-control form-control-sm mt-1" placeholder="Valor">
-                </div>
-                {% endfor %}
-              </details>
-            </div>
+            {% endfor %}
           </div>
-          <label class="mt-2" for="lab_immunology_notes">Notas de autoinmunidad</label>
-          <textarea id="lab_immunology_notes" name="lab_immunology_notes" class="form-control" rows="2"></textarea>
-          <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+          <div class="form-group mt-2">
+            <label for="lab_immunology_notes">Notas / resultados</label>
+            <textarea id="lab_immunology_notes" name="lab_immunology_notes" class="form-control" rows="2"></textarea>
+            <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Revisión -->
-    <div class="card mb-4">
+    <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Revisión de colegas</h5>
         <div class="form-group">
-          <label for="review_recipients">Profesionales para revisar (Ctrl para seleccionar varios)</label>
+          <label for="review_recipients">Destinatarios</label>
           <select id="review_recipients" name="review_recipients" class="form-control" multiple>
-            {% for user in review_users %}
-            <option value="{{ user.id }}">{{ user.full_name }} ({{ user.email }})</option>
+            {% for u in review_users %}
+            <option value="{{ u.id }}">{{ u.full_name }} ({{ u.email }})</option>
             {% endfor %}
           </select>
         </div>
         <div class="form-group">
-          <label for="review_message">Mensaje para la revisión</label>
-          <textarea id="review_message" name="review_message" class="form-control" rows="2"></textarea>
+          <label for="review_message">Mensaje</label>
+          <textarea id="review_message" name="review_message" class="form-control" rows="3"></textarea>
           <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
         </div>
       </div>
     </div>
 
-    <div class="text-right mb-4">
+    <div class="d-flex justify-content-between mb-4">
       <button type="submit" class="btn btn-primary">Guardar consulta</button>
-      <a class="btn btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
-    </div>
-
-    <!-- Templates ocultos para filas dinámicas -->
-    <div id="tpl-func-row" class="d-none">
-      <div class="dynamic-row border rounded p-3 mb-3">
-        <div class="form-row align-items-end">
-          <div class="form-group col-md-6">
-            <label>Tipo de estudio</label>
-            <select name="func_type[]" class="form-control">
-              <option value="">-- Seleccionar --</option>
-              <option>Espirometría</option>
-              <option>Test de la Marcha 6m</option>
-              <option>DLCO</option>
-              <option>Volúmenes Pulmonares</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label>Fecha del estudio</label>
-            <input type="date" name="func_date[]" class="form-control">
-          </div>
-          <div class="form-group col-md-2 text-right">
-            <button type="button" class="btn btn-link text-danger remove-row">Eliminar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tpl-img-row" class="d-none">
-      <div class="dynamic-row border rounded p-3 mb-3">
-        <div class="form-row align-items-end">
-          <div class="form-group col-md-4">
-            <label>Tipo de estudio</label>
-            <select name="img_type[]" class="form-control">
-              <option value="">-- Seleccionar --</option>
-              <option>TC Tórax</option>
-              <option>RM Tórax</option>
-              <option>PET-CT</option>
-              <option>RX</option>
-              <option>Ecografía</option>
-              <option>Ecocardiograma</option>
-              <option>Ecodoppler Angiopower</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label>Fecha del estudio</label>
-            <input type="date" name="img_date[]" class="form-control">
-          </div>
-          <div class="form-group col-md-3">
-            <label>Centro</label>
-            <select name="img_center[]" class="form-control">
-              <option value="">-- Seleccionar --</option>
-              {% for c in center_options %}
-              <option value="{{ c }}">{{ c }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group col-md-1 text-right">
-            <button type="button" class="btn btn-link text-danger remove-row">Eliminar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tpl-inv-row" class="d-none">
-      <div class="dynamic-row border rounded p-3 mb-3">
-        <div class="form-row align-items-end">
-          <div class="form-group col-md-6">
-            <label>Tipo de estudio</label>
-            <select name="inv_type[]" class="form-control">
-              <option value="">-- Seleccionar --</option>
-              <option>Fibrobroncoscopía</option>
-              <option>Biopsia</option>
-              <option>BAL</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label>Fecha del estudio</label>
-            <input type="date" name="inv_date[]" class="form-control">
-          </div>
-          <div class="form-group col-md-2 text-right">
-            <button type="button" class="btn btn-link text-danger remove-row">Eliminar</button>
-          </div>
-        </div>
-      </div>
+      <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-link">Cancelar</a>
     </div>
   </form>
 </div>
 
-<style>
-  .d-none {
-    display: none !important;
-  }
-</style>
-
+<style>.d-none{display:none!important;}</style>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    function bindRemove(row) {
-      const btn = row.querySelector(".remove-row");
-      if (btn) {
-        btn.addEventListener("click", () => row.remove());
-      }
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  const block = document.getElementById("studies-block");
+  const groupRadios = document.querySelectorAll(".group-toggle");
+  const rowAccess = document.getElementById("row-access");
+  const rowPortal = document.getElementById("row-portal");
+  const rowCenter = document.getElementById("row-center");
+  const rowControl = document.getElementById("row-control");
+  const controlFields = document.getElementById("control-fields");
+  const chkControl = document.getElementById("control_enabled");
 
-    function addRow(group) {
-      const tpl = document.querySelector("#tpl-" + group + "-row");
-      const container = document.querySelector("#" + group + "-rows");
-      if (!tpl || !container) return;
-      const clone = tpl.firstElementChild.cloneNode(true);
-      bindRemove(clone);
-      container.appendChild(clone);
-    }
-
-    document.querySelectorAll(".add-row-btn").forEach((btn) => {
-      btn.addEventListener("click", () => addRow(btn.dataset.group));
-    });
-
-    function toggleBlock(toggle) {
-      const targetSel = toggle.dataset.target;
-      const group = toggle.dataset.group;
-      const block = document.querySelector(targetSel);
-      if (!block) return;
-      if (toggle.checked) {
+  groupRadios.forEach(r => {
+    r.addEventListener("change", () => {
+      if (r.checked) {
         block.classList.remove("d-none");
-        const rows = block.querySelectorAll(".dynamic-row");
-        if (rows.length === 0) {
-          addRow(group);
-        }
-      } else {
-        block.classList.add("d-none");
+        const g = r.value;
+        // mostrar/ocultar campos según grupo
+        const showCenter = (g === "img");
+        const showAccess = (g === "img");
+        const showPortal = (g === "img");
+        const showControl = (g !== "inv"); // func e img
+        rowCenter.classList.toggle("d-none", !showCenter);
+        rowAccess.classList.toggle("d-none", !showAccess);
+        rowPortal.classList.toggle("d-none", !showPortal);
+        rowControl.classList.toggle("d-none", !showControl);
+        controlFields.classList.toggle("d-none", !showControl || !chkControl.checked);
       }
-    }
-
-    document.querySelectorAll(".group-toggle").forEach((tg) => {
-      tg.addEventListener("change", () => toggleBlock(tg));
-      toggleBlock(tg);
     });
-
-    function handleControl(chkId, fieldsId) {
-      const chk = document.getElementById(chkId);
-      const fields = document.getElementById(fieldsId);
-      if (!chk || !fields) return;
-      const apply = () => fields.classList.toggle("d-none", !chk.checked);
-      apply();
-      chk.addEventListener("change", apply);
-    }
-
-    handleControl("control-enabled", "control-fields");
-    handleControl("img-control-enabled", "img-control-fields");
   });
+
+  if (chkControl && controlFields) {
+    chkControl.addEventListener("change", () => {
+      controlFields.classList.toggle("d-none", !chkControl.checked);
+    });
+  }
+});
 </script>
 {% endblock %}
