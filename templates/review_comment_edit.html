@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Editar comentario</h1>
+<p><strong>Paciente:</strong> {{ review.patient.full_name }}</p>
+<p><strong>Comentario actual:</strong></p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="voice-field">
+    <textarea name="message" rows="4" style="width:100%;">{{ comment.message }}</textarea>
+    <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="message">Dictado</button>
+  </div>
+  <button type="submit" class="btn btn-primary" style="margin-top:8px;">Guardar cambios</button>
+  <a href="{{ url_for('reviews_inbox') }}" class="btn-link btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

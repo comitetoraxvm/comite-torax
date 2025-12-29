@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Screening de cáncer de pulmón</h1>
+
+<p>
+  <strong>Paciente:</strong> {{ patient.full_name }}
+  {% if patient.dni %}(DNI: {{ patient.dni }}){% endif %}
+</p>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="form-section">
+    <h2>Datos de screening</h2>
+
+    <div class="form-section" style="background:#f5f8ff; border:1px solid #d4e1ff; border-radius:8px; padding:12px;">
+      <h3>Elegibilidad automática (básica)</h3>
+      <p><strong>Resultado:</strong> {{ 'Cumple' if eligibility_met else 'No cumple o faltan datos' }}</p>
+      <ul>
+        {% for r in eligibility_reasons %}
+          <li>{{ r }}</li>
+        {% endfor %}
+      </ul>
+      <p><strong>Dato guardado en paciente:</strong> Edad: {{ patient.age or '---' }}, IPA: {{ patient.smoking_pack_years or '---' }}, Tabaquismo: {% if patient.smoking_current %}Actual{% elif patient.smoking_previous %}Previo{% else %}No{% endif %}.</p>
+    </div>
+
+    <label for="nccn_criteria">Criterio de inclusión NCCN (sí/no/motivo)</label>
+    <div class="voice-field">
+      <textarea id="nccn_criteria" name="nccn_criteria" rows="2">{{ screening.nccn_criteria or '' }}</textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="nccn_criteria">Dictado</button>
+    </div>
+
+    <label for="extra_email">Email adicional (secretaría / contacto)</label>
+    <input type="email" id="extra_email" name="extra_email" value="{{ screening.extra_email or '' }}" placeholder="secretaria@ejemplo.com">
+
+    <label for="ecog_status">ECOG Performance Status</label>
+    <select id="ecog_status" name="ecog_status">
+      <option value="">-- Seleccionar --</option>
+      <option value="0" {% if screening.ecog_status == '0' %}selected{% endif %}>0 - Asintomático, actividad normal</option>
+      <option value="1" {% if screening.ecog_status == '1' %}selected{% endif %}>1 - Síntomas leves, actividades habituales conservadas</option>
+      <option value="2" {% if screening.ecog_status == '2' %}selected{% endif %}>2 - Ambulatorio, incapaz de trabajar</option>
+      <option value="3" {% if screening.ecog_status == '3' %}selected{% endif %}>3 - Autocuidado limitado, >50% del día en cama</option>
+      <option value="4" {% if screening.ecog_status == '4' %}selected{% endif %}>4 - Postrado</option>
+      <option value="5" {% if screening.ecog_status == '5' %}selected{% endif %}>5 - Fallecido</option>
+    </select>
+
+    <h3>Tomografía de base</h3>
+    <div class="grid-2">
+      <div>
+        <label for="study_center_select">Lugar de realización del estudio</label>
+        <select id="study_center_select">
+          <option value="">-- Seleccionar --</option>
+          {% for c in center_options %}
+            <option value="{{ c }}" {% if screening.study_center == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+          <option value="__otro__" {% if screening.study_center and screening.study_center not in center_options %}selected{% endif %}>Otro</option>
+        </select>
+        <input type="text" id="study_center" name="study_center" value="{{ screening.study_center or '' }}" placeholder="Ej: Hospital Pasteur">
+        <p id="screening-center-link"></p>
+      </div>
+      <div>
+        <label for="study_number">Número de estudio / ID PACS</label>
+        <input type="text" id="study_number" name="study_number" value="{{ screening.study_number or '' }}">
+      </div>
+    </div>
+
+    <label for="study_date">Fecha del estudio</label>
+    <input type="date" id="study_date" name="study_date" value="{{ screening.study_date or '' }}">
+
+    <label for="study_file">Subir informe (PDF)</label>
+    <input type="file" id="study_file" name="study_file" accept=".pdf">
+    {% if screening.study_file %}
+      <p>Archivo actual: <a href="{{ url_for('patient_screening_file', patient_id=patient.id) }}">Descargar</a></p>
+    {% endif %}
+
+    <div class="grid-2">
+      <div>
+        <label for="lung_rads">Lung-RADS</label>
+        <input type="text" id="lung_rads" name="lung_rads" value="{{ screening.lung_rads or '' }}" placeholder="Ej: 1, 2, 3, 4A, 4B...">
+      </div>
+      <div>
+        <label for="next_control_date">Fecha de próximo control sugerido</label>
+        <input type="date" id="next_control_date" name="next_control_date" value="{{ screening.next_control_date or '' }}">
+      </div>
+    </div>
+
+    <label for="conclusion">Conducta / Recomendación / Conclusión breve</label>
+    <div class="voice-field">
+      <textarea id="conclusion" name="conclusion" rows="4">{{ screening.conclusion or screening.recommendation or '' }}</textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="conclusion">Dictado</button>
+    </div>
+  </div>
+
+  <button type="submit">Guardar screening</button>
+  <a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Volver al paciente</a>
+</form>
+
+<div class="form-section" id="followups">
+  <h2>Controles / Seguimientos</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="add_followup">
+
+    <div class="grid-2">
+      <div>
+        <label for="fu_study_type">Tipo de estudio</label>
+        <input type="text" id="fu_study_type" name="fu_study_type" placeholder="LDCT, CT, PET/CT, etc." required>
+      </div>
+      <div>
+        <label for="fu_study_date">Fecha del estudio</label>
+        <input type="date" id="fu_study_date" name="fu_study_date" required>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="fu_study_center_select">Lugar de realización</label>
+        <select id="fu_study_center_select">
+          <option value="">-- Seleccionar --</option>
+          {% for c in center_options %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+          <option value="__otro__">Otro</option>
+        </select>
+        <input type="text" id="fu_study_center" name="fu_study_center" placeholder="Ej: Hospital Pasteur">
+        <p id="fu-center-link"></p>
+      </div>
+      <div>
+        <label for="fu_study_number">Número de estudio / ID</label>
+        <input type="text" id="fu_study_number" name="fu_study_number">
+      </div>
+    </div>
+
+    <label for="fu_findings">Hallazgos / Observaciones</label>
+    <div class="voice-field">
+      <textarea id="fu_findings" name="fu_findings" rows="3"></textarea>
+      <button type="button" class="btn-link btn-secondary" data-voice-btn data-target="fu_findings">Dictado</button>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="fu_lung_rads">Lung-RADS</label>
+        <input type="text" id="fu_lung_rads" name="fu_lung_rads" placeholder="Ej: 2, 3, 4A...">
+      </div>
+      <div>
+        <label for="fu_next_control_date">Próximo control sugerido</label>
+        <input type="date" id="fu_next_control_date" name="fu_next_control_date">
+      </div>
+    </div>
+
+    <label for="fu_file">Subir informe (PDF/imagen)</label>
+    <input type="file" id="fu_file" name="fu_file" accept=".pdf,.png,.jpg,.jpeg">
+
+    <button type="submit">Agregar control</button>
+  </form>
+
+  <h3>Historial de controles</h3>
+  {% if followups %}
+    <ul>
+      {% for fu in followups %}
+        <li style="margin-bottom:12px;">
+          <div><strong>{{ fu.study_type or 'Estudio' }}</strong></div>
+          <div>
+            {% if fu.study_date %}Fecha: {{ fu.study_date }} |{% endif %}
+            {% if fu.study_center %} Centro: {{ fu.study_center }} |{% endif %}
+            {% if fu.study_number %} ID: {{ fu.study_number }} |{% endif %}
+            {% if fu.lung_rads %} Lung-RADS: {{ fu.lung_rads }} |{% endif %}
+            {% if fu.next_control_date %} Próximo: {{ fu.next_control_date }} |{% endif %}
+            {% if fu.file_name %}
+              <a href="{{ url_for('screening_followup_file', followup_id=fu.id) }}">Archivo</a> |
+            {% endif %}
+            <form method="post" action="{{ url_for('screening_followup_delete', followup_id=fu.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este control?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-link btn-secondary" style="padding:2px 6px;">Eliminar</button>
+            </form>
+          </div>
+          {% if fu.findings %}<div><small>{{ fu.findings }}</small></div>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay controles cargados.</p>
+  {% endif %}
+</div>
+
+<style>
+  .toggle-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 10px 0 16px;
+  }
+  .toggle-item {
+    display: inline-flex;
+    align-items: center;
+  }
+  .toggle-item input {
+    display: none;
+  }
+  .toggle-item span {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid #cfd8ff;
+    background: #f6f8ff;
+    color: #20315a;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: all 0.15s ease;
+  }
+  .toggle-item input:checked + span {
+    background: #1847d6;
+    color: #fff;
+    border-color: #1847d6;
+    box-shadow: 0 6px 14px rgba(24,71,214,0.25);
+  }
+</style>
+
+<script>
+  (function() {
+    const links = {{ center_links|tojson }};
+    // Base study
+    const selectBase = document.getElementById('study_center_select');
+    const inputBase = document.getElementById('study_center');
+    const linkBase = document.getElementById('screening-center-link');
+    function updateBaseLink() {
+      if (!inputBase || !linkBase) return;
+      const value = (inputBase.value || '').trim().toLowerCase();
+      const url = links[value] || '';
+      linkBase.innerHTML = url ? 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>' : '';
+    }
+    function syncBase() {
+      if (!selectBase || !inputBase) return;
+      if (selectBase.value && selectBase.value !== '__otro__') {
+        inputBase.value = selectBase.value;
+        inputBase.readOnly = true;
+      } else if (selectBase.value === '__otro__') {
+        inputBase.readOnly = false;
+        if (!inputBase.value) inputBase.value = '';
+        inputBase.focus();
+      } else {
+        inputBase.readOnly = false;
+        inputBase.value = '';
+      }
+      updateBaseLink();
+    }
+    if (selectBase) {
+      selectBase.addEventListener('change', syncBase);
+      syncBase();
+    }
+    if (inputBase) {
+      inputBase.addEventListener('input', updateBaseLink);
+      updateBaseLink();
+    }
+
+    // Follow-up study
+    const selectFu = document.getElementById('fu_study_center_select');
+    const inputFu = document.getElementById('fu_study_center');
+    const linkFu = document.getElementById('fu-center-link');
+    function updateFuLink() {
+      if (!inputFu || !linkFu) return;
+      const value = (inputFu.value || '').trim().toLowerCase();
+      const url = links[value] || '';
+      linkFu.innerHTML = url ? 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>' : '';
+    }
+    function syncFu() {
+      if (!selectFu || !inputFu) return;
+      if (selectFu.value && selectFu.value !== '__otro__') {
+        inputFu.value = selectFu.value;
+        inputFu.readOnly = true;
+      } else if (selectFu.value === '__otro__') {
+        inputFu.readOnly = false;
+        if (!inputFu.value) inputFu.value = '';
+        inputFu.focus();
+      } else {
+        inputFu.readOnly = false;
+        inputFu.value = '';
+      }
+      updateFuLink();
+    }
+    if (selectFu) {
+      selectFu.addEventListener('change', syncFu);
+      syncFu();
+    }
+    if (inputFu) {
+      inputFu.addEventListener('input', updateFuLink);
+      updateFuLink();
+    }
+  })();
+</script>
+{% endblock %}
