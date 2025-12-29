@@ -3,9 +3,10 @@
 {% block content %}
 <div class="container mt-4">
   <h2>Nueva consulta</h2>
-  <p><strong>Paciente:</strong> {{ patient.full_name }}</p>
+  <p><strong>Paciente:</strong> {{ patient.full_name }}{% if patient.dni %} | DNI: {{ patient.dni }}{% endif %}</p>
 
   <form method="post" enctype="multipart/form-data">
+    <!-- Datos básicos -->
     <div class="card mb-4">
       <div class="card-body">
         <div class="row g-3">
@@ -15,38 +16,17 @@
           </div>
           <div class="col-md-8">
             <label class="form-label">Notas</label>
-            <textarea name="notes" rows="2" class="form-control"></textarea>
-          </div>
-        </div>
-
-        <hr>
-        <h5>Laboratorio</h5>
-        <div class="mb-2">
-          <label class="form-label">Laboratorio general</label>
-          <textarea name="lab_general" rows="2" class="form-control"></textarea>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Autoinmunidad (seleccionar)</label>
-          <div class="row">
-            {% for value,label in immuno_options %}
-            <div class="col-md-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="lab_immunology" value="{{ value }}" id="lab_{{ value }}">
-                <label class="form-check-label" for="lab_{{ value }}">{{ label }}</label>
-              </div>
-              <input type="text" class="form-control form-control-sm mt-1" name="lab_immunology_value_{{ value }}" placeholder="Valor (opcional)">
+            <div class="input-group">
+              <textarea name="notes" rows="2" class="form-control"></textarea>
+              <button type="button" class="btn btn-secondary voice-btn" data-target="[name='notes']">Dictado</button>
             </div>
-            {% endfor %}
           </div>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Notas autoinmunidad</label>
-          <textarea name="lab_immunology_notes" rows="2" class="form-control"></textarea>
         </div>
       </div>
     </div>
 
-    <div class="card">
+    <!-- Estudios asociados -->
+    <div class="card mb-4">
       <div class="card-body">
         <h4>Estudio asociado</h4>
         <p>Elige el grupo y completa solo ese bloque. Puedes agregar más de un estudio dentro del mismo grupo.</p>
@@ -78,7 +58,10 @@
 
           <div class="mb-3">
             <label class="form-label">Descripción / hallazgos (compartida)</label>
-            <textarea name="func_description" rows="3" class="form-control"></textarea>
+            <div class="input-group">
+              <textarea name="func_description" rows="3" class="form-control"></textarea>
+              <button type="button" class="btn btn-secondary voice-btn" data-target="[name='func_description']">Dictado</button>
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label">Subir informe (PDF) (compartido)</label>
@@ -117,7 +100,10 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Descripción / hallazgos (compartida)</label>
-            <textarea name="img_description" rows="3" class="form-control"></textarea>
+            <div class="input-group">
+              <textarea name="img_description" rows="3" class="form-control"></textarea>
+              <button type="button" class="btn btn-secondary voice-btn" data-target="[name='img_description']">Dictado</button>
+            </div>
           </div>
           <div class="mb-3">
             <div class="form-check mb-2">
@@ -152,7 +138,29 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Descripción / hallazgos (compartida)</label>
-            <textarea name="inv_description" rows="3" class="form-control"></textarea>
+            <div class="input-group">
+              <textarea name="inv_description" rows="3" class="form-control"></textarea>
+              <button type="button" class="btn btn-secondary voice-btn" data-target="[name='inv_description']">Dictado</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revisiones -->
+        <hr>
+        <h5>Revisión</h5>
+        <div class="mb-3">
+          <label class="form-label">Destinatarios</label>
+          <select name="review_recipients" class="form-select" multiple size="4">
+            {% for u in review_users %}
+            <option value="{{ u.id }}">{{ u.full_name }} ({{ u.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mensaje para revisión</label>
+          <div class="input-group">
+            <textarea name="review_message" rows="2" class="form-control"></textarea>
+            <button type="button" class="btn btn-secondary voice-btn" data-target=\"[name='review_message']\">Dictado</button>
           </div>
         </div>
 
@@ -187,7 +195,7 @@
 
 <template id="tpl-img">
   <div class="row g-3 align-items-end mb-2 img-row">
-    <div class="col-md-4">
+    <div class="col-md-6">
       <label class="form-label">Tipo de estudio</label>
       <select name="img_type[]" class="form-select">
         <option value="">-- Seleccionar --</option>
@@ -196,12 +204,12 @@
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6">
       <label class="form-label">Fecha</label>
       <input type="date" name="img_date[]" class="form-control">
     </div>
-    <div class="col-md-3">
-      <label class="form-label">Centro</label>
+    <div class="col-md-6">
+      <label class="form-label mt-2">Centro</label>
       <select name="img_center[]" class="form-select">
         <option value="">-- Seleccionar --</option>
         {% for c in center_options %}
@@ -209,16 +217,16 @@
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-2">
-      <button type="button" class="btn btn-outline-danger w-100" onclick="removeRow(this)">Eliminar</button>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <label class="form-label mt-2">Número de acceso</label>
       <input type="text" name="img_access[]" class="form-control" placeholder="Ej: 123456">
     </div>
-    <div class="col-md-8">
+    <div class="col-12">
       <label class="form-label mt-2">Link de acceso directo</label>
       <input type="url" name="img_link[]" class="form-control" placeholder="Ej: https://portal.com/estudio/123">
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger w-100 mt-2" onclick="removeRow(this)">Eliminar</button>
     </div>
   </div>
 </template>
@@ -275,19 +283,15 @@
     window.open("https://ae.connect.boehringer-ingelheim.com/c/eJx0klFv2yAQxz8NfkuFzwY7D35w63iL1JdWytY-RRjOCSoGBnaX7dNPOFPWPdSyTsD97v7cX7xsHsWApiHVPQHwwalFzntFAEjREgBBqaLrpxDdoW2fUgoeCEBAqb1GO_-DDV50_C2sCto6UtLTJLS5k266FQnvg3tHtUuZjzoQD_tV5_HL62V6bb_eSvAyY7DiRtvFmGtmiRg-9KCU0e9rD_7Wupen9nDr4cLpP7D7OxQdn9m33RWsukw1uFVQbTNs8qpkDGhVsuzc1KymwFLMVbllaqhz5HwUkvOBjQXPdAMUGC2hzGsGwO7Gmo1DwYcEKFpVpKTSWYtyvhscnoO2JwybFM0Z9ZQ8ykxznmcf1zv2BHof3KcwgT4KAr0IBHopjFyMUC6IjcKND-4UMGpnr7sFBxHTclysTKd-MZOzImxEIEUvtSJF1-6S7vqvo0AOBPj9ft-RoqM0vxqWyx-Hnw9tMow7v6S6ZwJ80EeF6I22b8eIMUkfh19exEiKLs9C8_nLyN4b-BMAAP__3uHA8g", "_blank");
   }
 
-  // Inicial
   document.addEventListener("DOMContentLoaded", function() {
-    // radios
     document.querySelectorAll("input[name='study_group']").forEach(r => {
       r.addEventListener("change", e => switchGroup(e.target.value));
     });
-    switchGroup(document.querySelector("input[name='study_group']:checked").value);
-
-    // filas iniciales (una por grupo)
+    const checked = document.querySelector("input[name='study_group']:checked");
+    switchGroup(checked ? checked.value : 'func');
     addRow('func');
     addRow('img');
     addRow('inv');
-
     toggleControl('func');
     toggleControl('img');
   });
