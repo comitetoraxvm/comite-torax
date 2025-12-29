@@ -4,36 +4,42 @@
 {% block content %}
 <div class="container mt-4">
   <h2 class="mb-3">Nueva consulta</h2>
-  <p class="text-muted">
-    Paciente: <strong>{{ patient.full_name }}</strong>
-    {% if patient.dni %} &mdash; DNI: <strong>{{ patient.dni }}</strong>{% endif %}
-  </p>
-
   <form method="post" enctype="multipart/form-data">
-    {{ csrf_token() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <!-- Datos básicos -->
-    <div class="card mb-4">
-      <div class="card-header fw-bold">Datos de la consulta</div>
-      <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label class="form-label">Fecha de la consulta <span class="text-danger">*</span></label>
-            <input type="date" name="date" class="form-control" required>
-          </div>
-          <div class="col-md-8">
-            <label class="form-label">Notas</label>
-            <div class="input-group">
-              <textarea name="notes" class="form-control" rows="3" id="notes"></textarea>
-              <button type="button" class="btn btn-outline-secondary voice-btn" data-target="#notes">Dictado</button>
+    <div class="bg-light p-3 rounded">
+      <!-- Paciente -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="mb-0 text-muted">
+            Paciente: <strong>{{ patient.full_name }}</strong>
+            {% if patient.dni %} &mdash; DNI: <strong>{{ patient.dni }}</strong>{% endif %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Datos básicos -->
+      <div class="card mb-3">
+        <div class="card-header fw-bold">Datos de la consulta</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Fecha de la consulta <span class="text-danger">*</span></label>
+              <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Notas</label>
+              <div class="input-group">
+                <textarea name="notes" class="form-control" rows="3" id="notes"></textarea>
+                <button type="button" class="btn btn-outline-secondary voice-btn" data-target="#notes">Dictado</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Estudios asociados -->
-    <div class="card mb-4">
+    <div class="card mb-3">
       <div class="card-header fw-bold">Estudio asociado</div>
       <div class="card-body">
         <p class="text-muted">Elige el grupo y completa solo ese bloque.</p>
@@ -152,7 +158,7 @@
     </div>
 
     <!-- Laboratorio -->
-    <div class="card mb-4">
+    <div class="card mb-3">
       <div class="card-header fw-bold">Laboratorio</div>
       <div class="card-body">
         <div class="mb-3">
@@ -205,7 +211,7 @@
     </div>
 
     <!-- Revisiones -->
-    <div class="card mb-4">
+    <div class="card mb-3">
       <div class="card-header fw-bold">Revisión de colegas</div>
       <div class="card-body">
         <div class="mb-3">
@@ -227,9 +233,10 @@
       </div>
     </div>
 
-    <div class="text-end mb-4">
+    <div class="text-end mt-3">
       <button type="submit" class="btn btn-primary">Guardar consulta</button>
       <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-secondary">Cancelar</a>
+    </div>
     </div>
   </form>
 </div>
