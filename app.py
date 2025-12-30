@@ -315,6 +315,7 @@ def load_catalogs():
 
 
 CATALOGS = load_catalogs()
+# Ensure default upload dir exists; note that tests may override app.config['UPLOAD_DIR'] later
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -356,6 +357,11 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get(
     "SECRET_KEY", "cambia-esta-clave-por-una-larga-y-segura"
 )
+
+
+def get_upload_dir():
+    """Devuelve el directorio de uploads, permitiendo override mediante app.config['UPLOAD_DIR']."""
+    return app.config.get("UPLOAD_DIR", UPLOAD_DIR)
 default_sqlite = "sqlite:///" + os.path.join(BASE_DIR, "instance", "comite.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", default_sqlite)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -2174,7 +2180,8 @@ def patient_new():
             filename = secure_filename(genogram_pdf.filename)
             if allowed_patient_file(filename):
                 unique_name = f"patient_{patient.id}_familiograma_{int(time.time())}.pdf"
-                genogram_pdf.save(os.path.join(UPLOAD_DIR, unique_name))
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                genogram_pdf.save(os.path.join(get_upload_dir(), unique_name))
                 patient.family_genogram_pdf = unique_name
                 db.session.commit()
             else:
@@ -2420,7 +2427,8 @@ def patient_screening(patient_id):
                 fname = secure_filename(fu_file.filename)
                 if allowed_patient_file(fname):
                     unique_name = f"screeningfu_{screening.id}_{int(time.time())}_{fname}"
-                    fu_file.save(os.path.join(UPLOAD_DIR, unique_name))
+                    os.makedirs(get_upload_dir(), exist_ok=True)
+                    fu_file.save(os.path.join(get_upload_dir(), unique_name))
                     file_name = unique_name
                 else:
                     flash("Solo se permiten PDF/imagenes (pdf/png/jpg/jpeg).", "danger")
@@ -2483,7 +2491,8 @@ def patient_screening(patient_id):
             filename = secure_filename(study_file.filename)
             if allowed_patient_file(filename):
                 unique_name = f"screening_{patient.id}_{int(time.time())}.pdf"
-                save_path = os.path.join(UPLOAD_DIR, unique_name)
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                save_path = os.path.join(get_upload_dir(), unique_name)
                 study_file.save(save_path)
                 screening.study_file = unique_name
             else:
@@ -2523,11 +2532,11 @@ def patient_screening_file(patient_id):
     if not screening.study_file:
         flash("No hay archivo de screening cargado.", "warning")
         return redirect(url_for("patient_screening", patient_id=patient_id))
-    file_path = os.path.join(UPLOAD_DIR, screening.study_file)
+    file_path = os.path.join(get_upload_dir(), screening.study_file)
     if not os.path.exists(file_path):
         flash("El archivo no se encuentra disponible.", "danger")
         return redirect(url_for("patient_screening", patient_id=patient_id))
-    return send_from_directory(UPLOAD_DIR, screening.study_file, as_attachment=True)
+    return send_from_directory(get_upload_dir(), screening.study_file, as_attachment=True)
 
 
 @app.route("/screening/followup/<int:followup_id>/file")
@@ -2537,11 +2546,11 @@ def screening_followup_file(followup_id):
     if not fu.file_name:
         flash("No hay archivo adjunto para este control.", "warning")
         return redirect(url_for("patient_screening", patient_id=fu.screening.patient_id))
-    file_path = os.path.join(UPLOAD_DIR, fu.file_name)
+    file_path = os.path.join(get_upload_dir(), fu.file_name)
     if not os.path.exists(file_path):
         flash("El archivo no se encuentra disponible.", "danger")
         return redirect(url_for("patient_screening", patient_id=fu.screening.patient_id))
-    return send_from_directory(UPLOAD_DIR, fu.file_name, as_attachment=True)
+    return send_from_directory(get_upload_dir(), fu.file_name, as_attachment=True)
 
 
 @app.route("/screening/followup/<int:followup_id>/delete", methods=["POST"])
@@ -2551,7 +2560,7 @@ def screening_followup_delete(followup_id):
     patient_id = fu.screening.patient_id
     # borrar archivo si existe
     if fu.file_name:
-        path = os.path.join(UPLOAD_DIR, fu.file_name)
+        path = os.path.join(get_upload_dir(), fu.file_name)
         if os.path.exists(path):
             try:
                 os.remove(path)
@@ -2619,7 +2628,8 @@ def screening_followup_edit(followup_id):
             fname = secure_filename(file.filename)
             if allowed_patient_file(fname):
                 unique_name = f"screeningfu_{fu.id}_{int(time.time())}_{fname}"
-                file.save(os.path.join(UPLOAD_DIR, unique_name))
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                file.save(os.path.join(get_upload_dir(), unique_name))
                 fu.file_name = unique_name
             else:
                 flash("Solo se permiten PDF/imagenes (pdf/png/jpg/jpeg).", "danger")
@@ -2707,14 +2717,15 @@ def patient_edit(patient_id):
             filename = secure_filename(genogram_pdf.filename)
             if allowed_patient_file(filename):
                 if patient.family_genogram_pdf:
-                    old_path = os.path.join(UPLOAD_DIR, patient.family_genogram_pdf)
+                    old_path = os.path.join(get_upload_dir(), patient.family_genogram_pdf)
                     if os.path.exists(old_path):
                         try:
                             os.remove(old_path)
                         except Exception:
                             pass
                 unique_name = f"patient_{patient.id}_familiograma_{int(time.time())}.pdf"
-                genogram_pdf.save(os.path.join(UPLOAD_DIR, unique_name))
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                genogram_pdf.save(os.path.join(get_upload_dir(), unique_name))
                 patient.family_genogram_pdf = unique_name
             else:
                 flash("El familiograma solo admite PDF.", "warning")
@@ -2769,7 +2780,7 @@ def patient_delete(patient_id):
             db.session.delete(sc)
 
         if patient.family_genogram_pdf:
-            pdf_path = os.path.join(UPLOAD_DIR, patient.family_genogram_pdf)
+            pdf_path = os.path.join(get_upload_dir(), patient.family_genogram_pdf)
             if os.path.exists(pdf_path):
                 try:
                     os.remove(pdf_path)
@@ -2836,11 +2847,11 @@ def patient_family_genogram_download(patient_id):
     if not patient.family_genogram_pdf:
         flash("Este paciente no tiene familiograma adjunto.", "warning")
         return redirect(url_for("patient_detail", patient_id=patient.id))
-    file_path = os.path.join(UPLOAD_DIR, patient.family_genogram_pdf)
+    file_path = os.path.join(get_upload_dir(), patient.family_genogram_pdf)
     if not os.path.exists(file_path):
         flash("El archivo adjunto no se encuentra disponible.", "danger")
         return redirect(url_for("patient_detail", patient_id=patient.id))
-    return send_from_directory(UPLOAD_DIR, patient.family_genogram_pdf, as_attachment=True)
+    return send_from_directory(get_upload_dir(), patient.family_genogram_pdf, as_attachment=True)
 
 
 @app.route("/reviews/<int:review_id>/resolve", methods=["POST"])
@@ -2963,7 +2974,8 @@ def study_new(patient_id):
             filename = secure_filename(pdf_file.filename)
             if allowed_study_file(filename):
                 unique_name = f"study_{study.id}_{int(time.time())}.pdf"
-                save_path = os.path.join(UPLOAD_DIR, unique_name)
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                save_path = os.path.join(get_upload_dir(), unique_name)
                 pdf_file.save(save_path)
                 study.report_file = unique_name
             else:
@@ -3018,7 +3030,8 @@ def medical_info():
             filename = secure_filename(file.filename)
             if allowed_patient_file(filename):
                 unique_name = f"medres_{int(time.time())}_{filename}"
-                save_path = os.path.join(UPLOAD_DIR, unique_name)
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                save_path = os.path.join(get_upload_dir(), unique_name)
                 file.save(save_path)
                 file_name = unique_name
             else:
@@ -3047,11 +3060,11 @@ def medical_info_download(resource_id):
     if not res.file_name:
         flash("Este recurso no tiene archivo adjunto.", "warning")
         return redirect(url_for("medical_info"))
-    file_path = os.path.join(UPLOAD_DIR, res.file_name)
+    file_path = os.path.join(get_upload_dir(), res.file_name)
     if not os.path.exists(file_path):
         flash("El archivo adjunto no se encuentra disponible.", "danger")
         return redirect(url_for("medical_info"))
-    return send_from_directory(UPLOAD_DIR, res.file_name, as_attachment=True)
+    return send_from_directory(get_upload_dir(), res.file_name, as_attachment=True)
 
 @app.route("/studies/<int:study_id>/file")
 @login_required
@@ -3060,11 +3073,11 @@ def study_download(study_id):
     if not study.report_file:
         flash("Este estudio no tiene archivo adjunto.", "warning")
         return redirect(url_for("patient_detail", patient_id=study.patient_id))
-    file_path = os.path.join(UPLOAD_DIR, study.report_file)
+    file_path = os.path.join(get_upload_dir(), study.report_file)
     if not os.path.exists(file_path):
         flash("El archivo adjunto no se encuentra disponible.", "danger")
         return redirect(url_for("patient_detail", patient_id=study.patient_id))
-    return send_from_directory(UPLOAD_DIR, study.report_file, as_attachment=True)
+    return send_from_directory(get_upload_dir(), study.report_file, as_attachment=True)
 
 
 @app.route("/studies/<int:study_id>/edit", methods=["GET", "POST"])
@@ -3087,11 +3100,12 @@ def study_edit(study_id):
             filename = secure_filename(pdf_file.filename)
             if allowed_study_file(filename):
                 if study.report_file:
-                    old_path = os.path.join(UPLOAD_DIR, study.report_file)
+                    old_path = os.path.join(get_upload_dir(), study.report_file)
                     if os.path.exists(old_path):
                         os.remove(old_path)
                 unique_name = f"study_{study.id}_{int(time.time())}.pdf"
-                pdf_file.save(os.path.join(UPLOAD_DIR, unique_name))
+                os.makedirs(get_upload_dir(), exist_ok=True)
+                pdf_file.save(os.path.join(get_upload_dir(), unique_name))
                 study.report_file = unique_name
             else:
                 flash("Solo se permiten archivos PDF para el reporte.", "danger")
@@ -3176,24 +3190,38 @@ def consultation_new(patient_id):
                 db.session.add(study)
                 studies_created.append(study)
 
-        # Datos por grupo (UI ahora aporta un solo bloque por grupo)
-        func_types = [ (request.form.get("study_type_func") or "").strip() ]
-        func_dates = [ (request.form.get("study_date_func") or "").strip() ]
-        func_desc = (request.form.get("study_description_func") or "").strip() or None
-        func_file = request.files.get("study_file_func")
+        # Datos por grupo (UI puede aportar múltiples filas por grupo)
+        def _get_list(key):
+            vals = request.form.getlist(key)
+            if vals:
+                return [v.strip() for v in vals]
+            vals = request.form.getlist(f"{key}[]")
+            return [v.strip() for v in vals] if vals else []
 
-        img_types = [ (request.form.get("study_type_img") or "").strip() ]
-        img_dates = [ (request.form.get("study_date_img") or "").strip() ]
-        img_centers = [ (request.form.get("study_center_img") or "").strip() ]
-        img_access = [ (request.form.get("study_access_code_img") or "").strip() ]
-        img_links = [ (request.form.get("study_portal_link_img") or "").strip() ]
-        img_desc = (request.form.get("study_description_img") or "").strip() or None
-        img_file = request.files.get("study_file_img")
+        def _get_files(key):
+            files = request.files.getlist(key)
+            if files:
+                return files
+            files = request.files.getlist(f"{key}[]")
+            return files or []
 
-        inv_types = [ (request.form.get("study_type_inv") or "").strip() ]
-        inv_dates = [ (request.form.get("study_date_inv") or "").strip() ]
-        inv_desc = (request.form.get("study_description_inv") or "").strip() or None
-        inv_file = request.files.get("study_file_inv")
+        func_types = _get_list("study_type_func")
+        func_dates = _get_list("study_date_func")
+        func_descs = _get_list("study_description_func")
+        func_files = _get_files("study_file_func")
+
+        img_types = _get_list("study_type_img")
+        img_dates = _get_list("study_date_img")
+        img_centers = _get_list("study_center_img")
+        img_access = _get_list("study_access_code_img")
+        img_links = _get_list("study_portal_link_img")
+        img_descs = _get_list("study_description_img")
+        img_files = _get_files("study_file_img")
+
+        inv_types = _get_list("study_type_inv")
+        inv_dates = _get_list("study_date_inv")
+        inv_descs = _get_list("study_description_inv")
+        inv_files = _get_files("study_file_inv")
 
         # control compartido
         control_enabled = request.form.get("control_enabled") in ("on", "true", "1")
@@ -3201,54 +3229,94 @@ def consultation_new(patient_id):
         control_extra_emails = (request.form.get("control_extra_emails") or "").strip() or None
 
         # Agregar estudios según selección múltiple
-        group_first_index = {}
+        group_indices = {}
+        def add_studies_from_lists(types, dates, centers=None, accesses=None, links=None, descs=None):
+            nonlocal studies_created
+            added = 0
+            max_len = max(len(types) if types else 0, len(dates) if dates else 0)
+            for idx in range(max_len):
+                stype = (types[idx] if idx < len(types) else "") or ""
+                stype = stype.strip()
+                sdate = (dates[idx] if idx < len(dates) else "") or ""
+                sdate = sdate.strip()
+                center = (centers[idx] if centers and idx < len(centers) else "").strip() if centers else ""
+                access = (accesses[idx] if accesses and idx < len(accesses) else "").strip() if accesses else ""
+                link = (links[idx] if links and idx < len(links) else "").strip() if links else ""
+                desc = (descs[idx] if descs and idx < len(descs) else "").strip() if descs else None
+                if not any([stype, sdate, center, access, link, desc]):
+                    continue
+                study = Study(
+                    patient=patient,
+                    consultation=consultation,
+                    study_type=stype or "Estudio asociado a consulta",
+                    date=sdate or date,
+                    center=center or None,
+                    description=desc or None,
+                    created_by=current_user,
+                )
+                study.access_code = access or None
+                study.portal_link = link or None
+                db.session.add(study)
+                studies_created.append(study)
+                added += 1
+            return added
+
         if "func" in study_groups:
-            group_first_index['func'] = len(studies_created)
-            add_studies_from_lists(func_types, func_dates, description=func_desc)
+            group_indices['func'] = (len(studies_created), add_studies_from_lists(func_types, func_dates, descs=func_descs))
         if "img" in study_groups:
-            group_first_index['img'] = len(studies_created)
-            add_studies_from_lists(img_types, img_dates, img_centers, img_access, img_links, img_desc)
+            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, centers=img_centers, accesses=img_access, links=img_links, descs=img_descs))
         if "inv" in study_groups:
-            group_first_index['inv'] = len(studies_created)
-            add_studies_from_lists(inv_types, inv_dates, description=inv_desc)
+            group_indices['inv'] = (len(studies_created), add_studies_from_lists(inv_types, inv_dates, descs=inv_descs))
 
         db.session.flush()
 
-        # PDF compartido: lo asociamos al primer estudio creado de CADA grupo (si corresponde)
-        if studies_created:
-            if 'func' in group_first_index:
-                idx = group_first_index['func']
-                if func_file and func_file.filename and idx < len(studies_created):
-                    filename = secure_filename(func_file.filename)
+        # Asociar archivos por estudio (uno por fila). Si se sube un solo archivo para el grupo, lo asociamos al primer estudio.
+        def _save_file_for_study_filelist(filelist, start_idx, count, group_name):
+            if not filelist:
+                return
+            # if only 1 file but multiple studies, treat as group-level file -> first study
+            if len(filelist) == 1 and count > 0:
+                f = filelist[0]
+                if f and getattr(f, "filename", ""):
+                    filename = secure_filename(f.filename)
                     if allowed_study_file(filename):
-                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
-                        save_path = os.path.join(UPLOAD_DIR, unique_name)
-                        func_file.save(save_path)
-                        studies_created[idx].report_file = unique_name
+                        idx = start_idx
+                        if idx < len(studies_created):
+                            unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                            os.makedirs(get_upload_dir(), exist_ok=True)
+                            save_path = os.path.join(get_upload_dir(), unique_name)
+                            f.save(save_path)
+                            studies_created[idx].report_file = unique_name
                     else:
                         flash("Solo se permiten archivos PDF para el reporte.", "danger")
-            if 'img' in group_first_index:
-                idx = group_first_index['img']
-                if img_file and img_file.filename and idx < len(studies_created):
-                    filename = secure_filename(img_file.filename)
-                    if allowed_study_file(filename):
-                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
-                        save_path = os.path.join(UPLOAD_DIR, unique_name)
-                        img_file.save(save_path)
-                        studies_created[idx].report_file = unique_name
-                    else:
-                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
-            if 'inv' in group_first_index:
-                idx = group_first_index['inv']
-                if inv_file and inv_file.filename and idx < len(studies_created):
-                    filename = secure_filename(inv_file.filename)
-                    if allowed_study_file(filename):
-                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
-                        save_path = os.path.join(UPLOAD_DIR, unique_name)
-                        inv_file.save(save_path)
-                        studies_created[idx].report_file = unique_name
-                    else:
-                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
+                return
+            # otherwise map files by index
+            for i in range(count):
+                idx = start_idx + i
+                if idx >= len(studies_created):
+                    break
+                f = filelist[i] if i < len(filelist) else None
+                if not f or not getattr(f, "filename", ""):
+                    continue
+                filename = secure_filename(f.filename)
+                if allowed_study_file(filename):
+                    unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                    os.makedirs(get_upload_dir(), exist_ok=True)
+                    save_path = os.path.join(get_upload_dir(), unique_name)
+                    f.save(save_path)
+                    studies_created[idx].report_file = unique_name
+                else:
+                    flash("Solo se permiten archivos PDF para el reporte.", "danger")
+
+        if 'func' in group_indices:
+            start, count = group_indices['func']
+            _save_file_for_study_filelist(func_files, start, count, 'func')
+        if 'img' in group_indices:
+            start, count = group_indices['img']
+            _save_file_for_study_filelist(img_files, start, count, 'img')
+        if 'inv' in group_indices:
+            start, count = group_indices['inv']
+            _save_file_for_study_filelist(inv_files, start, count, 'inv')
 
         # Solicitar control (si se solicitó y al menos un grupo aplicable fue seleccionado)
         cr = None
@@ -3293,38 +3361,7 @@ def consultation_new(patient_id):
         study_type_options=STUDY_TYPE_OPTIONS,
         center_options=CATALOGS.get("centers", []),
         # optional external calculator for functional tests (configure via env FUNC_PROGRESS_CALC_URL)
-        func_calc_url=os.environ.get("FUNC_PROGRESS_CALC_URL")
-        flash("Solo puede editar la consulta quien la creó.", "danger")
-        return redirect(url_for("patient_detail", patient_id=patient.id))
-
-    if request.method == "POST":
-        consultation.date = request.form.get("date")
-        consultation.notes = request.form.get("notes")
-        consultation.lab_general = (request.form.get("lab_general") or "").strip() or None
-        consultation.lab_immunology = _serialize_list(
-            request.form.getlist("lab_immunology")
-        )
-        consultation.lab_immunology_notes = (request.form.get("lab_immunology_notes") or "").strip() or None
-        lab_immunology_values = {}
-        for key, _ in IMMUNO_LAB_OPTIONS:
-            val = (request.form.get(f"lab_immunology_value_{key}") or "").strip()
-            if val:
-                lab_immunology_values[key] = val
-        consultation.lab_immunology_values = _serialize_kv(lab_immunology_values)
-
-        # NO tocamos aqui los estudios ya creados; eso se maneja por study_edit
-        db.session.commit()
-        flash("Consulta actualizada correctamente.", "success")
-        return redirect(url_for("patient_detail", patient_id=patient.id))
-
-    return render_template(
-        "consultation_edit.html",
-        consultation=consultation,
-        patient=patient,
-        immuno_values=_deserialize_kv(consultation.lab_immunology_values),
-        immuno_options=IMMUNO_LAB_OPTIONS,
-        immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
-        immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
+        func_calc_url=os.environ.get("FUNC_PROGRESS_CALC_URL"),
     )
 
 

@@ -253,3 +253,5 @@
 {"timestamp": "2025-12-27T00:27:17.539345", "action": "patient_create", "details": {"patient_id": 1}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
 {"timestamp": "2025-12-27T12:45:19.978103", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
 {"timestamp": "2025-12-29T02:38:25.170427", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
+{"timestamp": "2025-12-30T15:45:15.808675", "action": "user_login", "details": {"user_id": 3, "method": "password"}, "actor": {"id": 3, "name": "Test User"}}
+{"timestamp": "2025-12-30T17:55:50.697185", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "T"}}
