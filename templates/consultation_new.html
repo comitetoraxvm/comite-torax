@@ -73,6 +73,11 @@
             </div>
             <div class="form-group">
               <label for="study_description_func">Descripción / hallazgos</label>
+              {% if func_calc_url %}
+              <div class="mb-2">
+                <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Calculadora de progresión</a>
+              </div>
+              {% endif %}
               <textarea id="study_description_func" name="study_description_func" class="form-control" rows="3"></textarea>
               <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
             </div>

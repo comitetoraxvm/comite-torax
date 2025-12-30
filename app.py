@@ -3292,16 +3292,8 @@ def consultation_new(patient_id):
         immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
         study_type_options=STUDY_TYPE_OPTIONS,
         center_options=CATALOGS.get("centers", []),
-    )
-
-
-@app.route("/consultations/<int:consultation_id>/edit", methods=["GET", "POST"])
-@login_required
-def consultation_edit(consultation_id):
-    consultation = Consultation.query.get_or_404(consultation_id)
-    patient = consultation.patient
-
-    if consultation.created_by_id and consultation.created_by_id != current_user.id:
+        # optional external calculator for functional tests (configure via env FUNC_PROGRESS_CALC_URL)
+        func_calc_url=os.environ.get("FUNC_PROGRESS_CALC_URL")
         flash("Solo puede editar la consulta quien la creó.", "danger")
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
