@@ -257,3 +257,8 @@
 {"timestamp": "2025-12-30T17:55:50.697185", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "T"}}
 {"timestamp": "2025-12-30T18:25:55.085240", "action": "user_login", "details": {"user_id": 3, "method": "password"}, "actor": {"id": 3, "name": "T"}}
 {"timestamp": "2025-12-30T18:26:32.404391", "action": "user_login", "details": {"user_id": 4, "method": "password"}, "actor": {"id": 4, "name": "T"}}
+{"timestamp": "2025-12-30T21:49:16.362821", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Test User"}}
+{"timestamp": "2025-12-30T21:49:56.487055", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Test User"}}
+{"timestamp": "2025-12-30T21:50:09.382025", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Test User"}}
+{"timestamp": "2025-12-30T21:50:19.608991", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Test User"}}
+{"timestamp": "2025-12-30T21:50:27.240290", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Test User"}}
