@@ -4,6 +4,8 @@
 
 Aplicación Flask que permite a un pequeño grupo de médicos registrar pacientes, consultas y estudios de patología torácica. Incluye autenticación, aprobación de usuarios, ficha clínica estandarizada, filtros avanzados, consentimiento informado, auditoría y respaldos automáticos.
 
+> Nota: Se agregó integración continua (tests) — re-ejecutando CI para verificar resultados.
+
 ## Pila tecnológica
 
 - Python 3.11+/Flask
