@@ -4,3 +4,8 @@ Flask-SQLAlchemy
 Flask-WTF
 psycopg2-binary
 gunicorn
+
+# Test dependencies
+pytest
+pytest-flask
+pytest-cov
