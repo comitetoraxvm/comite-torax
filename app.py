@@ -1820,34 +1820,6 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/reset_admin")
-def reset_admin():
-    try:
-        admin = User.query.filter_by(username="admin").first()
-        if admin is None:
-            admin = User(
-                full_name="Administrador Comité",
-                specialty="",
-                email="admin@comite.com",
-                username="admin",
-                role="admin",
-                status="approved",
-            )
-            admin.set_password("Admin2025!")
-            db.session.add(admin)
-            flash("✅ Admin creado. Usuario: admin / Pass: Admin2025!", "success")
-        else:
-            admin.set_password("Admin2025!")
-            admin.role = "admin"
-            admin.status = "approved"
-            flash("✅ Admin actualizado. Usuario: admin / Pass: Admin2025!", "success")
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error al resetear admin: {e}", "danger")
-    return redirect(url_for("login"))
-
-
 @app.route("/logout")
 @login_required
 def logout():
