@@ -74,7 +74,10 @@
                   <input name="study_date_func[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar</button>
+                  </div>
                 </div>
               </div>
               <div class="form-group">
@@ -113,7 +116,10 @@
                     <input name="study_date_func[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar</button>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group">
@@ -134,9 +140,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <button type="button" class="btn btn-primary btn-sm add-study" data-group="func">Agregar estudio</button>
-            </div>
+
 
           </div>
 
@@ -164,7 +168,10 @@
                   <input name="study_date_img[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar</button>
+                  </div>
                 </div>
               </div>
 
@@ -228,7 +235,10 @@
                     <input name="study_date_img[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar</button>
+                    </div>
                   </div>
                 </div>
 
@@ -271,9 +281,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <button type="button" class="btn btn-primary btn-sm add-study" data-group="img">Agregar estudio</button>
-            </div>
+
 
           </div>
 
@@ -298,7 +306,10 @@
                   <input name="study_date_inv[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar</button>
+                  </div>
                 </div>
               </div>
 
@@ -335,7 +346,10 @@
                     <input name="study_date_inv[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar</button>
+                    </div>
                   </div>
                 </div>
 
@@ -354,9 +368,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <button type="button" class="btn btn-primary btn-sm add-study" data-group="inv">Agregar estudio</button>
-            </div>
+
 
           </div>
 
@@ -455,6 +467,71 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chkControl && controlFields) {
     chkControl.addEventListener("change", update);
   }
+
+  // funciones para agregar/eliminar filas dinámicamente
+  function _clearInputs(node) {
+    node.querySelectorAll('input, textarea, select').forEach(el => {
+      if (el.type === 'file') {
+        el.value = '';
+      } else if (el.tagName === 'SELECT') {
+        el.selectedIndex = 0;
+      } else {
+        el.value = '';
+      }
+    });
+  }
+
+  function addStudyRow(group, afterRow) {
+    const block = document.getElementById(`block-${group}`);
+    if (!block) return;
+    const template = block.querySelector('.study-row-template');
+    if (!template) return;
+    const clone = template.cloneNode(true);
+    clone.classList.remove('d-none');
+    clone.classList.remove('study-row-template');
+    clone.classList.add('study-row');
+    // limpiar valores
+    _clearInputs(clone);
+    const rows = block.querySelector('.study-rows');
+    if (afterRow && afterRow.parentElement && afterRow.parentElement.classList.contains('study-rows')) {
+      // insert after specific row
+      const ref = afterRow.nextSibling;
+      rows.insertBefore(clone, ref);
+    } else {
+      rows.appendChild(clone);
+    }
+  }
+
+  // delegación de eventos para botones agregar/eliminar
+  document.addEventListener('click', (ev) => {
+    const addBtn = ev.target.closest('.add-study');
+    if (addBtn) {
+      const group = addBtn.dataset.group;
+      addStudyRow(group);
+      return;
+    }
+    const addRowBtn = ev.target.closest('.add-study-row');
+    if (addRowBtn) {
+      const group = addRowBtn.dataset.group;
+      const row = addRowBtn.closest('.study-row');
+      addStudyRow(group, row);
+      return;
+    }
+    const rmBtn = ev.target.closest('.remove-study');
+    if (rmBtn) {
+      const row = rmBtn.closest('.study-row');
+      if (!row) return;
+      const rows = row.parentElement;
+      const siblingRows = rows.querySelectorAll('.study-row');
+      if (siblingRows.length <= 1) {
+        // limpiar inputs si es la única fila
+        _clearInputs(row);
+      } else {
+        row.remove();
+      }
+      return;
+    }
+  });
 
   // estado inicial
   update();
