@@ -1,19 +1,11 @@
-<<<<<<< HEAD
 {% extends "base.html" %}
 {% block content %}
 <h1>Registro de médico</h1>
 
-=======
-{% extends "base.html" %}
-{% block content %}
-<h1>Registro de médico</h1>
-
->>>>>>> ca39a71e6698f6d4ec1a9a65577646ea83648565
 <form method="post">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
   <label>Nombre y apellido:</label><br>
-<<<<<<< HEAD
   <input type="text" name="full_name" required><br><br>
 
   <label>Especialidad:</label><br>
@@ -35,26 +27,4 @@
 </form>
 
 {% endblock %}
-=======
-  <input type="text" name="full_name" required><br><br>
 
-  <label>Especialidad:</label><br>
-  <input type="text" name="specialty"><br><br>
-
-  <label>Email:</label><br>
-  <input type="email" name="email" required><br><br>
-
-  <label>Usuario:</label><br>
-  <input type="text" name="username" required><br><br>
-
-  <label>Contraseña:</label><br>
-  <input type="password" name="password" required><br><br>
-
-  <label>Repetir contraseña:</label><br>
-  <input type="password" name="confirm_password" required><br><br>
-
-  <button type="submit">Registrarse</button>
-</form>
-
-{% endblock %}
->>>>>>> ca39a71e6698f6d4ec1a9a65577646ea83648565
