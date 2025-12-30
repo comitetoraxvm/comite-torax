@@ -3148,7 +3148,7 @@ def consultation_new(patient_id):
         db.session.add(consultation)
         db.session.flush()  # para tener consultation.id
 
-        study_group = request.form.get("study_group") or "func"
+        study_groups = request.form.getlist("study_groups") or []
         studies_created = []
 
         def add_studies_from_lists(types, dates, centers=None, accesses=None, links=None, description=None):
@@ -3176,70 +3176,88 @@ def consultation_new(patient_id):
                 db.session.add(study)
                 studies_created.append(study)
 
-        # Datos por grupo
-        func_types = request.form.getlist("func_type[]")
-        func_dates = request.form.getlist("func_date[]")
-        func_desc = (request.form.get("func_description") or "").strip() or None
-        func_file = request.files.get("func_file")
-        func_control_enabled = request.form.get("func_control_enabled") in ("on", "true", "1")
-        func_control_date = (request.form.get("func_control_date") or "").strip() or None
-        func_control_extra_emails = (request.form.get("func_control_extra_emails") or "").strip() or None
+        # Datos por grupo (UI ahora aporta un solo bloque por grupo)
+        func_types = [ (request.form.get("study_type_func") or "").strip() ]
+        func_dates = [ (request.form.get("study_date_func") or "").strip() ]
+        func_desc = (request.form.get("study_description_func") or "").strip() or None
+        func_file = request.files.get("study_file_func")
 
-        img_types = request.form.getlist("img_type[]")
-        img_dates = request.form.getlist("img_date[]")
-        img_centers = request.form.getlist("img_center[]")
-        img_access = request.form.getlist("img_access[]")
-        img_links = request.form.getlist("img_link[]")
-        img_desc = (request.form.get("img_description") or "").strip() or None
-        img_file = request.files.get("img_file")
-        img_control_enabled = request.form.get("img_control_enabled") in ("on", "true", "1")
-        img_control_date = (request.form.get("img_control_date") or "").strip() or None
-        img_control_extra_emails = (request.form.get("img_control_extra_emails") or "").strip() or None
+        img_types = [ (request.form.get("study_type_img") or "").strip() ]
+        img_dates = [ (request.form.get("study_date_img") or "").strip() ]
+        img_centers = [ (request.form.get("study_center_img") or "").strip() ]
+        img_access = [ (request.form.get("study_access_code_img") or "").strip() ]
+        img_links = [ (request.form.get("study_portal_link_img") or "").strip() ]
+        img_desc = (request.form.get("study_description_img") or "").strip() or None
+        img_file = request.files.get("study_file_img")
 
-        inv_types = request.form.getlist("inv_type[]")
-        inv_dates = request.form.getlist("inv_date[]")
-        inv_desc = (request.form.get("inv_description") or "").strip() or None
-        inv_file = request.files.get("inv_file")
+        inv_types = [ (request.form.get("study_type_inv") or "").strip() ]
+        inv_dates = [ (request.form.get("study_date_inv") or "").strip() ]
+        inv_desc = (request.form.get("study_description_inv") or "").strip() or None
+        inv_file = request.files.get("study_file_inv")
 
-        if study_group == "func":
+        # control compartido
+        control_enabled = request.form.get("control_enabled") in ("on", "true", "1")
+        control_date = (request.form.get("control_date") or "").strip() or None
+        control_extra_emails = (request.form.get("control_extra_emails") or "").strip() or None
+
+        # Agregar estudios según selección múltiple
+        group_first_index = {}
+        if "func" in study_groups:
+            group_first_index['func'] = len(studies_created)
             add_studies_from_lists(func_types, func_dates, description=func_desc)
-        elif study_group == "img":
+        if "img" in study_groups:
+            group_first_index['img'] = len(studies_created)
             add_studies_from_lists(img_types, img_dates, img_centers, img_access, img_links, img_desc)
-        elif study_group == "inv":
+        if "inv" in study_groups:
+            group_first_index['inv'] = len(studies_created)
             add_studies_from_lists(inv_types, inv_dates, description=inv_desc)
 
         db.session.flush()
 
-        # PDF compartido: lo asociamos al primer estudio creado del grupo
+        # PDF compartido: lo asociamos al primer estudio creado de CADA grupo (si corresponde)
         if studies_created:
-            upload_file = func_file if study_group == "func" else img_file if study_group == "img" else inv_file
-            if upload_file and upload_file.filename:
-                filename = secure_filename(upload_file.filename)
-                if allowed_study_file(filename):
-                    unique_name = f"study_{studies_created[0].id}_{int(time.time())}.pdf"
-                    save_path = os.path.join(UPLOAD_DIR, unique_name)
-                    upload_file.save(save_path)
-                    studies_created[0].report_file = unique_name
-                else:
-                    flash("Solo se permiten archivos PDF para el reporte.", "danger")
+            if 'func' in group_first_index:
+                idx = group_first_index['func']
+                if func_file and func_file.filename and idx < len(studies_created):
+                    filename = secure_filename(func_file.filename)
+                    if allowed_study_file(filename):
+                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                        save_path = os.path.join(UPLOAD_DIR, unique_name)
+                        func_file.save(save_path)
+                        studies_created[idx].report_file = unique_name
+                    else:
+                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
+            if 'img' in group_first_index:
+                idx = group_first_index['img']
+                if img_file and img_file.filename and idx < len(studies_created):
+                    filename = secure_filename(img_file.filename)
+                    if allowed_study_file(filename):
+                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                        save_path = os.path.join(UPLOAD_DIR, unique_name)
+                        img_file.save(save_path)
+                        studies_created[idx].report_file = unique_name
+                    else:
+                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
+            if 'inv' in group_first_index:
+                idx = group_first_index['inv']
+                if inv_file and inv_file.filename and idx < len(studies_created):
+                    filename = secure_filename(inv_file.filename)
+                    if allowed_study_file(filename):
+                        unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                        save_path = os.path.join(UPLOAD_DIR, unique_name)
+                        inv_file.save(save_path)
+                        studies_created[idx].report_file = unique_name
+                    else:
+                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
 
-        # Solicitar control (solo func e imágenes)
+        # Solicitar control (si se solicitó y al menos un grupo aplicable fue seleccionado)
         cr = None
-        if study_group == "func" and func_control_enabled and func_control_date:
+        if control_enabled and control_date and any(g in study_groups for g in ("func", "img")):
             cr = ControlReminder(
                 patient=patient,
                 consultation=consultation,
-                control_date=func_control_date,
-                extra_emails=func_control_extra_emails,
-                created_by=current_user,
-            )
-            db.session.add(cr)
-        if study_group == "img" and img_control_enabled and img_control_date:
-            cr = ControlReminder(
-                patient=patient,
-                consultation=consultation,
-                control_date=img_control_date,
-                extra_emails=img_control_extra_emails,
+                control_date=control_date,
+                extra_emails=control_extra_emails,
                 created_by=current_user,
             )
             db.session.add(cr)
