@@ -1,5 +1,7 @@
 # Comité Torax – Historia Clínica Web
 
+[![Run tests](https://github.com/comitetoraxvm/comite-torax/actions/workflows/pytest.yml/badge.svg)](https://github.com/comitetoraxvm/comite-torax/actions/workflows/pytest.yml)
+
 Aplicación Flask que permite a un pequeño grupo de médicos registrar pacientes, consultas y estudios de patología torácica. Incluye autenticación, aprobación de usuarios, ficha clínica estandarizada, filtros avanzados, consentimiento informado, auditoría y respaldos automáticos.
 
 ## Pila tecnológica
