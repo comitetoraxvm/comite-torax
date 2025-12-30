@@ -19,6 +19,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run tests
+      - name: Run tests (with diagnostics)
         run: |
-          pytest -q --maxfail=1
+          # Run tests and capture exit code so we can print diagnostics on failure
+          rc=0
+          pytest -q --maxfail=1 || rc=$?
+          echo "pytest exit code: $rc"
+          echo "--- Python info ---"
+          python -V
+          pip --version
+          echo "--- pip packages (first 200 lines) ---"
+          pip list --format=columns | sed -n '1,200p'
+          echo "--- Workspace files ---"
+          ls -la || true
+          echo "--- Tests dir ---"
+          ls -la tests || true
+          echo "--- test file preview ---"
+          sed -n '1,120p' tests/test_consultation_multi_groups.py || true
+          exit $rc
