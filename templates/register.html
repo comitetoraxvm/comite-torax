@@ -18,13 +18,39 @@
   <input type="text" name="username" required><br><br>
 
   <label>Contraseña:</label><br>
-  <input type="password" name="password" required><br><br>
+  <div style="position: relative; display: inline-block; width: 100%;">
+    <input type="password" name="password" id="password" required style="width: calc(100% - 40px); padding-right: 40px;">
+    <button type="button" id="togglePassword" style="position: absolute; right: 5px; top: 2px; border: none; background: transparent; cursor: pointer; font-size: 20px;">👁️</button>
+  </div><br><br>
 
   <label>Repetir contraseña:</label><br>
-  <input type="password" name="confirm_password" required><br><br>
+  <div style="position: relative; display: inline-block; width: 100%;">
+    <input type="password" name="confirm_password" id="confirm_password" required style="width: calc(100% - 40px); padding-right: 40px;">
+    <button type="button" id="toggleConfirmPassword" style="position: absolute; right: 5px; top: 2px; border: none; background: transparent; cursor: pointer; font-size: 20px;">👁️</button>
+  </div><br><br>
 
   <button type="submit">Registrarse</button>
 </form>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+  const confirmPasswordInput = document.getElementById('confirm_password');
+
+  togglePassword.addEventListener('click', function() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+  });
+
+  toggleConfirmPassword.addEventListener('click', function() {
+    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    confirmPasswordInput.setAttribute('type', type);
+    this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+  });
+});
+</script>
 {% endblock %}
 
