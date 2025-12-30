@@ -23,7 +23,7 @@ jobs:
         run: |
           # Run tests and capture exit code so we can print diagnostics on failure
           rc=0
-          pytest -q --maxfail=1 || rc=$?
+          python -m pytest -q --maxfail=1 || rc=$?
           echo "pytest exit code: $rc"
           echo "--- Python info ---"
           python -V
