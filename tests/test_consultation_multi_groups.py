@@ -12,17 +12,17 @@ def test_create_consultation_with_multiple_groups(client, db_session, user, pati
     rv = login(client)
     assert b"Login" not in rv.data or rv.status_code == 200
 
-    # build multipart data with two files (func + img)
+    # build multipart data with two groups (func + img)
     data = {
         'study_groups': ['func','img'],
         'study_type_func': 'Espirometría',
         'study_date_func': '2025-12-01',
-        'study_description_func': 'Hallazgos funcionales',
+        'study_description_func': 'Hallazgos funcionales',  # shared description
         'study_type_img': 'TC Tórax',
         'study_date_img': '2025-12-02',
-        'study_center_img': 'Hospital Pasteur',
-        'study_access_code_img': 'ABC123',
-        'study_description_img': 'Lesiones pulmonares',
+        'study_center_img': 'Hospital Pasteur',  # shared center
+        'study_access_code_img': 'ABC123',  # shared access code
+        'study_description_img': 'Lesiones pulmonares',  # shared description
         'control_enabled': 'on',
         'control_date': '2026-01-15',
         'date': '2025-12-30',
@@ -48,33 +48,35 @@ def test_create_consultation_with_multiple_groups(client, db_session, user, pati
         st_img = Study.query.filter_by(study_type='TC Tórax').first()
         assert st_func is not None
         assert st_img is not None
+        # both should have shared descriptions
+        assert st_func.description == 'Hallazgos funcionales'
+        assert st_img.description == 'Lesiones pulmonares'
 
         cr = ControlReminder.query.filter_by(consultation_id=st_func.consultation_id if st_func else None).first()
         assert cr is not None
 
 def test_multiple_studies_per_group(client, db_session, user, patient, temp_upload_dir):
-    # create a consultation with two func studies and two img studies (each with its own file)
+    # create a consultation with two func studies and two img studies
+    # Now: types + dates are arrays, but description is a single shared value
     login(client)
     data = {
         'study_groups': ['func','img'],
         'study_type_func': ['Espirometría', 'Espirometría seguimiento'],
         'study_date_func': ['2025-12-01', '2025-12-06'],
-        'study_description_func': ['Hallazgos A', 'Hallazgos B'],
+        'study_description_func': 'Hallazgos funcionales compartidos',  # single shared description
         'study_type_img': ['TC Tórax', 'Rx Torax'],
         'study_date_img': ['2025-12-02', '2025-12-03'],
-        'study_center_img': ['Hospital Pasteur', 'Clinica San Martin'],
-        'study_access_code_img': ['ABC123', 'DEF456'],
-        'study_description_img': ['Lesion 1', 'Lesion 2'],
+        'study_center_img': 'Hospital Pasteur',  # single shared center
+        'study_access_code_img': 'ABC123',  # single shared access code
+        'study_description_img': 'Hallazgos de imagen compartidos',  # single shared description
         'control_enabled': 'on',
         'control_date': '2026-01-15',
         'date': '2025-12-30',
     }
 
     files = [
-        ('study_file_func', (io.BytesIO(b"PDFFUNC1"), 'func1.pdf')),
-        ('study_file_func', (io.BytesIO(b"PDFFUNC2"), 'func2.pdf')),
-        ('study_file_img', (io.BytesIO(b"PDFIMG1"), 'img1.pdf')),
-        ('study_file_img', (io.BytesIO(b"PDFIMG2"), 'img2.pdf')),
+        ('study_file_func', (io.BytesIO(b"PDFFUNC"), 'func.pdf')),
+        ('study_file_img', (io.BytesIO(b"PDFIMG"), 'img.pdf')),
     ]
 
     multipart = []
@@ -95,7 +97,7 @@ def test_multiple_studies_per_group(client, db_session, user, patient, temp_uplo
     # verify DB entries
     with client.application.app_context():
         studies = list(Study.query.filter_by(patient_id=patient.id).all())
-        # expect 4 studies created
+        # expect 4 studies created (2 func + 2 img)
         assert len(studies) >= 4
         types = [s.study_type for s in studies]
         assert 'Espirometría' in types

@@ -3205,22 +3205,25 @@ def consultation_new(patient_id):
             files = request.files.getlist(f"{key}[]")
             return files or []
 
+        # Funcionales: tipos + fechas son arrays, descripción es compartida (string único)
         func_types = _get_list("study_type_func")
         func_dates = _get_list("study_date_func")
-        func_descs = _get_list("study_description_func")
+        func_desc = (request.form.get("study_description_func") or "").strip() or None
         func_files = _get_files("study_file_func")
 
+        # Imágenes: tipos + fechas son arrays, otros campos compartidos (strings únicos)
         img_types = _get_list("study_type_img")
         img_dates = _get_list("study_date_img")
-        img_centers = _get_list("study_center_img")
-        img_access = _get_list("study_access_code_img")
-        img_links = _get_list("study_portal_link_img")
-        img_descs = _get_list("study_description_img")
+        img_center = (request.form.get("study_center_img") or "").strip() or ""
+        img_access = (request.form.get("study_access_code_img") or "").strip() or ""
+        img_link = (request.form.get("study_portal_link_img") or "").strip() or ""
+        img_desc = (request.form.get("study_description_img") or "").strip() or None
         img_files = _get_files("study_file_img")
 
+        # Invasivos: tipos + fechas son arrays, descripción es compartida (string único)
         inv_types = _get_list("study_type_inv")
         inv_dates = _get_list("study_date_inv")
-        inv_descs = _get_list("study_description_inv")
+        inv_desc = (request.form.get("study_description_inv") or "").strip() or None
         inv_files = _get_files("study_file_inv")
 
         # control compartido
@@ -3230,7 +3233,10 @@ def consultation_new(patient_id):
 
         # Agregar estudios según selección múltiple
         group_indices = {}
-        def add_studies_from_lists(types, dates, centers=None, accesses=None, links=None, descs=None):
+        def add_studies_from_lists(types, dates, shared_desc, centers=None, accesses=None, links=None):
+            """
+            Crea un Study por cada (tipo, fecha) pair. Todos comparten la descripción.
+            """
             nonlocal studies_created
             added = 0
             max_len = max(len(types) if types else 0, len(dates) if dates else 0)
@@ -3242,8 +3248,8 @@ def consultation_new(patient_id):
                 center = (centers[idx] if centers and idx < len(centers) else "").strip() if centers else ""
                 access = (accesses[idx] if accesses and idx < len(accesses) else "").strip() if accesses else ""
                 link = (links[idx] if links and idx < len(links) else "").strip() if links else ""
-                desc = (descs[idx] if descs and idx < len(descs) else "").strip() if descs else None
-                if not any([stype, sdate, center, access, link, desc]):
+                # skip empty type+date pair
+                if not stype and not sdate:
                     continue
                 study = Study(
                     patient=patient,
@@ -3251,7 +3257,7 @@ def consultation_new(patient_id):
                     study_type=stype or "Estudio asociado a consulta",
                     date=sdate or date,
                     center=center or None,
-                    description=desc or None,
+                    description=shared_desc or None,  # use shared description for all studies in group
                     created_by=current_user,
                 )
                 study.access_code = access or None
@@ -3262,11 +3268,11 @@ def consultation_new(patient_id):
             return added
 
         if "func" in study_groups:
-            group_indices['func'] = (len(studies_created), add_studies_from_lists(func_types, func_dates, descs=func_descs))
+            group_indices['func'] = (len(studies_created), add_studies_from_lists(func_types, func_dates, func_desc))
         if "img" in study_groups:
-            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, centers=img_centers, accesses=img_access, links=img_links, descs=img_descs))
+            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, img_desc, centers=[img_center], accesses=[img_access], links=[img_link]))
         if "inv" in study_groups:
-            group_indices['inv'] = (len(studies_created), add_studies_from_lists(inv_types, inv_dates, descs=inv_descs))
+            group_indices['inv'] = (len(studies_created), add_studies_from_lists(inv_types, inv_dates, inv_desc))
 
         db.session.flush()
 

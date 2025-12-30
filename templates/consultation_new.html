@@ -56,7 +56,7 @@
           <!-- Funcionales -->
           <div id="block-func" class="d-none">
 
-            <!-- template row -->
+            <!-- template row (solo tipo + fecha) -->
             <div class="study-row-template d-none">
               <div class="form-row">
                 <div class="form-group col-md-6">
@@ -74,31 +74,13 @@
                   <input name="study_date_func[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar</button>
-                  </div>
+                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                 </div>
               </div>
-              <div class="form-group">
-                {% if func_calc_url %}
-                <div class="mb-2">
-                  <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Calculadora de progresión</a>
-                </div>
-                {% endif %}
-                <label>Descripción / hallazgos</label>
-                <textarea name="study_description_func[]" class="form-control" rows="3"></textarea>
-                <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-              </div>
-              <div class="form-group">
-                <label>Subir informe (PDF)</label>
-                <input type="file" name="study_file_func[]" accept="application/pdf">
-              </div>
-              <hr>
             </div>
 
             <div class="study-rows">
-              <!-- initial row -->
+              <!-- initial row (solo tipo + fecha) -->
               <div class="study-row">
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -116,28 +98,31 @@
                     <input name="study_date_func[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar</button>
-                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                   </div>
                 </div>
-                <div class="form-group">
-                  {% if func_calc_url %}
-                  <div class="mb-2">
-                    <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Calculadora de progresión</a>
-                  </div>
-                  {% endif %}
-                  <label>Descripción / hallazgos</label>
-                  <textarea name="study_description_func[]" class="form-control" rows="3"></textarea>
-                  <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-                </div>
-                <div class="form-group">
-                  <label>Subir informe (PDF)</label>
-                  <input type="file" name="study_file_func[]" accept="application/pdf">
-                </div>
-                <hr>
               </div>
+            </div>
+
+            <!-- Botones Agregar/Eliminar ANTES de campos compartidos -->
+            <div class="form-group mb-3">
+              <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar estudio</button>
+            </div>
+
+            <!-- Campos compartidos (descripción, PDF, recordatorio) -->
+            {% if func_calc_url %}
+            <div class="form-group">
+              <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Calculadora de progresión</a>
+            </div>
+            {% endif %}
+            <div class="form-group">
+              <label>Descripción / hallazgos (compartida para todos los estudios)</label>
+              <textarea name="study_description_func" class="form-control" rows="3"></textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+            </div>
+            <div class="form-group">
+              <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+              <input type="file" name="study_file_func" multiple accept="application/pdf">
             </div>
 
 
@@ -147,7 +132,7 @@
           <!-- Imágenes -->
           <div id="block-img" class="d-none">
 
-            <!-- template row -->
+            <!-- template row (solo tipo + fecha) -->
             <div class="study-row-template d-none">
               <div class="form-row">
                 <div class="form-group col-md-6">
@@ -168,53 +153,13 @@
                   <input name="study_date_img[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar</button>
-                  </div>
+                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                 </div>
               </div>
-
-              <div class="form-row">
-                <div class="form-group col-md-12">
-                  <label>Centro</label>
-                  <select name="study_center_img[]" class="form-control">
-                    <option value="">-- Seleccionar --</option>
-                    {% for c in center_options %}
-                    <option value="{{ c }}">{{ c }}</option>
-                    {% endfor %}
-                  </select>
-                  <small class="form-text text-muted">Ej: Hospital Pasteur</small>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Número de acceso</label>
-                  <input name="study_access_code_img[]" type="text" class="form-control">
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Link de ingreso directo</label>
-                  <input name="study_portal_link_img[]" type="url" class="form-control">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Descripción / hallazgos</label>
-                <textarea name="study_description_img[]" class="form-control" rows="3"></textarea>
-                <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-              </div>
-
-              <div class="form-group">
-                <label>Subir informe (PDF)</label>
-                <input type="file" name="study_file_img[]" accept="application/pdf">
-              </div>
-
-              <hr>
             </div>
 
             <div class="study-rows">
-              <!-- initial row -->
+              <!-- initial row (solo tipo + fecha) -->
               <div class="study-row">
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -235,50 +180,51 @@
                     <input name="study_date_img[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar</button>
-                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                   </div>
                 </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-12">
-                    <label>Centro</label>
-                    <select name="study_center_img[]" class="form-control">
-                      <option value="">-- Seleccionar --</option>
-                      {% for c in center_options %}
-                      <option value="{{ c }}">{{ c }}</option>
-                      {% endfor %}
-                    </select>
-                    <small class="form-text text-muted">Ej: Hospital Pasteur</small>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label>Número de acceso</label>
-                    <input name="study_access_code_img[]" type="text" class="form-control">
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label>Link de ingreso directo</label>
-                    <input name="study_portal_link_img[]" type="url" class="form-control">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Descripción / hallazgos</label>
-                  <textarea name="study_description_img[]" class="form-control" rows="3"></textarea>
-                  <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-                </div>
-
-                <div class="form-group">
-                  <label>Subir informe (PDF)</label>
-                  <input type="file" name="study_file_img[]" accept="application/pdf">
-                </div>
-
-                <hr>
               </div>
+            </div>
+
+            <!-- Botones Agregar ANTES de campos compartidos -->
+            <div class="form-group mb-3">
+              <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar estudio</button>
+            </div>
+
+            <!-- Campos compartidos (Centro, Acceso, Link, Descripción, PDF) -->
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label>Centro</label>
+                <select name="study_center_img" class="form-control">
+                  <option value="">-- Seleccionar --</option>
+                  {% for c in center_options %}
+                  <option value="{{ c }}">{{ c }}</option>
+                  {% endfor %}
+                </select>
+                <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Número de acceso</label>
+                <input name="study_access_code_img" type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-6">
+                <label>Link de ingreso directo</label>
+                <input name="study_portal_link_img" type="url" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Descripción / hallazgos (compartida para todos los estudios)</label>
+              <textarea name="study_description_img" class="form-control" rows="3"></textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+            </div>
+
+            <div class="form-group">
+              <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+              <input type="file" name="study_file_img" multiple accept="application/pdf">
             </div>
 
 
@@ -288,7 +234,7 @@
           <!-- Invasivos -->
           <div id="block-inv" class="d-none">
 
-            <!-- template row -->
+            <!-- template row (solo tipo + fecha) -->
             <div class="study-row-template d-none">
               <div class="form-row">
                 <div class="form-group col-md-6">
@@ -306,29 +252,13 @@
                   <input name="study_date_inv[]" type="date" class="form-control">
                 </div>
                 <div class="form-group col-md-2 d-flex align-items-end">
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                    <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar</button>
-                  </div>
+                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                 </div>
               </div>
-
-              <div class="form-group">
-                <label>Descripción / hallazgos</label>
-                <textarea name="study_description_inv[]" class="form-control" rows="3"></textarea>
-                <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-              </div>
-
-              <div class="form-group">
-                <label>Subir informe (PDF)</label>
-                <input type="file" name="study_file_inv[]" accept="application/pdf">
-              </div>
-
-              <hr>
             </div>
 
             <div class="study-rows">
-              <!-- initial row -->
+              <!-- initial row (solo tipo + fecha) -->
               <div class="study-row">
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -346,26 +276,27 @@
                     <input name="study_date_inv[]" type="date" class="form-control">
                   </div>
                   <div class="form-group col-md-2 d-flex align-items-end">
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                      <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar</button>
-                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                   </div>
                 </div>
-
-                <div class="form-group">
-                  <label>Descripción / hallazgos</label>
-                  <textarea name="study_description_inv[]" class="form-control" rows="3"></textarea>
-                  <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-                </div>
-
-                <div class="form-group">
-                  <label>Subir informe (PDF)</label>
-                  <input type="file" name="study_file_inv[]" accept="application/pdf">
-                </div>
-
-                <hr>
               </div>
+            </div>
+
+            <!-- Botones Agregar ANTES de campos compartidos -->
+            <div class="form-group mb-3">
+              <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar procedimiento</button>
+            </div>
+
+            <!-- Campos compartidos (Descripción, PDF) -->
+            <div class="form-group">
+              <label>Descripción / hallazgos (compartida para todos los procedimientos)</label>
+              <textarea name="study_description_inv" class="form-control" rows="3"></textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+            </div>
+
+            <div class="form-group">
+              <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+              <input type="file" name="study_file_inv" multiple accept="application/pdf">
             </div>
 
 

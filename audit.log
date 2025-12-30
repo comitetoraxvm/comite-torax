@@ -255,3 +255,5 @@
 {"timestamp": "2025-12-29T02:38:25.170427", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "Administrador Comit\u00e9"}}
 {"timestamp": "2025-12-30T15:45:15.808675", "action": "user_login", "details": {"user_id": 3, "method": "password"}, "actor": {"id": 3, "name": "Test User"}}
 {"timestamp": "2025-12-30T17:55:50.697185", "action": "user_login", "details": {"user_id": 1, "method": "password"}, "actor": {"id": 1, "name": "T"}}
+{"timestamp": "2025-12-30T18:25:55.085240", "action": "user_login", "details": {"user_id": 3, "method": "password"}, "actor": {"id": 3, "name": "T"}}
+{"timestamp": "2025-12-30T18:26:32.404391", "action": "user_login", "details": {"user_id": 4, "method": "password"}, "actor": {"id": 4, "name": "T"}}
