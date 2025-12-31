@@ -482,6 +482,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // autocompletar link cuando se selecciona un centro
+  const centerLinks = {
+    {% for name, url in center_links.items() %}
+    "{{ name }}": "{{ url }}",
+    {% endfor %}
+  };
+
+  document.addEventListener('change', (ev) => {
+    const centerSelect = ev.target.closest('select[name="study_center_img[]"]');
+    if (centerSelect) {
+      const row = centerSelect.closest('.study-row');
+      if (!row) return;
+      const linkInput = row.querySelector('input[name="study_portal_link_img[]"]');
+      if (!linkInput) return;
+      const selectedCenter = centerSelect.value.toLowerCase();
+      const url = centerLinks[selectedCenter];
+      if (url && !linkInput.value) {
+        linkInput.value = url;
+      }
+    }
+  });
+
   // estado inicial
   update();
 });

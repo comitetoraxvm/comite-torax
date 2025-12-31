@@ -379,7 +379,7 @@ CENTER_PORTAL_LINKS_RAW = {
     "Roentgen": "https://estudios.roentgen.com.ar:4432/request-report/",
     "Sanatorio Cruz Azul": "https://cruzazul.informemedico.com.ar/mis_estudios/",
     "Sanatorio de la Canada": "https://pacientes.sdlc.com.ar/",
-    "Clinica San Martin": "https://pacientes.sdlc.com.ar/",
+    "Clinica San Martin": "https://clinicasanmartin.com.ar/estudios/",
 }
 CENTER_PORTAL_LINKS = {name.lower(): url for name, url in CENTER_PORTAL_LINKS_RAW.items()}
 STUDY_TYPE_OPTIONS = [
