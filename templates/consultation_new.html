@@ -144,12 +144,9 @@
                     <option>Ecodoppler Angiopower</option>
                   </select>
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-6">
                   <label>Fecha del estudio</label>
                   <input name="study_date_img[]" type="date" class="form-control">
-                </div>
-                <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                 </div>
               </div>
               <div class="form-row">
@@ -194,12 +191,9 @@
                       <option>Ecodoppler Angiopower</option>
                     </select>
                   </div>
-                  <div class="form-group col-md-4">
+                  <div class="form-group col-md-6">
                     <label>Fecha del estudio</label>
                     <input name="study_date_img[]" type="date" class="form-control">
-                  </div>
-                  <div class="form-group col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                   </div>
                 </div>
                 <div class="form-row">
@@ -228,9 +222,10 @@
               </div>
             </div>
 
-            <!-- Botones Agregar ANTES de campos compartidos -->
+            <!-- Botones Agregar y Eliminar juntos -->
             <div class="form-group mb-3">
               <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar estudio</button>
+              <button type="button" class="btn btn-outline-danger btn-sm remove-study-row" data-group="img">Eliminar</button>
             </div>
 
             <!-- Campos compartidos (Descripción, PDF) -->
@@ -499,6 +494,25 @@ document.addEventListener("DOMContentLoaded", () => {
         _clearInputs(row);
       } else {
         row.remove();
+      }
+      return;
+    }
+
+    // nuevo manejador para botón "Eliminar" global (quita última fila)
+    const removeRowBtn = ev.target.closest('.remove-study-row');
+    if (removeRowBtn) {
+      const group = removeRowBtn.dataset.group;
+      const block = document.getElementById('block-' + group);
+      if (!block) return;
+      const rows = block.querySelector('.study-rows');
+      if (!rows) return;
+      const allRows = rows.querySelectorAll('.study-row');
+      if (allRows.length <= 1) {
+        // si es la última, limpiar inputs
+        _clearInputs(allRows[0]);
+      } else {
+        // eliminar la última fila
+        allRows[allRows.length - 1].remove();
       }
       return;
     }
