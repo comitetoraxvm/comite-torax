@@ -107,14 +107,10 @@
             <!-- Botones Agregar/Eliminar ANTES de campos compartidos -->
             <div class="form-group mb-3">
               <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar estudio</button>
+              <a href="https://pro.boehringer-ingelheim.com/sa/ar/calculadora-de-progresion-de-pruebas-de-funcion-pulmonar-ar?cid=AE:::20250212&BIID=001d000001cqUwCAAU&opu=AR&bi_deeplink_session_bypass=1" target="_blank" rel="noopener" class="btn btn-outline-info btn-sm">🧮 Calculadora de progresión</a>
             </div>
 
             <!-- Campos compartidos (descripción, PDF, recordatorio) -->
-            {% if func_calc_url %}
-            <div class="form-group">
-              <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Calculadora de progresión</a>
-            </div>
-            {% endif %}
             <div class="form-group">
               <label>Descripción / hallazgos (compartida para todos los estudios)</label>
               <textarea name="study_description_func" class="form-control" rows="3"></textarea>
