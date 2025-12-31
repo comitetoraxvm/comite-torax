@@ -3183,12 +3183,12 @@ def consultation_new(patient_id):
         func_desc = (request.form.get("study_description_func") or "").strip() or None
         func_files = _get_files("study_file_func")
 
-        # Imágenes: tipos + fechas son arrays, otros campos compartidos (strings únicos)
+        # Imágenes: tipos, fechas, centros, accesos y links son arrays, descripción es compartida
         img_types = _get_list("study_type_img")
         img_dates = _get_list("study_date_img")
-        img_center = (request.form.get("study_center_img") or "").strip() or ""
-        img_access = (request.form.get("study_access_code_img") or "").strip() or ""
-        img_link = (request.form.get("study_portal_link_img") or "").strip() or ""
+        img_centers = _get_list("study_center_img")
+        img_accesses = _get_list("study_access_code_img")
+        img_links = _get_list("study_portal_link_img")
         img_desc = (request.form.get("study_description_img") or "").strip() or None
         img_files = _get_files("study_file_img")
 
@@ -3242,7 +3242,7 @@ def consultation_new(patient_id):
         if "func" in study_groups:
             group_indices['func'] = (len(studies_created), add_studies_from_lists(func_types, func_dates, func_desc))
         if "img" in study_groups:
-            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, img_desc, centers=[img_center], accesses=[img_access], links=[img_link]))
+            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, img_desc, centers=img_centers, accesses=img_accesses, links=img_links))
         if "inv" in study_groups:
             group_indices['inv'] = (len(studies_created), add_studies_from_lists(inv_types, inv_dates, inv_desc))
 

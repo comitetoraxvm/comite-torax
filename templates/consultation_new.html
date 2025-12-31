@@ -128,7 +128,7 @@
           <!-- Imágenes -->
           <div id="block-img" class="d-none">
 
-            <!-- template row (solo tipo + fecha) -->
+            <!-- template row (tipo + fecha + centro + acceso + link) -->
             <div class="study-row-template d-none">
               <div class="form-row">
                 <div class="form-group col-md-6">
@@ -152,10 +152,33 @@
                   <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                 </div>
               </div>
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label>Centro</label>
+                  <select name="study_center_img[]" class="form-control">
+                    <option value="">-- Seleccionar --</option>
+                    {% for c in center_options %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+                  <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label>Número de acceso</label>
+                  <input name="study_access_code_img[]" type="text" class="form-control">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Link de ingreso directo</label>
+                  <input name="study_portal_link_img[]" type="url" class="form-control">
+                </div>
+              </div>
+              <hr>
             </div>
 
             <div class="study-rows">
-              <!-- initial row (solo tipo + fecha) -->
+              <!-- initial row (tipo + fecha + centro + acceso + link) -->
               <div class="study-row">
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -179,6 +202,29 @@
                     <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
                   </div>
                 </div>
+                <div class="form-row">
+                  <div class="form-group col-md-12">
+                    <label>Centro</label>
+                    <select name="study_center_img[]" class="form-control">
+                      <option value="">-- Seleccionar --</option>
+                      {% for c in center_options %}
+                      <option value="{{ c }}">{{ c }}</option>
+                      {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Número de acceso</label>
+                    <input name="study_access_code_img[]" type="text" class="form-control">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Link de ingreso directo</label>
+                    <input name="study_portal_link_img[]" type="url" class="form-control">
+                  </div>
+                </div>
+                <hr>
               </div>
             </div>
 
@@ -187,31 +233,7 @@
               <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar estudio</button>
             </div>
 
-            <!-- Campos compartidos (Centro, Acceso, Link, Descripción, PDF) -->
-            <div class="form-row">
-              <div class="form-group col-md-12">
-                <label>Centro</label>
-                <select name="study_center_img" class="form-control">
-                  <option value="">-- Seleccionar --</option>
-                  {% for c in center_options %}
-                  <option value="{{ c }}">{{ c }}</option>
-                  {% endfor %}
-                </select>
-                <small class="form-text text-muted">Ej: Hospital Pasteur</small>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label>Número de acceso</label>
-                <input name="study_access_code_img" type="text" class="form-control">
-              </div>
-              <div class="form-group col-md-6">
-                <label>Link de ingreso directo</label>
-                <input name="study_portal_link_img" type="url" class="form-control">
-              </div>
-            </div>
-
+            <!-- Campos compartidos (Descripción, PDF) -->
             <div class="form-group">
               <label>Descripción / hallazgos (compartida para todos los estudios)</label>
               <textarea name="study_description_img" class="form-control" rows="3"></textarea>
