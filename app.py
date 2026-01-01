@@ -3372,6 +3372,71 @@ def consultation_view(consultation_id):
     )
 
 
+@app.route("/consultations/<int:consultation_id>/edit", methods=["GET", "POST"])
+@login_required
+def consultation_edit(consultation_id):
+    consultation = Consultation.query.get_or_404(consultation_id)
+    patient = consultation.patient
+    
+    # Solo el creador puede editar
+    if consultation.created_by_id != current_user.id:
+        flash("No tienes permiso para editar esta consulta.", "danger")
+        return redirect(url_for("consultation_view", consultation_id=consultation.id))
+    
+    if request.method == "POST":
+        consultation.date = request.form.get("date") or None
+        consultation.notes = request.form.get("notes") or None
+        consultation.lab_general = request.form.get("lab_general") or None
+        consultation.lab_immunology_notes = request.form.get("lab_immunology_notes") or None
+        
+        # Actualizar laboratorio de inmunología (checkboxes + valores)
+        immuno_list = request.form.getlist("lab_immunology")
+        consultation.lab_immunology = ",".join(immuno_list) if immuno_list else None
+        
+        # Capturar valores de inmunología
+        immuno_values = {}
+        for key in immuno_list:
+            val = request.form.get(f"lab_immuno_value_{key}", "").strip()
+            if val:
+                immuno_values[key] = val
+        consultation.lab_immunology_values = _serialize_kv(immuno_values)
+        
+        db.session.commit()
+        flash("Consulta actualizada correctamente.", "success")
+        return redirect(url_for("consultation_view", consultation_id=consultation.id))
+    
+    # GET: pre-cargar datos
+    immuno_selected = consultation.lab_immunology.split(",") if consultation.lab_immunology else []
+    immuno_values = _deserialize_kv(consultation.lab_immunology_values)
+    
+    return render_template(
+        "consultation_edit.html",
+        consultation=consultation,
+        patient=patient,
+        immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
+        immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
+        immuno_selected=immuno_selected,
+        immuno_values=immuno_values,
+    )
+
+
+@app.route("/consultations/<int:consultation_id>/delete", methods=["POST"])
+@login_required
+def consultation_delete(consultation_id):
+    consultation = Consultation.query.get_or_404(consultation_id)
+    patient_id = consultation.patient_id
+    
+    # Solo el creador puede borrar
+    if consultation.created_by_id != current_user.id:
+        flash("No tienes permiso para borrar esta consulta.", "danger")
+        return redirect(url_for("consultation_view", consultation_id=consultation.id))
+    
+    db.session.delete(consultation)
+    db.session.commit()
+    flash("Consulta eliminada correctamente.", "success")
+    return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
 # -------------------------------------------------
 # CONTEXTO GLOBAL EXTRA (badge revisiones)
 # -------------------------------------------------
