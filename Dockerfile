@@ -16,4 +16,6 @@ ENV SECRET_KEY=change-me \
     PYTHONIOENCODING=utf-8
 
 EXPOSE 5000
+
+# Use wsgi.py as entry point for Gunicorn (DB init happens once at startup)
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
