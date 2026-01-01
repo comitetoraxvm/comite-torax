@@ -357,6 +357,9 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get(
     "SECRET_KEY", "cambia-esta-clave-por-una-larga-y-segura"
 )
+app.config["TEMPLATES_AUTO_RELOAD"] = True  # Forzar recarga de templates
+app.jinja_env.auto_reload = True
+app.jinja_env.cache = {}
 
 
 def get_upload_dir():
