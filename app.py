@@ -1713,19 +1713,7 @@ def create_tables_and_admin():
             print("[INFO] Usuario admin actualizado a rol=admin, status=approved.")
 
 
-_DB_INIT_DONE = False
 
-
-@app.before_request
-def _init_db_once():
-    """Asegura tablas/columnas antes del primer request (flask run)."""
-    global _DB_INIT_DONE
-    if _DB_INIT_DONE:
-        return
-    try:
-        create_tables_and_admin()
-    finally:
-        _DB_INIT_DONE = True
 
 
 # -------------------------------------------------
