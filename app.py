@@ -3117,6 +3117,7 @@ def study_edit(study_id):
 @app.route("/patients/<int:patient_id>/consultations/new", methods=["GET", "POST"])
 @login_required
 def consultation_new(patient_id):
+    print(f"[DEBUG] consultation_new: Rendering template with immuno_core_options count={len(IMMUNO_LAB_CORE_OPTIONS)}")
     patient = Patient.query.get_or_404(patient_id)
     review_users = get_review_recipient_options(current_user)
 
@@ -3363,6 +3364,7 @@ def consultation_new(patient_id):
 def consultation_view(consultation_id):
     consultation = Consultation.query.get_or_404(consultation_id)
     patient = consultation.patient
+    print(f"[DEBUG] consultation_view: consultation_id={consultation_id}, created_by_id={consultation.created_by_id}, current_user_id={current_user.id}")
     return render_template(
         "consultation_view.html",
         consultation=consultation,
