@@ -1713,6 +1713,30 @@ def create_tables_and_admin():
             print("[INFO] Usuario admin actualizado a rol=admin, status=approved.")
 
 
+import threading
+
+_DB_INIT_LOCK = threading.Lock()
+_DB_INIT_DONE = False
+
+
+@app.before_request
+def _init_db_if_needed():
+    """Inicializa tablas y admin en el primer request (thread-safe)."""
+    global _DB_INIT_DONE
+    if _DB_INIT_DONE:
+        return
+    
+    with _DB_INIT_LOCK:
+        if _DB_INIT_DONE:
+            return
+        try:
+            print("[INIT] Initializing database (first request)...")
+            create_tables_and_admin()
+            print("[OK] Database initialization complete")
+        except Exception as e:
+            print(f"[WARN] Database initialization: {e}")
+        finally:
+            _DB_INIT_DONE = True
 
 
 
