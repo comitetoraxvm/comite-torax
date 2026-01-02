@@ -223,18 +223,14 @@
           {% for s in consultation_group.studies %}
             <li>
               {{ s.study_type or 'Estudio' }}
+              {% if s.date %} - {{ s.date }}{% endif %}
               {% if s.description %}
                 <br><em>{{ s.description | nl2br }}</em>
               {% endif %}
-              <br>
-              <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
-              <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
-              </form>
             </li>
           {% endfor %}
         </ul>
+        <a href="{{ url_for('consultation_edit', consultation_id=consultation_group.consultation.id) }}">Editar estudio</a>
       </div>
     {% endfor %}
   {% endif %}
