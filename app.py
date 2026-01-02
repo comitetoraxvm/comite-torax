@@ -3594,6 +3594,21 @@ def consultation_edit(consultation_id):
             _save_file_for_study_filelist(inv_files, start, count, 'inv')
         
         db.session.commit()
+        
+        # Solicitud de revisión (si se especificaron destinatarios)
+        review_recips = _parse_recipient_ids(request.form.getlist("review_recipients"))
+        review_message = request.form.get("review_message")
+        study_for_review = studies_created[0] if studies_created else None
+        if review_recips:
+            create_review_request(
+                patient,
+                current_user,
+                review_recips,
+                review_message,
+                consultation=consultation,
+                study=study_for_review,
+            )
+        
         flash("Consulta actualizada correctamente.", "success")
         return redirect(url_for("consultation_view", consultation_id=consultation.id))
     
