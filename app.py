@@ -3111,6 +3111,29 @@ def study_edit(study_id):
     )
 
 
+@app.route("/studies/<int:study_id>/delete", methods=["POST"])
+@login_required
+def study_delete(study_id):
+    study = Study.query.get_or_404(study_id)
+    patient_id = study.patient_id
+    
+    # Solo el creador puede borrar
+    if study.created_by_id != current_user.id:
+        flash("No tienes permiso para borrar este estudio.", "danger")
+        return redirect(url_for("patient_detail", patient_id=patient_id))
+    
+    # Borrar archivo PDF si existe
+    if study.report_file:
+        file_path = os.path.join(get_upload_dir(), study.report_file)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    
+    db.session.delete(study)
+    db.session.commit()
+    flash("Estudio eliminado correctamente.", "success")
+    return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
 # --------------- CONSULTAS -----------------------
 
 

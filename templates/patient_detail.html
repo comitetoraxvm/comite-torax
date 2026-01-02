@@ -243,7 +243,11 @@
         {% if s.report_file %}
           <a href="{{ url_for('study_download', study_id=s.id) }}" target="_blank">Ver PDF</a> |
         {% endif %}
-        <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a>
+        <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
+        <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
+        </form>
         </li>
       {% endfor %}
     </ul>
