@@ -3402,6 +3402,7 @@ def consultation_view(consultation_id):
 def consultation_edit(consultation_id):
     consultation = Consultation.query.get_or_404(consultation_id)
     patient = consultation.patient
+    review_users = get_review_recipient_options(current_user)
     
     # Solo el creador puede editar
     if consultation.created_by_id != current_user.id:
@@ -3409,6 +3410,7 @@ def consultation_edit(consultation_id):
         return redirect(url_for("consultation_view", consultation_id=consultation.id))
     
     if request.method == "POST":
+        # Actualizar datos básicos
         consultation.date = request.form.get("date") or None
         consultation.notes = request.form.get("notes") or None
         consultation.lab_general = request.form.get("lab_general") or None
@@ -3421,29 +3423,174 @@ def consultation_edit(consultation_id):
         # Capturar valores de inmunología
         immuno_values = {}
         for key in immuno_list:
-            val = request.form.get(f"lab_immuno_value_{key}", "").strip()
+            val = request.form.get(f"lab_immunology_value_{key}", "").strip()
             if val:
                 immuno_values[key] = val
         consultation.lab_immunology_values = _serialize_kv(immuno_values)
+        
+        # Eliminar estudios existentes para esta consulta y recrearlos
+        Study.query.filter_by(consultation_id=consultation_id).delete()
+        db.session.flush()
+        
+        # Procesar grupos de estudios (igual que en consultation_new)
+        study_groups = request.form.getlist("study_groups") or []
+        studies_created = []
+        
+        def _get_list(key):
+            vals = request.form.getlist(key)
+            if vals:
+                return [v.strip() for v in vals]
+            vals = request.form.getlist(f"{key}[]")
+            return [v.strip() for v in vals] if vals else []
+        
+        def _get_files(key):
+            files = request.files.getlist(key)
+            if files:
+                return files
+            files = request.files.getlist(f"{key}[]")
+            return files or []
+        
+        # Funcionales
+        func_types = _get_list("study_type_func")
+        func_dates = _get_list("study_date_func")
+        func_desc = (request.form.get("study_description_func") or "").strip() or None
+        func_files = _get_files("study_file_func")
+        
+        # Imágenes
+        img_types = _get_list("study_type_img")
+        img_dates = _get_list("study_date_img")
+        img_centers = _get_list("study_center_img")
+        img_accesses = _get_list("study_access_code_img")
+        img_links = _get_list("study_portal_link_img")
+        img_desc = (request.form.get("study_description_img") or "").strip() or None
+        img_files = _get_files("study_file_img")
+        
+        # Invasivos
+        inv_types = _get_list("study_type_inv")
+        inv_dates = _get_list("study_date_inv")
+        inv_desc = (request.form.get("study_description_inv") or "").strip() or None
+        inv_files = _get_files("study_file_inv")
+        
+        def add_studies_from_lists(types, dates, shared_desc, centers=None, accesses=None, links=None):
+            nonlocal studies_created
+            added = 0
+            max_len = max(len(types) if types else 0, len(dates) if dates else 0)
+            for idx in range(max_len):
+                stype = (types[idx] if idx < len(types) else "") or ""
+                stype = stype.strip()
+                sdate = (dates[idx] if idx < len(dates) else "") or ""
+                sdate = sdate.strip()
+                center = (centers[idx] if centers and idx < len(centers) else "").strip() if centers else ""
+                access = (accesses[idx] if accesses and idx < len(accesses) else "").strip() if accesses else ""
+                link = (links[idx] if links and idx < len(links) else "").strip() if links else ""
+                if not stype and not sdate:
+                    continue
+                study = Study(
+                    patient=patient,
+                    consultation=consultation,
+                    study_type=stype or "Estudio asociado a consulta",
+                    date=sdate or consultation.date,
+                    center=center or None,
+                    description=shared_desc or None,
+                    created_by=current_user,
+                )
+                study.access_code = access or None
+                study.portal_link = link or None
+                db.session.add(study)
+                studies_created.append(study)
+                added += 1
+            return added
+        
+        group_indices = {}
+        if "func" in study_groups:
+            group_indices['func'] = (len(studies_created), add_studies_from_lists(func_types, func_dates, func_desc))
+        if "img" in study_groups:
+            group_indices['img'] = (len(studies_created), add_studies_from_lists(img_types, img_dates, img_desc, centers=img_centers, accesses=img_accesses, links=img_links))
+        if "inv" in study_groups:
+            group_indices['inv'] = (len(studies_created), add_studies_from_lists(inv_types, inv_dates, inv_desc))
+        
+        db.session.flush()
+        
+        # Guardar archivos para estudios
+        def _save_file_for_study_filelist(filelist, start_idx, count, group_name):
+            if not filelist:
+                return
+            if len(filelist) == 1 and count > 0:
+                f = filelist[0]
+                if f and getattr(f, "filename", ""):
+                    filename = secure_filename(f.filename)
+                    if allowed_study_file(filename):
+                        idx = start_idx
+                        if idx < len(studies_created):
+                            unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                            os.makedirs(get_upload_dir(), exist_ok=True)
+                            save_path = os.path.join(get_upload_dir(), unique_name)
+                            f.save(save_path)
+                            studies_created[idx].report_file = unique_name
+                    else:
+                        flash("Solo se permiten archivos PDF para el reporte.", "danger")
+                return
+            for i in range(count):
+                idx = start_idx + i
+                if idx >= len(studies_created):
+                    break
+                f = filelist[i] if i < len(filelist) else None
+                if not f or not getattr(f, "filename", ""):
+                    continue
+                filename = secure_filename(f.filename)
+                if allowed_study_file(filename):
+                    unique_name = f"study_{studies_created[idx].id}_{int(time.time())}.pdf"
+                    os.makedirs(get_upload_dir(), exist_ok=True)
+                    save_path = os.path.join(get_upload_dir(), unique_name)
+                    f.save(save_path)
+                    studies_created[idx].report_file = unique_name
+                else:
+                    flash("Solo se permiten archivos PDF para el reporte.", "danger")
+        
+        if 'func' in group_indices:
+            start, count = group_indices['func']
+            _save_file_for_study_filelist(func_files, start, count, 'func')
+        if 'img' in group_indices:
+            start, count = group_indices['img']
+            _save_file_for_study_filelist(img_files, start, count, 'img')
+        if 'inv' in group_indices:
+            start, count = group_indices['inv']
+            _save_file_for_study_filelist(inv_files, start, count, 'inv')
         
         db.session.commit()
         flash("Consulta actualizada correctamente.", "success")
         return redirect(url_for("consultation_view", consultation_id=consultation.id))
     
     # GET: pre-cargar datos
-    immuno_selected = consultation.lab_immunology.split(",") if consultation.lab_immunology else []
     immuno_values = _deserialize_kv(consultation.lab_immunology_values)
-    studies = Study.query.filter_by(consultation_id=consultation_id).order_by(Study.date.desc()).all()
+    immuno_selected = consultation.lab_immunology.split(",") if consultation.lab_immunology else []
+    
+    # Separar estudios por tipo para cargar en el template
+    studies = Study.query.filter_by(consultation_id=consultation_id).all()
+    
+    func_studies = [s for s in studies if s.study_type in ["Espirometría", "Test de la Marcha 6m", "DLCO", "Volúmenes pulmonares"]]
+    img_studies = [s for s in studies if s.study_type in ["TC Tórax", "RM Tórax", "PET-CT", "RX", "Ecografía", "Ecocardiograma", "Ecodoppler Angiopower"]]
+    inv_studies = [s for s in studies if s.study_type in ["Fibrobroncoscopía", "Biopsia", "BAL", "Otro"]]
+    other_studies = [s for s in studies if s not in func_studies + img_studies + inv_studies]
     
     return render_template(
         "consultation_edit.html",
         consultation=consultation,
         patient=patient,
-        studies=studies,
+        review_users=review_users,
+        center_links=CENTER_PORTAL_LINKS,
+        immuno_options=IMMUNO_LAB_OPTIONS,
         immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
         immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
-        immuno_selected=immuno_selected,
+        study_type_options=STUDY_TYPE_OPTIONS,
+        center_options=CATALOGS.get("centers", []),
+        func_calc_url=os.environ.get("FUNC_PROGRESS_CALC_URL"),
         immuno_values=immuno_values,
+        immuno_selected=immuno_selected,
+        func_studies=func_studies,
+        img_studies=img_studies,
+        inv_studies=inv_studies,
+        other_studies=other_studies,
     )
 
 
