@@ -213,28 +213,61 @@
 
 <div class="form-section">
   <h2>Estudios</h2>
-  {% if studies %}
-    <ul>
-      {% for s in studies %}
-        <li>
-          <strong>{{ s.study_type or 'Estudio' }}</strong>
-          {% if s.date %} - {{ s.date }}{% endif %}
-          <br>
-          {% if s.description %}
-            {{ s.description | nl2br }}
-          {% else %}
-            <em>Sin descripción.</em>
-          {% endif %}
-          <br>
-          <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
-          <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
+  
+  <!-- Estudios asociados a consultas -->
+  {% if sorted_consultation_studies %}
+    {% for consultation_group in sorted_consultation_studies %}
+      <div style="margin-bottom: 20px;">
+        <strong>Estudio asociado a consulta - {{ consultation_group.consultation.date or '---' }}</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+          {% for s in consultation_group.studies %}
+            <li>
+              {{ s.study_type or 'Estudio' }}
+              {% if s.description %}
+                <br><em>{{ s.description | nl2br }}</em>
+              {% endif %}
+              <br>
+              <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
+              <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  <!-- Estudios sueltos (sin consulta asociada) -->
+  {% if standalone_studies %}
+    <div style="margin-top: 20px;">
+      <strong>Estudios sin consulta asociada</strong>
+      <ul style="margin-top: 10px; padding-left: 20px;">
+        {% for s in standalone_studies %}
+          <li>
+            <strong>{{ s.study_type or 'Estudio' }}</strong>
+            {% if s.date %} - {{ s.date }}{% endif %}
+            <br>
+            {% if s.description %}
+              {{ s.description | nl2br }}
+            {% else %}
+              <em>Sin descripción.</em>
+            {% endif %}
+            <br>
+            <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
+            <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  
+  <!-- Sin estudios -->
+  {% if not sorted_consultation_studies and not standalone_studies %}
     <p><em>Sin estudios cargados aún.</em></p>
   {% endif %}
 </div>

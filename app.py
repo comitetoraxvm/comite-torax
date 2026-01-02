@@ -2205,6 +2205,31 @@ def patient_detail(patient_id):
         .order_by(Study.date.desc().nullslast(), Study.id.desc())
         .all()
     )
+    
+    # Agrupar estudios por consulta (si están asociados a una)
+    studies_by_consultation = {}
+    standalone_studies = []
+    
+    for study in studies:
+        if study.consultation_id:
+            # Estudio ligado a una consulta
+            if study.consultation_id not in studies_by_consultation:
+                consultation = study.consultation
+                studies_by_consultation[study.consultation_id] = {
+                    'consultation': consultation,
+                    'studies': []
+                }
+            studies_by_consultation[study.consultation_id]['studies'].append(study)
+        else:
+            # Estudio suelto (sin consulta)
+            standalone_studies.append(study)
+    
+    # Ordenar consultas por fecha descendente
+    sorted_consultation_studies = sorted(
+        studies_by_consultation.values(),
+        key=lambda x: x['consultation'].date or '',
+        reverse=True
+    )
     pending_reviews = []
     all_reviews = []
     for review in sorted(patient.review_requests, key=lambda r: r.created_at or datetime.datetime.min, reverse=True):
@@ -2225,6 +2250,8 @@ def patient_detail(patient_id):
         patient=patient,
         consultations=consultations,
         studies=studies,
+        sorted_consultation_studies=sorted_consultation_studies,
+        standalone_studies=standalone_studies,
         pending_reviews=pending_reviews,
         all_reviews=all_reviews,
         center_links=CENTER_PORTAL_LINKS,

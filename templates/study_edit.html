@@ -16,13 +16,14 @@
     <div class="form-section">
       <h2>Editar estudio</h2>
       
-      <!-- Detectar grupo del estudio actual -->
+      <!-- Detectar grupo del estudio actual - case insensitive -->
+      {% set study_type_lower = (study.study_type or '')|lower %}
       {% set current_group = 'other' %}
-      {% if study.study_type in ['Espirometría', 'Test de la Marcha 6m', 'DLCO', 'Volúmenes pulmonares'] %}
+      {% if study_type_lower in ['espirometría', 'test de la marcha 6m', 'dlco', 'volúmenes pulmonares'] %}
         {% set current_group = 'func' %}
-      {% elif study.study_type in ['TC Tórax', 'TC torax + abdomen/pelvis', 'RM Tórax', 'RM torax', 'PET-CT', 'RX', 'Rx torax', 'Ecografía', 'Ecografia', 'Ecocardiograma', 'Ecocardioragor', 'Ecodoppler Angiopower'] %}
+      {% elif ('tc' in study_type_lower or 'rm' in study_type_lower or 'pet' in study_type_lower or 'rx' in study_type_lower or 'ecografia' in study_type_lower or 'ecocardiograma' in study_type_lower or 'ecodoppler' in study_type_lower) %}
         {% set current_group = 'img' %}
-      {% elif study.study_type in ['Fibrobroncoscopía', 'Biopsia', 'BAL', 'Otro'] %}
+      {% elif study_type_lower in ['fibrobroncoscopía', 'biopsia', 'bal', 'otro'] %}
         {% set current_group = 'inv' %}
       {% endif %}
       
@@ -120,34 +121,37 @@
   // Portal link display para estudios de imagen
   const centerLinks = {
     {% for name, url in center_links.items() %}
-    "{{ name }}": "{{ url }}",
+    "{{ name|lower }}": "{{ url }}",
     {% endfor %}
   };
 
+  function updatePortalLink(centerSelect) {
+    const linkDisplay = document.querySelector('.center-link-display');
+    if (!centerSelect || !linkDisplay) return;
+    
+    const selectedCenter = centerSelect.value.toLowerCase();
+    const url = centerLinks[selectedCenter];
+    if (url) {
+      linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+      linkDisplay.style.display = 'block';
+    } else {
+      linkDisplay.style.display = 'none';
+    }
+  }
+
+  // Al cambiar el centro
   document.addEventListener('change', (ev) => {
     const centerSelect = ev.target.closest('select#center');
     if (centerSelect) {
-      const linkDisplay = document.querySelector('.center-link-display');
-      const linkInput = document.getElementById('portal_link');
-      if (!linkInput || !linkDisplay) return;
-      
-      const selectedCenter = centerSelect.value.toLowerCase();
-      const url = centerLinks[selectedCenter];
-      if (url) {
-        linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
-        linkDisplay.style.display = 'block';
-      } else {
-        linkDisplay.style.display = 'none';
-      }
+      updatePortalLink(centerSelect);
     }
   });
 
-  // Ejecutar al cargar para mostrar link si ya hay centro seleccionado
+  // Ejecutar al cargar la página para mostrar link si ya hay centro seleccionado
   document.addEventListener("DOMContentLoaded", () => {
     const centerSelect = document.getElementById('center');
     if (centerSelect && centerSelect.value) {
-      const event = new Event('change');
-      centerSelect.dispatchEvent(event);
+      updatePortalLink(centerSelect);
     }
   });
 </script>
