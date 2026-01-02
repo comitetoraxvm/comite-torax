@@ -344,12 +344,14 @@
           </div>
           <div class="form-group">
             <label>Autoinmunidad - CON VALORES</label>
-            <div class="d-flex flex-wrap align-items-start">
+            <div class="lab-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px 20px; margin-top: 10px;">
               {% for opt in immuno_core_options %}
-              <div class="d-flex align-items-center mr-3 mb-2" style="white-space: nowrap;">
-                <input class="mr-1" type="checkbox" name="lab_immunology" value="{{ opt[0] }}" id="im-{{ opt[0] }}">
-                <label class="mb-0 mr-2" for="im-{{ opt[0] }}" style="white-space: nowrap;">{{ opt[1] }}</label>
-                <input type="text" name="lab_immuno_value_{{ opt[0] }}" class="form-control form-control-sm" style="width: 80px;" placeholder="Valor">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0;">
+                <span style="display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                  <input class="mr-1" type="checkbox" name="lab_immunology" value="{{ opt[0] }}" id="im-{{ opt[0] }}">
+                  <label class="mb-0" for="im-{{ opt[0] }}" style="white-space: nowrap;">{{ opt[1] }}</label>
+                </span>
+                <input type="text" name="lab_immuno_value_{{ opt[0] }}" class="form-control form-control-sm" style="flex: 0 0 160px;" placeholder="Valor">
               </div>
               {% endfor %}
             </div>
@@ -361,12 +363,14 @@
               </button>
             </div>
             <div id="rheum-panel" class="collapse mt-2">
-              <div class="d-flex flex-wrap align-items-start">
+              <div class="lab-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px 20px; margin-top: 10px;">
                 {% for opt in immuno_rheum_options %}
-                <div class="d-flex align-items-center mr-3 mb-2" style="white-space: nowrap;">
-                  <input class="mr-1" type="checkbox" name="lab_immunology" value="{{ opt[0] }}" id="im-{{ opt[0] }}">
-                  <label class="mb-0 mr-2" for="im-{{ opt[0] }}" style="white-space: nowrap;">{{ opt[1] }}</label>
-                  <input type="text" name="lab_immuno_value_{{ opt[0] }}" class="form-control form-control-sm" style="width: 80px;" placeholder="Valor">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0;">
+                  <span style="display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                    <input class="mr-1" type="checkbox" name="lab_immunology" value="{{ opt[0] }}" id="im-{{ opt[0] }}">
+                    <label class="mb-0" for="im-{{ opt[0] }}" style="white-space: nowrap;">{{ opt[1] }}</label>
+                  </span>
+                  <input type="text" name="lab_immuno_value_{{ opt[0] }}" class="form-control form-control-sm" style="flex: 0 0 160px;" placeholder="Valor">
                 </div>
                 {% endfor %}
               </div>
