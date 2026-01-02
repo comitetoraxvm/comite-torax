@@ -209,7 +209,6 @@
                     </select>
                     <small class="center-link-display form-text text-muted" style="display:none;"></small>
                   </div>
-                  </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -538,10 +537,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // mostrar link debajo del select
         linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
         linkDisplay.style.display = 'block';
-        // autocompletar el campo de link si está vacío
-        if (!linkInput.value) {
-          linkInput.value = url;
-        }
       } else {
         linkDisplay.style.display = 'none';
       }
