@@ -218,31 +218,19 @@
       {% for s in studies %}
         <li>
           <strong>{{ s.study_type or 'Estudio' }}</strong>
-          {% if s.date %}- {{ s.date }}{% endif %}
-          {% if s.center %} - {{ s.center }}{% endif %}
+          {% if s.date %} - {{ s.date }}{% endif %}
           <br>
-        {% if s.description %}
-          {{ s.description | nl2br }}
-        {% else %}
-          <em>Sin descripcion.</em>
-        {% endif %}
-        <br>
-        {% set portal_url = center_links.get((s.center or '')|lower) %}
-        {% if portal_url %}
-          Portal: <a href="{{ portal_url }}" target="_blank">{{ portal_url }}</a>
-          {% if s.access_code %}| Numero acceso: {{ s.access_code }}{% endif %}
+          {% if s.description %}
+            {{ s.description | nl2br }}
+          {% else %}
+            <em>Sin descripción.</em>
+          {% endif %}
           <br>
-        {% elif s.access_code %}
-          Numero acceso: {{ s.access_code }}<br>
-        {% endif %}
-        {% if s.report_file %}
-          <a href="{{ url_for('study_download', study_id=s.id) }}" target="_blank">Ver PDF</a> |
-        {% endif %}
-        <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
-        <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
-        </form>
+          <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar estudio</a> |
+          <form method="POST" action="{{ url_for('study_delete', study_id=s.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">Eliminar estudio</button>
+          </form>
         </li>
       {% endfor %}
     </ul>

@@ -2,85 +2,114 @@
 
 {% block content %}
 <div class="container my-4">
-  <h3 class="mb-3">Editar estudio</h3>
-  <p><strong>Paciente:</strong> {{ patient.full_name }} (DNI: {{ patient.dni or "—" }})</p>
+  
+  <div class="form-section">
+    <h2>Paciente</h2>
+    <p class="mb-1">
+      <strong>{{ patient.full_name }}</strong> — DNI: <strong>{{ patient.dni or "—" }}</strong>
+    </p>
+  </div>
 
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">Datos del estudio</h5>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="study_type">Tipo de estudio</label>
-            <select id="study_type" name="study_type" class="form-control">
-              <option value="">-- Seleccionar --</option>
-              {% for opt in study_type_options %}
-              <option value="{{ opt }}" {% if study.study_type==opt %}selected{% endif %}>{{ opt }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="date">Fecha del estudio</label>
-            <input id="date" name="date" type="date" class="form-control" value="{{ study.date or '' }}">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="center">Centro</label>
-          <select id="center" name="center" class="form-control">
-            <option value="">-- Seleccionar --</option>
-            {% for c in center_options %}
-            <option value="{{ c }}" {% if study.center==c %}selected{% endif %}>{{ c }}</option>
+    
+    <div class="form-section">
+      <h2>Editar estudio</h2>
+      
+      <!-- Detectar grupo del estudio actual -->
+      {% set current_group = 'other' %}
+      {% if study.study_type in ['Espirometría', 'Test de la Marcha 6m', 'DLCO', 'Volúmenes pulmonares'] %}
+        {% set current_group = 'func' %}
+      {% elif study.study_type in ['TC Tórax', 'TC torax + abdomen/pelvis', 'RM Tórax', 'RM torax', 'PET-CT', 'RX', 'Rx torax', 'Ecografía', 'Ecografia', 'Ecocardiograma', 'Ecocardioragor', 'Ecodoppler Angiopower'] %}
+        {% set current_group = 'img' %}
+      {% elif study.study_type in ['Fibrobroncoscopía', 'Biopsia', 'BAL', 'Otro'] %}
+        {% set current_group = 'inv' %}
+      {% endif %}
+      
+      <div class="form-group">
+        <label for="study_type">Tipo de estudio</label>
+        <select id="study_type" name="study_type" class="form-control">
+          <option value="">-- Seleccionar --</option>
+          {% if current_group == 'func' %}
+            <option value="Espirometría" {% if study.study_type=='Espirometría' %}selected{% endif %}>Espirometría</option>
+            <option value="Test de la Marcha 6m" {% if study.study_type=='Test de la Marcha 6m' %}selected{% endif %}>Test de la Marcha 6m</option>
+            <option value="DLCO" {% if study.study_type=='DLCO' %}selected{% endif %}>DLCO</option>
+            <option value="Volúmenes pulmonares" {% if study.study_type=='Volúmenes pulmonares' %}selected{% endif %}>Volúmenes pulmonares</option>
+          {% elif current_group == 'img' %}
+            <option value="TC Tórax" {% if study.study_type=='TC Tórax' %}selected{% endif %}>TC Tórax</option>
+            <option value="TC torax + abdomen/pelvis" {% if study.study_type=='TC torax + abdomen/pelvis' %}selected{% endif %}>TC torax + abdomen/pelvis</option>
+            <option value="RM Tórax" {% if study.study_type=='RM Tórax' %}selected{% endif %}>RM Tórax</option>
+            <option value="RM torax" {% if study.study_type=='RM torax' %}selected{% endif %}>RM torax</option>
+            <option value="PET-CT" {% if study.study_type=='PET-CT' %}selected{% endif %}>PET-CT</option>
+            <option value="RX" {% if study.study_type=='RX' %}selected{% endif %}>RX</option>
+            <option value="Rx torax" {% if study.study_type=='Rx torax' %}selected{% endif %}>Rx torax</option>
+            <option value="Ecografía" {% if study.study_type=='Ecografía' %}selected{% endif %}>Ecografía</option>
+            <option value="Ecografia" {% if study.study_type=='Ecografia' %}selected{% endif %}>Ecografia</option>
+            <option value="Ecocardiograma" {% if study.study_type=='Ecocardiograma' %}selected{% endif %}>Ecocardiograma</option>
+            <option value="Ecocardioragor" {% if study.study_type=='Ecocardioragor' %}selected{% endif %}>Ecocardioragor</option>
+            <option value="Ecodoppler Angiopower" {% if study.study_type=='Ecodoppler Angiopower' %}selected{% endif %}>Ecodoppler Angiopower</option>
+          {% elif current_group == 'inv' %}
+            <option value="Fibrobroncoscopía" {% if study.study_type=='Fibrobroncoscopía' %}selected{% endif %}>Fibrobroncoscopía</option>
+            <option value="Biopsia" {% if study.study_type=='Biopsia' %}selected{% endif %}>Biopsia</option>
+            <option value="BAL" {% if study.study_type=='BAL' %}selected{% endif %}>BAL</option>
+            <option value="Otro" {% if study.study_type=='Otro' %}selected{% endif %}>Otro</option>
+          {% else %}
+            <!-- Mostrar todas las opciones si no es ninguno de los grupos -->
+            {% for opt in study_type_options %}
+            <option value="{{ opt }}" {% if study.study_type==opt %}selected{% endif %}>{{ opt }}</option>
             {% endfor %}
-          </select>
-          <small class="form-text text-muted">Ej: Hospital Pasteur</small>
-        </div>
-
-        <div class="form-group">
-          <label for="access_code">Número de acceso</label>
-          <input id="access_code" name="access_code" type="text" class="form-control" value="{{ study.access_code or '' }}">
-        </div>
-        <div class="form-group">
-          <label for="portal_link">Link de ingreso directo</label>
-          <input id="portal_link" name="portal_link" type="url" class="form-control" value="{{ study.portal_link or '' }}">
-        </div>
-
-        <div class="form-group">
-          <label for="description">Descripción / hallazgos</label>
-          <textarea id="description" name="description" class="form-control" rows="3">{{ study.description or '' }}</textarea>
-          <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
-        </div>
-
-        <div class="form-group">
-          <label for="study_file">Subir informe (PDF)</label>
-          <input id="study_file" type="file" name="study_file" accept="application/pdf">
-          {% if study.report_file %}
-          <small class="form-text text-muted">Archivo actual: {{ study.report_file }}</small>
           {% endif %}
-        </div>
+        </select>
+      </div>
 
-        <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" id="control-enabled" name="control_enabled">
-          <label class="form-check-label" for="control-enabled">Solicitar control (recordatorio)</label>
-        </div>
-        <div id="control-fields" class="form-row d-none">
-          <div class="form-group col-md-4">
-            <label for="control-date">Fecha de control</label>
-            <input id="control-date" name="control_date" type="date" class="form-control">
-          </div>
-          <div class="form-group col-md-8">
-            <label for="control-extra">Emails adicionales</label>
-            <input id="control-extra" name="control_extra_emails" type="text" class="form-control" placeholder="Correos separados por coma">
-          </div>
-        </div>
+      <div class="form-group">
+        <label for="date">Fecha del estudio</label>
+        <input id="date" name="date" type="date" class="form-control" value="{{ study.date or '' }}">
+      </div>
 
+      <!-- Mostrar centro, acceso y link solo si es grupo imagen -->
+      {% if current_group == 'img' %}
+      <div class="form-group">
+        <label for="center">Centro</label>
+        <select id="center" name="center" class="form-control">
+          <option value="">-- Seleccionar --</option>
+          {% for c in center_options %}
+          <option value="{{ c }}" {% if study.center==c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+        <small class="center-link-display form-text text-muted" style="display:none;"></small>
+      </div>
+
+      <div class="form-group">
+        <label for="access_code">Número de acceso</label>
+        <input id="access_code" name="access_code" type="text" class="form-control" value="{{ study.access_code or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="portal_link">Link de ingreso directo</label>
+        <input id="portal_link" name="portal_link" type="url" class="form-control" value="{{ study.portal_link or '' }}">
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="description">Descripción / hallazgos</label>
+        <textarea id="description" name="description" class="form-control" rows="3">{{ study.description or '' }}</textarea>
+        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="description">Dictado</button>
+      </div>
+
+      <div class="form-group">
+        <label for="study_file">Subir informe (PDF)</label>
+        <input id="study_file" type="file" name="study_file" accept="application/pdf" class="form-control">
+        {% if study.report_file %}
+        <small class="form-text text-muted d-block mt-2">
+          Archivo actual: <a href="{{ url_for('study_download', study_id=study.id) }}" target="_blank">{{ study.report_file }}</a>
+        </small>
+        {% endif %}
       </div>
     </div>
 
     <div class="d-flex justify-content-between mb-4">
-      <button type="submit" class="btn btn-primary">Guardar</button>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
       <a class="btn btn-link" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
     </div>
   </form>
@@ -88,12 +117,38 @@
 
 <style>.d-none{display:none!important;}</style>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const chk = document.getElementById("control-enabled");
-  const blk = document.getElementById("control-fields");
-  if(chk && blk){
-    chk.addEventListener("change",()=>blk.classList.toggle("d-none",!chk.checked));
-  }
-});
+  // Portal link display para estudios de imagen
+  const centerLinks = {
+    {% for name, url in center_links.items() %}
+    "{{ name }}": "{{ url }}",
+    {% endfor %}
+  };
+
+  document.addEventListener('change', (ev) => {
+    const centerSelect = ev.target.closest('select#center');
+    if (centerSelect) {
+      const linkDisplay = document.querySelector('.center-link-display');
+      const linkInput = document.getElementById('portal_link');
+      if (!linkInput || !linkDisplay) return;
+      
+      const selectedCenter = centerSelect.value.toLowerCase();
+      const url = centerLinks[selectedCenter];
+      if (url) {
+        linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+        linkDisplay.style.display = 'block';
+      } else {
+        linkDisplay.style.display = 'none';
+      }
+    }
+  });
+
+  // Ejecutar al cargar para mostrar link si ya hay centro seleccionado
+  document.addEventListener("DOMContentLoaded", () => {
+    const centerSelect = document.getElementById('center');
+    if (centerSelect && centerSelect.value) {
+      const event = new Event('change');
+      centerSelect.dispatchEvent(event);
+    }
+  });
 </script>
 {% endblock %}
