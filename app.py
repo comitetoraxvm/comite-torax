@@ -3428,6 +3428,23 @@ def consultation_edit(consultation_id):
                 immuno_values[key] = val
         consultation.lab_immunology_values = _serialize_kv(immuno_values)
         
+        # Guardar estudios existentes ANTES de borrar (para preservar archivos PDF por orden)
+        existing_studies = Study.query.filter_by(consultation_id=consultation_id).order_by(Study.id).all()
+        existing_files_by_type = {
+            'func': [],
+            'img': [],
+            'inv': []
+        }
+        # Separar archivos por tipo de estudio que tenían
+        for study in existing_studies:
+            if study.report_file:
+                if study.study_type in ["Espirometría", "Test de la Marcha 6m", "DLCO", "Volúmenes pulmonares"]:
+                    existing_files_by_type['func'].append(study.report_file)
+                elif study.study_type in ["TC Tórax", "RM Tórax", "PET-CT", "RX", "Ecografía", "Ecocardiograma", "Ecodoppler Angiopower"]:
+                    existing_files_by_type['img'].append(study.report_file)
+                elif study.study_type in ["Fibrobroncoscopía", "Biopsia", "BAL", "Otro"]:
+                    existing_files_by_type['inv'].append(study.report_file)
+        
         # Eliminar estudios existentes para esta consulta y recrearlos
         Study.query.filter_by(consultation_id=consultation_id).delete()
         db.session.flush()
@@ -3514,6 +3531,13 @@ def consultation_edit(consultation_id):
         # Guardar archivos para estudios
         def _save_file_for_study_filelist(filelist, start_idx, count, group_name):
             if not filelist:
+                # Si no hay archivos nuevos, intentar preservar los antiguos por índice
+                if group_name in existing_files_by_type:
+                    old_files = existing_files_by_type[group_name]
+                    for i in range(count):
+                        idx = start_idx + i
+                        if idx < len(studies_created) and i < len(old_files):
+                            studies_created[idx].report_file = old_files[i]
                 return
             if len(filelist) == 1 and count > 0:
                 f = filelist[0]
@@ -3529,6 +3553,13 @@ def consultation_edit(consultation_id):
                             studies_created[idx].report_file = unique_name
                     else:
                         flash("Solo se permiten archivos PDF para el reporte.", "danger")
+                else:
+                    # Archivo vacío pero existe old file, preservar
+                    if group_name in existing_files_by_type and existing_files_by_type[group_name]:
+                        old_files = existing_files_by_type[group_name]
+                        idx = start_idx
+                        if idx < len(studies_created) and idx < len(old_files):
+                            studies_created[idx].report_file = old_files[idx]
                 return
             for i in range(count):
                 idx = start_idx + i
@@ -3536,6 +3567,11 @@ def consultation_edit(consultation_id):
                     break
                 f = filelist[i] if i < len(filelist) else None
                 if not f or not getattr(f, "filename", ""):
+                    # Si no se subió archivo nuevo pero existe uno anterior, preservarlo por índice
+                    if group_name in existing_files_by_type:
+                        old_files = existing_files_by_type[group_name]
+                        if i < len(old_files):
+                            studies_created[idx].report_file = old_files[i]
                     continue
                 filename = secure_filename(f.filename)
                 if allowed_study_file(filename):

@@ -182,7 +182,7 @@
                     <option value="{{ c }}">{{ c }}</option>
                     {% endfor %}
                   </select>
-                  <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+                  <small class="center-link-display form-text text-muted" style="display:none;"></small>
                 </div>
               </div>
               <div class="form-row">
@@ -231,7 +231,7 @@
                           <option value="{{ c }}" {% if study.center == c %}selected{% endif %}>{{ c }}</option>
                           {% endfor %}
                         </select>
-                        <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+                        <small class="center-link-display form-text text-muted" style="display:none;"></small>
                       </div>
                     </div>
                     <div class="form-row">
@@ -277,7 +277,7 @@
                         <option value="{{ c }}">{{ c }}</option>
                         {% endfor %}
                       </select>
-                      <small class="form-text text-muted">Ej: Hospital Pasteur</small>
+                      <small class="center-link-display form-text text-muted" style="display:none;"></small>
                     </div>
                   </div>
                   <div class="form-row">
@@ -586,7 +586,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // autocompletar link cuando se selecciona un centro
+  // autocompletar link cuando se selecciona un centro y mostrar debajo del select
   const centerLinks = {
     {% for name, url in center_links.items() %}
     "{{ name }}": "{{ url }}",
@@ -599,11 +599,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const row = centerSelect.closest('.study-row');
       if (!row) return;
       const linkInput = row.querySelector('input[name="study_portal_link_img[]"]');
-      if (!linkInput) return;
+      const linkDisplay = row.querySelector('.center-link-display');
+      if (!linkInput || !linkDisplay) return;
       const selectedCenter = centerSelect.value.toLowerCase();
       const url = centerLinks[selectedCenter];
-      if (url && !linkInput.value) {
-        linkInput.value = url;
+      if (url) {
+        // mostrar link debajo del select
+        linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+        linkDisplay.style.display = 'block';
+        // autocompletar el campo de link si está vacío
+        if (!linkInput.value) {
+          linkInput.value = url;
+        }
+      } else {
+        linkDisplay.style.display = 'none';
       }
     }
   });

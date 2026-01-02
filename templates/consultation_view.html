@@ -30,8 +30,18 @@
         <li>
           <strong>{{ study.study_type or "---" }}</strong>
           {% if study.date %} • {{ study.date }} {% endif %}
+          {% if study.center %} • {{ study.center }} {% endif %}
           {% if study.description %}
             <br><em>{{ study.description }}</em>
+          {% endif %}
+          {% if study.access_code %}
+            <br><small>Acceso: {{ study.access_code }}</small>
+          {% endif %}
+          {% if study.portal_link %}
+            <br><small><a href="{{ study.portal_link }}" target="_blank">Portal de acceso</a></small>
+          {% endif %}
+          {% if study.report_file %}
+            <br><a href="{{ url_for('study_download', study_id=study.id) }}" class="btn btn-sm btn-outline-primary" download>Descargar informe (PDF)</a>
           {% endif %}
         </li>
       {% endfor %}
