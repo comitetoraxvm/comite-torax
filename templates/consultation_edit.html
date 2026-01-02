@@ -98,7 +98,31 @@
     </style>
   </div>
 
-  <p>Si necesitas ajustar estudios vinculados, hacelo desde la seccion de Estudios.</p>
+  {% if studies %}
+  <div class="form-section">
+    <h2>Estudios vinculados a esta consulta</h2>
+    <ul>
+      {% for study in studies %}
+        <li>
+          <strong>{{ study.study_type or "---" }}</strong>
+          {% if study.date %} • {{ study.date }} {% endif %}
+          {% if study.description %}
+            <br><em>{{ study.description }}</em>
+          {% endif %}
+          <div class="study-actions">
+            <a href="{{ url_for('study_edit', study_id=study.id) }}" class="btn-link">Editar</a>
+            <form method="POST" action="{{ url_for('study_delete', study_id=study.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este estudio? Esta acción no se puede deshacer.');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn-link btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <p class="form-help">No hay estudios vinculados a esta consulta aún.</p>
+  {% endif %}
 
   <button type="submit">Guardar cambios</button>
   <a class="btn-link btn-secondary" href="{{ url_for('patient_detail', patient_id=consultation.patient.id) }}">Cancelar</a>

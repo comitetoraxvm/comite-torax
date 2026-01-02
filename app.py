@@ -3386,10 +3386,12 @@ def consultation_new(patient_id):
 def consultation_view(consultation_id):
     consultation = Consultation.query.get_or_404(consultation_id)
     patient = consultation.patient
+    studies = Study.query.filter_by(consultation_id=consultation_id).order_by(Study.date.desc()).all()
     return render_template(
         "consultation_view.html",
         consultation=consultation,
         patient=patient,
+        studies=studies,
         immuno_map=IMMUNO_LAB_DICT,
         immuno_values=_deserialize_kv(consultation.lab_immunology_values),
     )
@@ -3431,11 +3433,13 @@ def consultation_edit(consultation_id):
     # GET: pre-cargar datos
     immuno_selected = consultation.lab_immunology.split(",") if consultation.lab_immunology else []
     immuno_values = _deserialize_kv(consultation.lab_immunology_values)
+    studies = Study.query.filter_by(consultation_id=consultation_id).order_by(Study.date.desc()).all()
     
     return render_template(
         "consultation_edit.html",
         consultation=consultation,
         patient=patient,
+        studies=studies,
         immuno_core_options=IMMUNO_LAB_CORE_OPTIONS,
         immuno_rheum_options=IMMUNO_LAB_RHEUM_OPTIONS,
         immuno_selected=immuno_selected,
