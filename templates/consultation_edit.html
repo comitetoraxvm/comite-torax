@@ -28,7 +28,7 @@
       <div class="form-group">
         <label for="notes">Notas</label>
         <textarea id="notes" name="notes" class="form-control" rows="4">{{ consultation.notes or '' }}</textarea>
-        <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="notes">Dictado</button>
       </div>
     </div>
 
@@ -139,8 +139,8 @@
             <!-- Campos compartidos (descripción, PDF, recordatorio) -->
             <div class="form-group">
               <label>Descripción / hallazgos (compartida para todos los estudios)</label>
-              <textarea name="study_description_func" class="form-control" rows="3">{% if func_studies %}{{ func_studies[0].description or '' }}{% endif %}</textarea>
-              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+              <textarea id="study_description_func" name="study_description_func" class="form-control" rows="3">{% if func_studies %}{{ func_studies[0].description or '' }}{% endif %}</textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_func">Dictado</button>
             </div>
             <div class="form-group">
               <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
@@ -304,8 +304,8 @@
             <!-- Campos compartidos (Descripción, PDF) -->
             <div class="form-group">
               <label>Descripción / hallazgos (compartida para todos los estudios)</label>
-              <textarea name="study_description_img" class="form-control" rows="3">{% if img_studies %}{{ img_studies[0].description or '' }}{% endif %}</textarea>
-              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+              <textarea id="study_description_img" name="study_description_img" class="form-control" rows="3">{% if img_studies %}{{ img_studies[0].description or '' }}{% endif %}</textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_img">Dictado</button>
             </div>
 
             <div class="form-group">
@@ -400,8 +400,8 @@
             <!-- Campos compartidos (Descripción, PDF) -->
             <div class="form-group">
               <label>Descripción / hallazgos (compartida para todos los procedimientos)</label>
-              <textarea name="study_description_inv" class="form-control" rows="3">{% if inv_studies %}{{ inv_studies[0].description or '' }}{% endif %}</textarea>
-              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+              <textarea id="study_description_inv" name="study_description_inv" class="form-control" rows="3">{% if inv_studies %}{{ inv_studies[0].description or '' }}{% endif %}</textarea>
+              <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_inv">Dictado</button>
             </div>
 
             <div class="form-group">
@@ -433,7 +433,7 @@
           <div class="form-group">
             <label for="lab_general">Laboratorio general</label>
             <textarea id="lab_general" name="lab_general" class="form-control" rows="2">{{ consultation.lab_general or '' }}</textarea>
-            <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+            <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="lab_general">Dictado</button>
           </div>
           <div class="form-group">
             <label>Autoinmunidad - CON VALORES</label>
@@ -468,7 +468,7 @@
             <div class="form-group mt-3">
               <label for="lab_immunology_notes">Notas / resultados</label>
               <textarea id="lab_immunology_notes" name="lab_immunology_notes" class="form-control" rows="2">{{ consultation.lab_immunology_notes or '' }}</textarea>
-              <button type="button" class="btn btn-secondary btn-sm mt-2">Dictado</button>
+              <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="lab_immunology_notes">Dictado</button>
             </div>
           </div>
     </div>

@@ -202,11 +202,6 @@
           <small>Creado por: {{ c.created_by.full_name or c.created_by.email }}</small><br>
         {% endif %}
         <a href="{{ url_for('consultation_view', consultation_id=c.id) }}">Ver consulta</a>
-        {% if not c.created_by_id or c.created_by_id == current_user.id %}
-          | <a href="{{ url_for('study_new', patient_id=patient.id) }}">Agregar estudio</a>
-        {% else %}
-          | <small>Solo consulta quien la creó.</small>
-        {% endif %}
         </li>
         <hr>
       {% endfor %}
