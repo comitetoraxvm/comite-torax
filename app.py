@@ -1088,11 +1088,12 @@ def notify_review_request(rr: "ReviewRequest"):
         return
 
     patient_name = rr.patient.full_name if rr.patient else "Paciente"
+    patient_dni = rr.patient.dni if rr.patient and rr.patient.dni else ""
+    patient_info = f"{patient_name} - DNI {patient_dni}" if patient_dni else patient_name
     requester = rr.created_by.full_name if rr.created_by else "Otro médico"
     link = _build_review_link()
     lines = [
-        f"{requester} solicitó revisión del paciente: {patient_name}",
-        f"ID de revisión: {rr.id}",
+        f"El doctor {requester} ha creado una revisión de caso para el paciente {patient_info}",
     ]
     if rr.message:
         lines.append("")
@@ -1101,7 +1102,7 @@ def notify_review_request(rr: "ReviewRequest"):
     if link:
         lines.append("")
         lines.append(f"Revisá la solicitud acá: {link}")
-    send_email(emails, f"Nueva revisión - {patient_name}", "\n".join(lines))
+    send_email(emails, f"Nueva revisión de caso - {patient_name}", "\n".join(lines))
 
 
 def notify_review_comment(review: "ReviewRequest", comment: "ReviewComment"):
@@ -1119,17 +1120,18 @@ def notify_review_comment(review: "ReviewRequest", comment: "ReviewComment"):
         return
 
     patient_name = review.patient.full_name if review.patient else "Paciente"
+    patient_dni = review.patient.dni if review.patient and review.patient.dni else ""
+    patient_info = f"{patient_name} - DNI {patient_dni}" if patient_dni else patient_name
     author = comment.author.full_name if comment.author else "Un colega"
     link = _build_review_link()
     lines = [
-        f"Nuevo comentario en la revisión del paciente: {patient_name}",
-        f"Autor: {author}",
+        f"El doctor {author} ha contestado su revisión de caso del paciente {patient_info}",
         f"Comentario: {comment.message}",
     ]
     if link:
         lines.append("")
         lines.append(f"Ver revisión: {link}")
-    send_email(emails, f"Comentario en revisión - {patient_name}", "\n".join(lines))
+    send_email(emails, f"Respuesta en revisión de caso - {patient_name}", "\n".join(lines))
 
 
 def create_review_request(patient, created_by, recipient_ids, message, consultation=None, study=None):
