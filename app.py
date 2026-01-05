@@ -841,22 +841,7 @@ def _is_sqlite_engine() -> bool:
         return False
 
 
-def ensure_patient_extra_columns():
-    if not _is_sqlite_engine():
-        return
-    try:
-        with db.engine.begin() as connection:
-            existing = {
-                row[1]
-                for row in connection.execute(text("PRAGMA table_info(patients)"))
-            }
-            for column, ddl in PATIENT_EXTRA_COLUMNS.items():
-                if column not in existing:
-                    connection.execute(
-                        text(f"ALTER TABLE patients ADD COLUMN {column} {ddl}")
-                    )
-    except Exception as exc:
-        print(f"Advertencia: no se pudo verificar columnas de pacientes: {exc}")
+
 
 
 def ensure_consultation_extra_columns():
@@ -1211,6 +1196,21 @@ def ensure_study_extra_columns():
                 connection.execute(text("ALTER TABLE studies ADD COLUMN IF NOT EXISTS portal_link TEXT"))
     except Exception as exc:
         print(f"[WARN] No se pudo verificar columnas extra de estudios: {exc}")
+
+
+def ensure_patient_extra_columns():
+    """Asegura columnas extra en patients (smoking_never)."""
+    try:
+        if _is_sqlite_engine():
+            with db.engine.begin() as connection:
+                existing = {row[1] for row in connection.execute(text("PRAGMA table_info(patients)"))}
+                if "smoking_never" not in existing:
+                    connection.execute(text("ALTER TABLE patients ADD COLUMN smoking_never BOOLEAN"))
+        else:
+            with db.engine.begin() as connection:
+                connection.execute(text("ALTER TABLE patients ADD COLUMN IF NOT EXISTS smoking_never BOOLEAN"))
+    except Exception as exc:
+        print(f"[WARN] No se pudo verificar columnas extra de pacientes: {exc}")
 
 
 def ensure_medical_resource_columns():
