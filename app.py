@@ -35,6 +35,8 @@ import json
 import csv
 from io import StringIO
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CATALOG_FILE = os.path.join(BASE_DIR, "catalogs.json")
@@ -150,7 +152,66 @@ def notify_control_reminder(cr: "ControlReminder", patient: "Patient"):
         print(f"[WARN] No se pudo notificar control: {exc}")
 
 
-def notify_screening_followup(fu: "ScreeningFollowup"):
+def notify_control_creation(cr: "ControlReminder", patient: "Patient"):
+    """Notificación cuando se CREA el control"""
+    try:
+        to_emails = []
+        if patient and patient.email:
+            to_emails.append(patient.email)
+        extra_list = []
+        if cr.extra_emails:
+            extra_list = [e.strip() for e in cr.extra_emails.split(",") if e.strip()]
+        creator_email = cr.created_by.email if cr.created_by and cr.created_by.email else None
+        to_emails = _collect_emails(to_emails, extra_list, creator_email)
+        if not to_emails:
+            return
+
+        patient_name = patient.full_name if patient else "Paciente"
+        subject = f"✓ Control registrado - {patient_name}"
+        lines = [
+            f"Se ha registrado correctamente un control para el paciente: {patient_name}",
+            f"Fecha de control: {cr.control_date or 'sin fecha'}",
+            f"",
+            f"Recibirá un recordatorio el día del control.",
+        ]
+        if cr.consultation_id:
+            lines.append(f"Consulta ID: {cr.consultation_id}")
+        body = "\n".join(lines)
+        send_email(to_emails, subject, body)
+    except Exception as exc:
+        print(f"[WARN] No se pudo notificar creación de control: {exc}")
+
+
+def notify_control_reminder(cr: "ControlReminder", patient: "Patient"):
+    """Notificación el DÍA del control (recordatorio)"""
+    try:
+        to_emails = []
+        if patient and patient.email:
+            to_emails.append(patient.email)
+        extra_list = []
+        if cr.extra_emails:
+            extra_list = [e.strip() for e in cr.extra_emails.split(",") if e.strip()]
+        creator_email = cr.created_by.email if cr.created_by and cr.created_by.email else None
+        to_emails = _collect_emails(to_emails, extra_list, creator_email)
+        if not to_emails:
+            return
+
+        patient_name = patient.full_name if patient else "Paciente"
+        subject = f"📋 Recordatorio: Control médico HOY - {patient_name}"
+        lines = [
+            f"Recordatorio: Hoy es el día del control para {patient_name}",
+            f"Fecha de control: {cr.control_date or 'sin fecha'}",
+        ]
+        if cr.consultation_id:
+            lines.append(f"Consulta ID: {cr.consultation_id}")
+        body = "\n".join(lines)
+        send_email(to_emails, subject, body)
+    except Exception as exc:
+        print(f"[WARN] No se pudo notificar recordatorio de control: {exc}")
+
+
+def notify_screening_creation(fu: "ScreeningFollowup"):
+    """Notificación cuando se CREA el screening followup"""
     try:
         sc = fu.screening
         patient = sc.patient if sc else None
@@ -164,9 +225,39 @@ def notify_screening_followup(fu: "ScreeningFollowup"):
             return
 
         patient_name = patient.full_name if patient else "Paciente"
-        subject = f"Control médico - {patient_name}"
+        subject = f"✓ Control de screening registrado - {patient_name}"
         lines = [
-            f"Se programó un control de screening para el paciente: {patient_name}",
+            f"Se ha registrado correctamente un control de screening para: {patient_name}",
+            f"Tipo de estudio: {fu.study_type or 'Estudio'}",
+            f"Fecha del estudio: {fu.study_date or 'sin fecha'}",
+            f"Próximo control sugerido: {fu.next_control_date or 'sin fecha'}",
+            f"",
+            f"Recibirá un recordatorio el día del estudio.",
+        ]
+        body = "\n".join(lines)
+        send_email(to_emails, subject, body)
+    except Exception as exc:
+        print(f"[WARN] No se pudo notificar creación screening: {exc}")
+
+
+def notify_screening_followup(fu: "ScreeningFollowup"):
+    """Notificación el DÍA del screening (recordatorio)"""
+    try:
+        sc = fu.screening
+        patient = sc.patient if sc else None
+        to_emails = []
+        if patient and patient.email:
+            to_emails.append(patient.email)
+        extra_email = sc.extra_email if sc else None
+        creator_email = fu.created_by.email if fu.created_by and fu.created_by.email else None
+        to_emails = _collect_emails(to_emails, extra_email, creator_email)
+        if not to_emails:
+            return
+
+        patient_name = patient.full_name if patient else "Paciente"
+        subject = f"📋 Recordatorio: Estudio de screening HOY - {patient_name}"
+        lines = [
+            f"Recordatorio: Hoy es el día del estudio de screening para {patient_name}",
             f"Tipo de estudio: {fu.study_type or 'Estudio'}",
             f"Fecha del estudio: {fu.study_date or 'sin fecha'}",
             f"Próximo control sugerido: {fu.next_control_date or 'sin fecha'}",
@@ -174,7 +265,7 @@ def notify_screening_followup(fu: "ScreeningFollowup"):
         body = "\n".join(lines)
         send_email(to_emails, subject, body)
     except Exception as exc:
-        print(f"[WARN] No se pudo notificar screening followup: {exc}")
+        print(f"[WARN] No se pudo notificar recordatorio screening: {exc}")
 
 DEFAULT_CATALOGS = {
     "centers": [
@@ -375,6 +466,50 @@ login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
 csrf = CSRFProtect(app)
+
+
+# ----- SCHEDULER PARA RECORDATORIOS AUTOMÁTICOS -----
+scheduler = BackgroundScheduler()
+
+def send_daily_reminders():
+    """Envía recordatorios de controles y screening cuya fecha es HOY"""
+    with app.app_context():
+        today = datetime.date.today()
+        
+        # Buscar ControlReminders con fecha = hoy
+        try:
+            from models import ControlReminder, Patient
+            controls_today = ControlReminder.query.filter(
+                ControlReminder.control_date == today
+            ).all()
+            for cr in controls_today:
+                patient = cr.patient
+                if patient:
+                    notify_control_reminder(cr, patient)
+            print(f"[INFO] Se enviaron {len(controls_today)} recordatorios de controles para hoy")
+        except Exception as e:
+            print(f"[WARN] Error enviando recordatorios de controles: {e}")
+        
+        # Buscar ScreeningFollowups con fecha = hoy
+        try:
+            from models import ScreeningFollowup
+            screenings_today = ScreeningFollowup.query.filter(
+                ScreeningFollowup.study_date == today
+            ).all()
+            for fu in screenings_today:
+                notify_screening_followup(fu)
+            print(f"[INFO] Se enviaron {len(screenings_today)} recordatorios de screening para hoy")
+        except Exception as e:
+            print(f"[WARN] Error enviando recordatorios de screening: {e}")
+
+# Registrar la tarea para ejecutarse a las 8:00 AM todos los días
+scheduler.add_job(
+    send_daily_reminders,
+    trigger=CronTrigger(hour=8, minute=0),
+    id='daily_reminders',
+    name='Recordatorios diarios de controles',
+    replace_existing=True
+)
 
 
 MMRC_OPTIONS = [0, 1, 2, 3, 4]
@@ -2470,7 +2605,7 @@ def patient_screening(patient_id):
             )
             db.session.add(fu)
             db.session.commit()
-            notify_screening_followup(fu)
+            notify_screening_creation(fu)
             flash("Control agregado.", "success")
             return redirect(
                 url_for("patient_screening", patient_id=patient.id, _anchor="followups")
@@ -3389,7 +3524,7 @@ def consultation_new(patient_id):
 
         db.session.commit()
         if cr:
-            notify_control_reminder(cr, patient)
+            notify_control_creation(cr, patient)
         flash("Consulta agregada correctamente.", "success")
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
@@ -3714,5 +3849,11 @@ if __name__ == "__main__":
     with app.app_context():
         create_tables_and_admin()
         backup_database_if_changed()
+    
+    # Iniciar el scheduler
+    if not scheduler.running:
+        scheduler.start()
+        print("[INFO] Scheduler iniciado - recordatorios automáticos activados")
+    
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
