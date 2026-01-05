@@ -167,15 +167,10 @@ def notify_control_creation(cr: "ControlReminder", patient: "Patient"):
             return
 
         patient_name = patient.full_name if patient else "Paciente"
-        subject = f"✓ Control registrado - {patient_name}"
+        subject = f"Control registrado - {patient_name}"
         lines = [
-            f"Se ha registrado correctamente un control para el paciente: {patient_name}",
-            f"Fecha de control: {cr.control_date or 'sin fecha'}",
-            f"",
-            f"Recibirá un recordatorio el día del control.",
+            f"Se ha creado un control con neumonología para el día {cr.control_date or 'sin asignar'}.",
         ]
-        if cr.consultation_id:
-            lines.append(f"Consulta ID: {cr.consultation_id}")
         body = "\n".join(lines)
         send_email(to_emails, subject, body)
     except Exception as exc:
@@ -197,13 +192,10 @@ def notify_control_reminder(cr: "ControlReminder", patient: "Patient"):
             return
 
         patient_name = patient.full_name if patient else "Paciente"
-        subject = f"📋 Recordatorio: Control médico HOY - {patient_name}"
+        subject = f"Recordatorio - Control médico {cr.control_date or 'sin fecha'}"
         lines = [
-            f"Recordatorio: Hoy es el día del control para {patient_name}",
-            f"Fecha de control: {cr.control_date or 'sin fecha'}",
+            f"RECORDATORIO DE CONTROL CON NEUMONOLOGÍA PARA EL DÍA {cr.control_date or 'SIN FECHA'}, POR FAVOR PONERSE EN CONTACTO CON SU MÉDICO.",
         ]
-        if cr.consultation_id:
-            lines.append(f"Consulta ID: {cr.consultation_id}")
         body = "\n".join(lines)
         send_email(to_emails, subject, body)
     except Exception as exc:
@@ -225,14 +217,9 @@ def notify_screening_creation(fu: "ScreeningFollowup"):
             return
 
         patient_name = patient.full_name if patient else "Paciente"
-        subject = f"✓ Control de screening registrado - {patient_name}"
+        subject = f"Control de screening registrado - {patient_name}"
         lines = [
-            f"Se ha registrado correctamente un control de screening para: {patient_name}",
-            f"Tipo de estudio: {fu.study_type or 'Estudio'}",
-            f"Fecha del estudio: {fu.study_date or 'sin fecha'}",
-            f"Próximo control sugerido: {fu.next_control_date or 'sin fecha'}",
-            f"",
-            f"Recibirá un recordatorio el día del estudio.",
+            f"Se ha creado un control con neumonología para el día {fu.study_date or 'sin asignar'}.",
         ]
         body = "\n".join(lines)
         send_email(to_emails, subject, body)
@@ -255,12 +242,9 @@ def notify_screening_followup(fu: "ScreeningFollowup"):
             return
 
         patient_name = patient.full_name if patient else "Paciente"
-        subject = f"📋 Recordatorio: Estudio de screening HOY - {patient_name}"
+        subject = f"Recordatorio - Estudio de screening {fu.study_date or 'sin fecha'}"
         lines = [
-            f"Recordatorio: Hoy es el día del estudio de screening para {patient_name}",
-            f"Tipo de estudio: {fu.study_type or 'Estudio'}",
-            f"Fecha del estudio: {fu.study_date or 'sin fecha'}",
-            f"Próximo control sugerido: {fu.next_control_date or 'sin fecha'}",
+            f"RECORDATORIO DE CONTROL CON NEUMONOLOGÍA PARA EL DÍA {fu.study_date or 'SIN FECHA'}, POR FAVOR PONERSE EN CONTACTO CON SU MÉDICO.",
         ]
         body = "\n".join(lines)
         send_email(to_emails, subject, body)
