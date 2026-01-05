@@ -100,7 +100,7 @@
   <h2>Tabaquismo</h2>
   <p class="form-help">Estos datos se usan para calcular el indice paquete anio.</p>
   <div class="grid-2">
-    <label><input type="checkbox" name="smoking_never" {% if p and (not p.smoking_current) and (not p.smoking_previous) %}checked{% endif %}> Nunca tabaquista</label>
+    <label><input type="checkbox" name="smoking_never" {% if p and p.smoking_never %}checked{% endif %}> Nunca tabaquista</label>
     <label><input type="checkbox" name="smoking_current" {% if p and p.smoking_current %}checked{% endif %}> Fumador actual</label>
     <label><input type="checkbox" name="smoking_previous" {% if p and p.smoking_previous %}checked{% endif %}> Fumador previo</label>
     <div>

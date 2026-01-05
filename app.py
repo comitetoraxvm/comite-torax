@@ -925,6 +925,7 @@ def populate_patient_from_form(patient, form_data, creator=None):
 
     # Smoking
     smoking_never = _checkbox_to_bool(form_data.get("smoking_never"))
+    patient.smoking_never = smoking_never
     patient.smoking_current = _checkbox_to_bool(form_data.get("smoking_current"))
     patient.smoking_previous = _checkbox_to_bool(form_data.get("smoking_previous"))
     patient.smoking_start_age = _to_int(form_data.get("smoking_start_age"))
@@ -1465,6 +1466,7 @@ class Patient(db.Model):
     center = db.Column(db.String(150), nullable=True)
 
     # Tabaquismo
+    smoking_never = db.Column(db.Boolean, nullable=True)
     smoking_current = db.Column(db.Boolean, nullable=True)
     smoking_previous = db.Column(db.Boolean, nullable=True)
     smoking_start_age = db.Column(db.Integer, nullable=True)
