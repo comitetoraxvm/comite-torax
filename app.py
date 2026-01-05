@@ -3232,6 +3232,42 @@ def study_edit(study_id):
         return redirect(url_for("patient_detail", patient_id=patient.id))
 
     if request.method == "POST":
+        # Acción: Eliminar estudio
+        if request.form.get("action") == "delete":
+            if study.report_file:
+                file_path = os.path.join(get_upload_dir(), study.report_file)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            db.session.delete(study)
+            db.session.commit()
+            flash("Estudio eliminado correctamente.", "success")
+            return redirect(url_for("patient_detail", patient_id=patient.id))
+        
+        # Acción: Agregar estudio (crear nuevo estudio del mismo grupo)
+        if request.form.get("action") == "add_study":
+            # Detectar el grupo del estudio actual
+            study_type_lower = (study.study_type or "").lower()
+            if any(kw in study_type_lower for kw in ['espirometría', 'test de la marcha', 'dlco', 'volúmenes']):
+                new_group = 'func'
+            elif any(kw in study_type_lower for kw in ['tc', 'rm', 'pet', 'rx', 'ecografia', 'ecocardiograma', 'ecodoppler']):
+                new_group = 'img'
+            elif any(kw in study_type_lower for kw in ['fibrobroncoscopía', 'biopsia', 'bal']):
+                new_group = 'inv'
+            else:
+                new_group = 'other'
+            
+            # Crear nuevo estudio en la misma consulta
+            new_study = Study(
+                patient=patient,
+                consultation=study.consultation,
+                created_by=current_user,
+            )
+            db.session.add(new_study)
+            db.session.commit()
+            flash("Nuevo estudio agregado. Completa sus datos.", "success")
+            return redirect(url_for("study_edit", study_id=new_study.id))
+        
+        # Acción: Guardar cambios
         study.study_type = request.form.get("study_type")
         study.date = request.form.get("date")
         study.center = request.form.get("center")
