@@ -230,7 +230,7 @@
             </li>
           {% endfor %}
         </ul>
-        <a href="{{ url_for('consultation_edit', consultation_id=consultation_group.consultation.id) }}">Editar estudio</a>
+        <a href="{{ url_for('study_edit', study_id=consultation_group.studies[0].id if consultation_group.studies else '#') }}">Editar estudio</a>
       </div>
     {% endfor %}
   {% endif %}

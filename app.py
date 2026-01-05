@@ -3222,6 +3222,13 @@ def study_edit(study_id):
     patient = study.patient
     review_users = get_review_recipient_options(current_user)
 
+    # Permisos: 
+    # - Si el estudio NO está ligado a consulta: solo el creador puede editar
+    # - Si el estudio SÍ está ligado a consulta: cualquiera puede editar (solo la parte del estudio)
+    if not study.consultation_id and study.created_by_id != current_user.id:
+        flash("No tienes permiso para editar este estudio.", "danger")
+        return redirect(url_for("patient_detail", patient_id=patient.id))
+
     if request.method == "POST":
         study.study_type = request.form.get("study_type")
         study.date = request.form.get("date")
