@@ -57,9 +57,19 @@
       </div>
     </div>
     <div>
-      <label>Palabra clave en historia clínica / patología</label>
-      <input type="text" name="respiratory_keyword" value="{{ respiratory_keyword }}" placeholder="Ej: asma, EPOC, fibrosante, broncodilatador">
-      <p class="form-help">Busca en antecedentes, patologías y notas de consultas.</p>
+      <label>Datos del paciente (antecedentes, síntomas, exposición)</label>
+      <input type="text" name="patient_data_keyword" value="{{ patient_data_keyword }}" placeholder="Ej: asma, diabetes, alérgico, tabaquismo">
+      <p class="form-help">Busca en antecedentes, síntomas, enfermedades autoinmunes, exposición laboral/domiciliaria.</p>
+    </div>
+    <div>
+      <label>Estudios e imágenes (laboratorio, radiografía, etc.)</label>
+      <input type="text" name="studies_keyword" value="{{ studies_keyword }}" placeholder="Ej: tomografía, laboratorio, radiografía">
+      <p class="form-help">Busca en reportes de estudios, laboratorios e imágenes.</p>
+    </div>
+    <div>
+      <label>Historial de consultas (diagnósticos, tratamientos)</label>
+      <input type="text" name="consultation_keyword" value="{{ consultation_keyword }}" placeholder="Ej: neumonía, tratamiento, seguimiento">
+      <p class="form-help">Busca en diagnósticos, tratamientos, evaluaciones y notas de consultas.</p>
     </div>
   </div>
   <button type="submit">Filtrar</button>

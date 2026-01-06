@@ -2060,11 +2060,18 @@ def build_patient_query_from_request(allow_full_filters: bool):
     ]
     min_age = (request.args.get("min_age") or "").strip()
     max_age = (request.args.get("max_age") or "").strip()
+    # New 3-level search fields
+    patient_data_keyword = (request.args.get("patient_data_keyword") or "").strip()
+    studies_keyword = (request.args.get("studies_keyword") or "").strip()
+    consultation_keyword = (request.args.get("consultation_keyword") or "").strip()
+    # Legacy field (backwards compatibility)
     respiratory_keyword = (request.args.get("respiratory_keyword") or "").strip()
     city = (request.args.get("city") or "").strip()
 
     query = Patient.query
     join_consultations = False
+    join_studies = False
+    
     if search:
         like_pattern = f"%{search}%"
         if allow_full_filters:
@@ -2111,10 +2118,62 @@ def build_patient_query_from_request(allow_full_filters: bool):
             query = query.filter(Patient.age.isnot(None), Patient.age >= int(min_age))
         if max_age.isdigit():
             query = query.filter(Patient.age.isnot(None), Patient.age <= int(max_age))
-        if respiratory_keyword:
-            like_kw = f"%{respiratory_keyword}%"
+        
+        # NEW: Level 1 - Datos del paciente (antecedentes, síntomas, exposición, etc.)
+        if patient_data_keyword:
+            like_kw = f"%{patient_data_keyword}%"
+            query = query.filter(
+                or_(
+                    Patient.respiratory_conditions.ilike(like_kw),
+                    Patient.antecedentes.ilike(like_kw),
+                    Patient.diagnoses.ilike(like_kw),
+                    Patient.autoimmune_conditions.ilike(like_kw),
+                    Patient.systemic_symptoms.ilike(like_kw),
+                    Patient.notes_respiratory_exam.ilike(like_kw),
+                    Patient.occupational_exposure_types.ilike(like_kw),
+                    Patient.occupational_jobs.ilike(like_kw),
+                    Patient.domestic_exposures.ilike(like_kw),
+                    Patient.drug_use.ilike(like_kw),
+                    Patient.current_medications.ilike(like_kw),
+                    Patient.notes_family_history.ilike(like_kw),
+                    Patient.notes_autoimmune.ilike(like_kw),
+                    Patient.notes_exposures.ilike(like_kw),
+                )
+            )
+        
+        # NEW: Level 2 - Estudios e imágenes (laboratorio, radiografía, tomografía, etc.)
+        if studies_keyword:
+            like_kw = f"%{studies_keyword}%"
+            query = query.outerjoin(Study, Study.patient_id == Patient.id)
+            join_studies = True
+            query = query.filter(
+                or_(
+                    Study.study_type.ilike(like_kw),
+                    Study.description.ilike(like_kw),
+                    Study.center.ilike(like_kw),
+                )
+            )
+        
+        # NEW: Level 3 - Historial de consultas (diagnósticos, tratamientos, notas)
+        if consultation_keyword:
+            like_kw = f"%{consultation_keyword}%"
             query = query.outerjoin(Consultation, Consultation.patient_id == Patient.id)
             join_consultations = True
+            query = query.filter(
+                or_(
+                    Consultation.notes.ilike(like_kw),
+                    Consultation.lab_general.ilike(like_kw),
+                    Consultation.lab_immunology.ilike(like_kw),
+                    Consultation.lab_immunology_notes.ilike(like_kw),
+                )
+            )
+        
+        # LEGACY: respiratory_keyword (backwards compatibility)
+        if respiratory_keyword:
+            like_kw = f"%{respiratory_keyword}%"
+            if not join_consultations:
+                query = query.outerjoin(Consultation, Consultation.patient_id == Patient.id)
+                join_consultations = True
             query = query.filter(
                 or_(
                     Patient.respiratory_conditions.ilike(like_kw),
@@ -2122,6 +2181,7 @@ def build_patient_query_from_request(allow_full_filters: bool):
                     Consultation.notes.ilike(like_kw),
                 )
             )
+        
         if city:
             query = query.filter(Patient.city.ilike(city))
     else:
@@ -2130,10 +2190,13 @@ def build_patient_query_from_request(allow_full_filters: bool):
         sex_filters = []
         min_age = ""
         max_age = ""
+        patient_data_keyword = ""
+        studies_keyword = ""
+        consultation_keyword = ""
         respiratory_keyword = ""
         city = ""
 
-    if join_consultations:
+    if join_consultations or join_studies:
         query = query.distinct()
 
     patients = query.order_by(Patient.full_name.asc()).all()
@@ -2162,6 +2225,9 @@ def build_patient_query_from_request(allow_full_filters: bool):
         "sex_filters": sex_filters,
         "min_age": min_age,
         "max_age": max_age,
+        "patient_data_keyword": patient_data_keyword,
+        "studies_keyword": studies_keyword,
+        "consultation_keyword": consultation_keyword,
         "respiratory_keyword": respiratory_keyword,
         "city_filter": city,
         "available_centers": center_options,
