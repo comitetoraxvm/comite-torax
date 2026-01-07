@@ -45,6 +45,9 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 ALLOWED_STUDY_EXTENSIONS = {"pdf"}
 ALLOWED_PATIENT_EXTENSIONS = {"pdf", "png", "jpg", "jpeg"}
 
+# Versión de la app (para mostrar badge visual en UI). Configurable por env.
+APP_VERSION = os.environ.get("APP_VERSION", "")
+
 
 # ------------------------------
 # EMAIL / NOTIFICACIONES
@@ -1408,6 +1411,12 @@ def yesno_filter(value):
 @app.context_processor
 def inject_csrf_token():
     return {"csrf_token": lambda: generate_csrf()}
+
+
+@app.context_processor
+def inject_app_version():
+    """Inyecta la versión de la app para mostrar badges/etiquetas de despliegue."""
+    return {"app_version": APP_VERSION}
 
 
 # -------------------------------------------------

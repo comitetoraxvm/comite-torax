@@ -15,7 +15,7 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     
     <div class="form-section">
-      <h2>Editar estudio</h2>
+      <h2>Editar estudio {% if app_version %}<small style="float:right; font-size:12px; color:#6c757d;">v{{ app_version }}</small>{% endif %}</h2>
       
       <!-- Detectar grupo del estudio actual - case insensitive -->
       {% set study_type_lower = (study.study_type or '')|lower %}
