@@ -1,0 +1,79 @@
+{% macro type_and_date_row(group, type_name, date_name, selected_type, date_value, study_type_options=None) %}
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>
+        {% if group == 'func' %}
+          Tipo de estudio (funcionales)
+        {% elif group == 'img' %}
+          Tipo de estudio (imágenes)
+        {% elif group == 'inv' %}
+          Tipo de procedimiento
+        {% else %}
+          Tipo de estudio
+        {% endif %}
+      </label>
+      <select name="{{ type_name }}" class="form-control">
+        <option value="">-- Seleccionar --</option>
+        {% if group == 'func' %}
+          <option {% if selected_type == 'Espirometría' %}selected{% endif %}>Espirometría</option>
+          <option {% if selected_type == 'Test de la Marcha 6m' %}selected{% endif %}>Test de la Marcha 6m</option>
+          <option {% if selected_type == 'DLCO' %}selected{% endif %}>DLCO</option>
+          <option {% if selected_type == 'Volúmenes pulmonares' %}selected{% endif %}>Volúmenes pulmonares</option>
+        {% elif group == 'img' %}
+          <option {% if selected_type == 'TC Tórax' %}selected{% endif %}>TC Tórax</option>
+          <option {% if selected_type == 'RM Tórax' %}selected{% endif %}>RM Tórax</option>
+          <option {% if selected_type == 'PET-CT' %}selected{% endif %}>PET-CT</option>
+          <option {% if selected_type == 'RX' %}selected{% endif %}>RX</option>
+          <option {% if selected_type == 'Ecografía' %}selected{% endif %}>Ecografía</option>
+          <option {% if selected_type == 'Ecocardiograma' %}selected{% endif %}>Ecocardiograma</option>
+          <option {% if selected_type == 'Ecodoppler Angiopower' %}selected{% endif %}>Ecodoppler Angiopower</option>
+        {% elif group == 'inv' %}
+          <option {% if selected_type == 'Fibrobroncoscopía' %}selected{% endif %}>Fibrobroncoscopía</option>
+          <option {% if selected_type == 'Biopsia' %}selected{% endif %}>Biopsia</option>
+          <option {% if selected_type == 'BAL' %}selected{% endif %}>BAL</option>
+          <option {% if selected_type == 'Otro' %}selected{% endif %}>Otro</option>
+        {% else %}
+          {% if study_type_options %}
+            {% for opt in study_type_options %}
+              <option value="{{ opt }}" {% if selected_type == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      </select>
+    </div>
+    <div class="form-group col-md-6">
+      <label>
+        {% if group == 'inv' %}Fecha del procedimiento{% else %}Fecha del estudio{% endif %}
+      </label>
+      <input name="{{ date_name }}" type="date" class="form-control" value="{{ date_value or '' }}">
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro image_center_row(field_name, value, center_options) %}
+  <div class="form-row">
+    <div class="form-group col-md-12">
+      <label>Centro</label>
+      <select name="{{ field_name }}" class="form-control">
+        <option value="">-- Seleccionar --</option>
+        {% for c in center_options %}
+          <option value="{{ c }}" {% if value == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      <small class="center-link-display form-text text-muted" style="display:none;"></small>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro image_access_link_row(access_name, access_value, portal_name, portal_value) %}
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>Número de acceso</label>
+      <input name="{{ access_name }}" type="text" class="form-control" value="{{ access_value or '' }}">
+    </div>
+    <div class="form-group col-md-6">
+      <label>Link de ingreso directo</label>
+      <input name="{{ portal_name }}" type="url" class="form-control" value="{{ portal_value or '' }}">
+    </div>
+  </div>
+{% endmacro %}

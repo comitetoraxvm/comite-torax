@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_study_form_macros.html" as sm %}
 
 {% block content %}
 <!-- Updated: 2026-01-02 - Editar consulta con estructura idéntica a nueva consulta -->
@@ -154,47 +155,9 @@
 
             <!-- template row (tipo + fecha + centro + acceso + link) -->
             <div class="study-row-template d-none">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Tipo de estudio (imágenes)</label>
-                  <select name="study_type_img[]" class="form-control">
-                    <option value="">-- Seleccionar --</option>
-                    <option>TC Tórax</option>
-                    <option>RM Tórax</option>
-                    <option>PET-CT</option>
-                    <option>RX</option>
-                    <option>Ecografía</option>
-                    <option>Ecocardiograma</option>
-                    <option>Ecodoppler Angiopower</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Fecha del estudio</label>
-                  <input name="study_date_img[]" type="date" class="form-control">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-12">
-                  <label>Centro</label>
-                  <select name="study_center_img[]" class="form-control">
-                    <option value="">-- Seleccionar --</option>
-                    {% for c in center_options %}
-                    <option value="{{ c }}">{{ c }}</option>
-                    {% endfor %}
-                  </select>
-                  <small class="center-link-display form-text text-muted" style="display:none;"></small>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Número de acceso</label>
-                  <input name="study_access_code_img[]" type="text" class="form-control">
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Link de ingreso directo</label>
-                  <input name="study_portal_link_img[]" type="url" class="form-control">
-                </div>
-              </div>
+              {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', '', '') }}
+              {{ sm.image_center_row('study_center_img[]', '', center_options) }}
+              {{ sm.image_access_link_row('study_access_code_img[]', '', 'study_portal_link_img[]', '') }}
               <hr>
             </div>
 
@@ -203,93 +166,17 @@
               {% if img_studies %}
                 {% for study in img_studies %}
                   <div class="study-row">
-                    <div class="form-row">
-                      <div class="form-group col-md-6">
-                        <label>Tipo de estudio (imágenes)</label>
-                        <select name="study_type_img[]" class="form-control">
-                          <option value="">-- Seleccionar --</option>
-                          <option {% if study.study_type == 'TC Tórax' %}selected{% endif %}>TC Tórax</option>
-                          <option {% if study.study_type == 'RM Tórax' %}selected{% endif %}>RM Tórax</option>
-                          <option {% if study.study_type == 'PET-CT' %}selected{% endif %}>PET-CT</option>
-                          <option {% if study.study_type == 'RX' %}selected{% endif %}>RX</option>
-                          <option {% if study.study_type == 'Ecografía' %}selected{% endif %}>Ecografía</option>
-                          <option {% if study.study_type == 'Ecocardiograma' %}selected{% endif %}>Ecocardiograma</option>
-                          <option {% if study.study_type == 'Ecodoppler Angiopower' %}selected{% endif %}>Ecodoppler Angiopower</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label>Fecha del estudio</label>
-                        <input name="study_date_img[]" type="date" class="form-control" value="{{ study.date or '' }}">
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="form-group col-md-12">
-                        <label>Centro</label>
-                        <select name="study_center_img[]" class="form-control">
-                          <option value="">-- Seleccionar --</option>
-                          {% for c in center_options %}
-                          <option value="{{ c }}" {% if study.center == c %}selected{% endif %}>{{ c }}</option>
-                          {% endfor %}
-                        </select>
-                        <small class="center-link-display form-text text-muted" style="display:none;"></small>
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="form-group col-md-6">
-                        <label>Número de acceso</label>
-                        <input name="study_access_code_img[]" type="text" class="form-control" value="{{ study.access_code or '' }}">
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label>Link de ingreso directo</label>
-                        <input name="study_portal_link_img[]" type="url" class="form-control" value="{{ study.portal_link or '' }}">
-                      </div>
-                    </div>
+                    {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', study.study_type, study.date) }}
+                    {{ sm.image_center_row('study_center_img[]', study.center, center_options) }}
+                    {{ sm.image_access_link_row('study_access_code_img[]', study.access_code, 'study_portal_link_img[]', study.portal_link) }}
                     <hr>
                   </div>
                 {% endfor %}
               {% else %}
                 <div class="study-row">
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Tipo de estudio (imágenes)</label>
-                      <select name="study_type_img[]" class="form-control">
-                        <option value="">-- Seleccionar --</option>
-                        <option>TC Tórax</option>
-                        <option>RM Tórax</option>
-                        <option>PET-CT</option>
-                        <option>RX</option>
-                        <option>Ecografía</option>
-                        <option>Ecocardiograma</option>
-                        <option>Ecodoppler Angiopower</option>
-                      </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label>Fecha del estudio</label>
-                      <input name="study_date_img[]" type="date" class="form-control">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-12">
-                      <label>Centro</label>
-                      <select name="study_center_img[]" class="form-control">
-                        <option value="">-- Seleccionar --</option>
-                        {% for c in center_options %}
-                        <option value="{{ c }}">{{ c }}</option>
-                        {% endfor %}
-                      </select>
-                      <small class="center-link-display form-text text-muted" style="display:none;"></small>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Número de acceso</label>
-                      <input name="study_access_code_img[]" type="text" class="form-control">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label>Link de ingreso directo</label>
-                      <input name="study_portal_link_img[]" type="url" class="form-control">
-                    </div>
-                  </div>
+                  {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', '', '') }}
+                  {{ sm.image_center_row('study_center_img[]', '', center_options) }}
+                  {{ sm.image_access_link_row('study_access_code_img[]', '', 'study_portal_link_img[]', '') }}
                   <hr>
                 </div>
               {% endif %}
