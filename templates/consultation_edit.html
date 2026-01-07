@@ -57,27 +57,9 @@
           <!-- Funcionales -->
           <div id="block-func" {% if not func_studies %}class="d-none"{% endif %}>
 
-            <!-- template row (solo tipo + fecha) -->
+            <!-- template row (macro con eliminar) -->
             <div class="study-row-template d-none">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Tipo de estudio (funcionales)</label>
-                  <select name="study_type_func[]" class="form-control">
-                    <option value="">-- Seleccionar --</option>
-                    <option>Espirometría</option>
-                    <option>Test de la Marcha 6m</option>
-                    <option>DLCO</option>
-                    <option>Volúmenes pulmonares</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-4">
-                  <label>Fecha del estudio</label>
-                  <input name="study_date_func[]" type="date" class="form-control">
-                </div>
-                <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                </div>
-              </div>
+              {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', '', '') }}
             </div>
 
             <div class="study-rows">
@@ -85,48 +67,12 @@
               {% if func_studies %}
                 {% for study in func_studies %}
                   <div class="study-row">
-                    <div class="form-row">
-                      <div class="form-group col-md-6">
-                        <label>Tipo de estudio (funcionales)</label>
-                        <select name="study_type_func[]" class="form-control">
-                          <option value="">-- Seleccionar --</option>
-                          <option {% if study.study_type == 'Espirometría' %}selected{% endif %}>Espirometría</option>
-                          <option {% if study.study_type == 'Test de la Marcha 6m' %}selected{% endif %}>Test de la Marcha 6m</option>
-                          <option {% if study.study_type == 'DLCO' %}selected{% endif %}>DLCO</option>
-                          <option {% if study.study_type == 'Volúmenes pulmonares' %}selected{% endif %}>Volúmenes pulmonares</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-4">
-                        <label>Fecha del estudio</label>
-                        <input name="study_date_func[]" type="date" class="form-control" value="{{ study.date or '' }}">
-                      </div>
-                      <div class="form-group col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                      </div>
-                    </div>
+                    {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', study.study_type, study.date) }}
                   </div>
                 {% endfor %}
               {% else %}
                 <div class="study-row">
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Tipo de estudio (funcionales)</label>
-                      <select name="study_type_func[]" class="form-control">
-                        <option value="">-- Seleccionar --</option>
-                        <option>Espirometría</option>
-                        <option>Test de la Marcha 6m</option>
-                        <option>DLCO</option>
-                        <option>Volúmenes pulmonares</option>
-                      </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                      <label>Fecha del estudio</label>
-                      <input name="study_date_func[]" type="date" class="form-control">
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-end">
-                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                    </div>
-                  </div>
+                  {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', '', '') }}
                 </div>
               {% endif %}
             </div>
@@ -205,27 +151,9 @@
           <!-- Invasivos -->
           <div id="block-inv" {% if not inv_studies %}class="d-none"{% endif %}>
 
-            <!-- template row (solo tipo + fecha) -->
+            <!-- template row (macro con eliminar) -->
             <div class="study-row-template d-none">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Tipo de procedimiento</label>
-                  <select name="study_type_inv[]" class="form-control">
-                    <option value="">-- Seleccionar --</option>
-                    <option>Fibrobroncoscopía</option>
-                    <option>Biopsia</option>
-                    <option>BAL</option>
-                    <option>Otro</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-4">
-                  <label>Fecha del procedimiento</label>
-                  <input name="study_date_inv[]" type="date" class="form-control">
-                </div>
-                <div class="form-group col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                </div>
-              </div>
+              {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', '', '') }}
             </div>
 
             <div class="study-rows">
@@ -233,48 +161,12 @@
               {% if inv_studies %}
                 {% for study in inv_studies %}
                   <div class="study-row">
-                    <div class="form-row">
-                      <div class="form-group col-md-6">
-                        <label>Tipo de procedimiento</label>
-                        <select name="study_type_inv[]" class="form-control">
-                          <option value="">-- Seleccionar --</option>
-                          <option {% if study.study_type == 'Fibrobroncoscopía' %}selected{% endif %}>Fibrobroncoscopía</option>
-                          <option {% if study.study_type == 'Biopsia' %}selected{% endif %}>Biopsia</option>
-                          <option {% if study.study_type == 'BAL' %}selected{% endif %}>BAL</option>
-                          <option {% if study.study_type == 'Otro' %}selected{% endif %}>Otro</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-4">
-                        <label>Fecha del procedimiento</label>
-                        <input name="study_date_inv[]" type="date" class="form-control" value="{{ study.date or '' }}">
-                      </div>
-                      <div class="form-group col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                      </div>
-                    </div>
+                    {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', study.study_type, study.date) }}
                   </div>
                 {% endfor %}
               {% else %}
                 <div class="study-row">
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Tipo de procedimiento</label>
-                      <select name="study_type_inv[]" class="form-control">
-                        <option value="">-- Seleccionar --</option>
-                        <option>Fibrobroncoscopía</option>
-                        <option>Biopsia</option>
-                        <option>BAL</option>
-                        <option>Otro</option>
-                      </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                      <label>Fecha del procedimiento</label>
-                      <input name="study_date_inv[]" type="date" class="form-control">
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-end">
-                      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
-                    </div>
-                  </div>
+                  {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', '', '') }}
                 </div>
               {% endif %}
             </div>

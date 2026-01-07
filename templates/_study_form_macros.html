@@ -77,3 +77,35 @@
     </div>
   </div>
 {% endmacro %}
+
+{# Fila con botón Eliminar para grupos funcionales/invasivos (col 6/4/2) #}
+{% macro type_and_date_with_remove(group, type_name, date_name, selected_type, date_value) %}
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>
+        {% if group == 'inv' %}Tipo de procedimiento{% else %}Tipo de estudio (funcionales){% endif %}
+      </label>
+      <select name="{{ type_name }}" class="form-control">
+        <option value="">-- Seleccionar --</option>
+        {% if group == 'func' %}
+          <option {% if selected_type == 'Espirometría' %}selected{% endif %}>Espirometría</option>
+          <option {% if selected_type == 'Test de la Marcha 6m' %}selected{% endif %}>Test de la Marcha 6m</option>
+          <option {% if selected_type == 'DLCO' %}selected{% endif %}>DLCO</option>
+          <option {% if selected_type == 'Volúmenes pulmonares' %}selected{% endif %}>Volúmenes pulmonares</option>
+        {% else %}
+          <option {% if selected_type == 'Fibrobroncoscopía' %}selected{% endif %}>Fibrobroncoscopía</option>
+          <option {% if selected_type == 'Biopsia' %}selected{% endif %}>Biopsia</option>
+          <option {% if selected_type == 'BAL' %}selected{% endif %}>BAL</option>
+          <option {% if selected_type == 'Otro' %}selected{% endif %}>Otro</option>
+        {% endif %}
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label>{% if group == 'inv' %}Fecha del procedimiento{% else %}Fecha del estudio{% endif %}</label>
+      <input name="{{ date_name }}" type="date" class="form-control" value="{{ date_value or '' }}">
+    </div>
+    <div class="form-group col-md-2 d-flex align-items-end">
+      <button type="button" class="btn btn-outline-danger btn-sm remove-study">Eliminar</button>
+    </div>
+  </div>
+{% endmacro %}
