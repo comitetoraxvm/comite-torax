@@ -20,109 +20,360 @@
           {{ s.study_type or '—' }} — {{ s.date or '—' }}
           {% if s.id == study.id %}
             <strong>(editando)</strong>
+  
+            <div class="form-section">
+              <h2>Paciente</h2>
+              <p class="mb-1">
+                <strong>{{ patient.full_name }}</strong> — DNI: <strong>{{ patient.dni or "—" }}</strong>
+              </p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+              {% if multi_mode %}
+              <!-- Modo multi-estudio (idéntico a la card de consulta) -->
+              <div class="form-section">
+                <h2>Estudios {% if app_version %}<small style="float:right; font-size:12px; color:#6c757d;">v{{ app_version }}</small>{% endif %}</h2>
+                  <p class="form-help">Elige uno o varios grupos y completa los bloques correspondientes.</p>
+
+                  <div class="form-check">
+                    <input class="form-check-input group-toggle" type="checkbox" name="study_groups" id="grp-func" value="func" {% if func_studies %}checked{% endif %}>
+                    <label class="form-check-label font-weight-bold" for="grp-func">Pruebas funcionales respiratorias</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input group-toggle" type="checkbox" name="study_groups" id="grp-img" value="img" {% if img_studies %}checked{% endif %}>
+                    <label class="form-check-label font-weight-bold" for="grp-img">Diagnóstico por imágenes</label>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input group-toggle" type="checkbox" name="study_groups" id="grp-inv" value="inv" {% if inv_studies %}checked{% endif %}>
+                    <label class="form-check-label font-weight-bold" for="grp-inv">Procedimientos invasivos</label>
+                  </div>
+
+                  <div id="studies-block" {% if not (func_studies or img_studies or inv_studies) %}class="d-none"{% endif %}>
+
+                    <!-- Funcionales -->
+                    <div id="block-func" {% if not func_studies %}class="d-none"{% endif %}>
+                      <div class="study-row-template d-none">
+                        {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', '', '') }}
+                      </div>
+                      <div class="study-rows">
+                        {% if func_studies %}
+                          {% for st in func_studies %}
+                            <div class="study-row">
+                              {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', st.study_type, st.date) }}
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          <div class="study-row">
+                            {{ sm.type_and_date_with_remove('func', 'study_type_func[]', 'study_date_func[]', '', '') }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="form-group mb-3">
+                        <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="func">Agregar estudio</button>
+                        <a href="{{ func_calc_url }}" target="_blank" rel="noopener" class="btn btn-outline-info btn-sm">🧮 Calculadora de progresión</a>
+                      </div>
+                      <div class="form-group">
+                        <label>Descripción / hallazgos (compartida para todos los estudios)</label>
+                        <textarea id="study_description_func" name="study_description_func" class="form-control" rows="3">{% if func_studies %}{{ func_studies[0].description or '' }}{% endif %}</textarea>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_func">Dictado</button>
+                      </div>
+                      <div class="form-group">
+                        <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+                        <input type="file" name="study_file_func" multiple accept="application/pdf">
+                      </div>
+                    </div>
+
+                    <!-- Imágenes -->
+                    <div id="block-img" {% if not img_studies %}class="d-none"{% endif %}>
+                      <div class="study-row-template d-none">
+                        {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', '', '') }}
+                        {{ sm.image_center_row('study_center_img[]', '', center_options) }}
+                        {{ sm.image_access_link_row('study_access_code_img[]', '', 'study_portal_link_img[]', '') }}
+                        <hr>
+                      </div>
+                      <div class="study-rows">
+                        {% if img_studies %}
+                          {% for st in img_studies %}
+                            <div class="study-row">
+                              {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', st.study_type, st.date) }}
+                              {{ sm.image_center_row('study_center_img[]', st.center, center_options) }}
+                              {{ sm.image_access_link_row('study_access_code_img[]', st.access_code, 'study_portal_link_img[]', st.portal_link) }}
+                              <hr>
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          <div class="study-row">
+                            {{ sm.type_and_date_row('img', 'study_type_img[]', 'study_date_img[]', '', '') }}
+                            {{ sm.image_center_row('study_center_img[]', '', center_options) }}
+                            {{ sm.image_access_link_row('study_access_code_img[]', '', 'study_portal_link_img[]', '') }}
+                            <hr>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="form-group mb-3">
+                        <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="img">Agregar estudio</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-study-row" data-group="img">Eliminar</button>
+                      </div>
+                      <div class="form-group">
+                        <label>Descripción / hallazgos (compartida para todos los estudios)</label>
+                        <textarea id="study_description_img" name="study_description_img" class="form-control" rows="3">{% if img_studies %}{{ img_studies[0].description or '' }}{% endif %}</textarea>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_img">Dictado</button>
+                      </div>
+                      <div class="form-group">
+                        <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+                        <input type="file" name="study_file_img" multiple accept="application/pdf">
+                      </div>
+                    </div>
+
+                    <!-- Invasivos -->
+                    <div id="block-inv" {% if not inv_studies %}class="d-none"{% endif %}>
+                      <div class="study-row-template d-none">
+                        {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', '', '') }}
+                      </div>
+                      <div class="study-rows">
+                        {% if inv_studies %}
+                          {% for st in inv_studies %}
+                            <div class="study-row">
+                              {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', st.study_type, st.date) }}
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          <div class="study-row">
+                            {{ sm.type_and_date_with_remove('inv', 'study_type_inv[]', 'study_date_inv[]', '', '') }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="form-group mb-3">
+                        <button type="button" class="btn btn-primary btn-sm add-study-row" data-group="inv">Agregar procedimiento</button>
+                      </div>
+                      <div class="form-group">
+                        <label>Descripción / hallazgos (compartida para todos los procedimientos)</label>
+                        <textarea id="study_description_inv" name="study_description_inv" class="form-control" rows="3">{% if inv_studies %}{{ inv_studies[0].description or '' }}{% endif %}</textarea>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="study_description_inv">Dictado</button>
+                      </div>
+                      <div class="form-group">
+                        <label>Subir informe (PDF) - pueden ser múltiples archivos</label>
+                        <input type="file" name="study_file_inv" multiple accept="application/pdf">
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="d-flex justify-content-between mb-4 gap-2 flex-wrap">
+                <div>
+                  <button type="submit" class="btn btn-primary" name="action" value="">Guardar cambios</button>
+                  <a class="btn btn-link" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
+                </div>
+              </div>
+
+              {% else %}
+              <!-- Modo estudio único (sin consulta) -->
+              <div class="form-section">
+                <h2>Editar estudio {% if app_version %}<small style="float:right; font-size:12px; color:#6c757d;">v{{ app_version }}</small>{% endif %}</h2>
+                {% set study_type_lower = (study.study_type or '')|lower %}
+                {% set current_group = 'other' %}
+                {% if study_type_lower in ['espirometría', 'test de la marcha 6m', 'dlco', 'volúmenes pulmonares'] %}
+                  {% set current_group = 'func' %}
+                {% elif ('tc' in study_type_lower or 'rm' in study_type_lower or 'pet' in study_type_lower or 'rx' in study_type_lower or 'ecografia' in study_type_lower or 'ecocardiograma' in study_type_lower or 'ecodoppler' in study_type_lower) %}
+                  {% set current_group = 'img' %}
+                {% elif study_type_lower in ['fibrobroncoscopía', 'biopsia', 'bal', 'otro'] %}
+                  {% set current_group = 'inv' %}
+                {% endif %}
+
+                {{ sm.type_and_date_row(current_group, 'study_type', 'date', study.study_type, study.date, study_type_options) }}
+                {% if current_group == 'img' %}
+                {{ sm.image_center_row('center', study.center, center_options, 'center') }}
+                {{ sm.image_access_link_row('access_code', study.access_code, 'portal_link', study.portal_link) }}
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="description">Descripción / hallazgos</label>
+                  <textarea id="description" name="description" class="form-control" rows="3">{{ study.description or '' }}</textarea>
+                  <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="description">Dictado</button>
+                </div>
+
+                <div class="form-group">
+                  <label for="study_file">Subir informe (PDF)</label>
+                  <input id="study_file" type="file" name="study_file" accept="application/pdf" class="form-control">
+                  {% if study.report_file %}
+                  <small class="form-text text-muted d-block mt-2">
+                    Archivo actual: <a href="{{ url_for('study_download', study_id=study.id) }}" target="_blank">{{ study.report_file }}</a>
+                  </small>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mb-4 gap-2 flex-wrap">
+                <div>
+                  <button type="submit" class="btn btn-primary" name="action" value="">Guardar cambios</button>
+                  <a class="btn btn-link" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
+                </div>
+                <div>
+                  <button type="submit" class="btn btn-primary btn-sm" name="action" value="add_study">Agregar estudio</button>
+                  <button type="submit" class="btn btn-outline-danger btn-sm" name="action" value="delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este estudio?')">Eliminar</button>
+                </div>
+              </div>
+              {% endif %}
+            </form>
+          </div>
+
+          <style>.d-none{display:none!important;}</style>
+          <script>
+          {% if multi_mode %}
+          document.addEventListener("DOMContentLoaded", () => {
+            const block = document.getElementById("studies-block");
+            const groupToggles = document.querySelectorAll(".group-toggle");
+            const blockFunc = document.getElementById("block-func");
+            const blockImg = document.getElementById("block-img");
+            const blockInv = document.getElementById("block-inv");
+
+            function update() {
+              const selected = Array.from(groupToggles).filter(c => c.checked).map(c => c.value);
+              block.classList.toggle("d-none", selected.length === 0);
+              blockFunc.classList.toggle("d-none", !selected.includes("func"));
+              blockImg.classList.toggle("d-none", !selected.includes("img"));
+              blockInv.classList.toggle("d-none", !selected.includes("inv"));
+            }
+
+            groupToggles.forEach(cb => cb.addEventListener("change", update));
+
+            function _clearInputs(node) {
+              node.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.type === 'file') {
+                  el.value = '';
+                } else if (el.tagName === 'SELECT') {
+                  el.selectedIndex = 0;
+                } else {
+                  el.value = '';
+                }
+              });
+            }
+
+            function addStudyRow(group, afterRow) {
+              const b = document.getElementById(`block-${group}`);
+              if (!b) return;
+              const template = b.querySelector('.study-row-template');
+              if (!template) return;
+              const clone = template.cloneNode(true);
+              clone.classList.remove('d-none');
+              clone.classList.remove('study-row-template');
+              clone.classList.add('study-row');
+              _clearInputs(clone);
+              const rows = b.querySelector('.study-rows');
+              if (afterRow && afterRow.parentElement && afterRow.parentElement.classList.contains('study-rows')) {
+                const ref = afterRow.nextSibling;
+                rows.insertBefore(clone, ref);
+              } else {
+                rows.appendChild(clone);
+              }
+            }
+
+            document.addEventListener('click', (ev) => {
+              const addRowBtn = ev.target.closest('.add-study-row');
+              if (addRowBtn) {
+                const group = addRowBtn.dataset.group;
+                const row = addRowBtn.closest('.study-row');
+                addStudyRow(group, row);
+                return;
+              }
+              const rmBtn = ev.target.closest('.remove-study');
+              if (rmBtn) {
+                const row = rmBtn.closest('.study-row');
+                if (!row) return;
+                const rows = row.parentElement;
+                const siblingRows = rows.querySelectorAll('.study-row');
+                if (siblingRows.length <= 1) {
+                  _clearInputs(row);
+                } else {
+                  row.remove();
+                }
+                return;
+              }
+              const removeRowBtn = ev.target.closest('.remove-study-row');
+              if (removeRowBtn) {
+                const group = removeRowBtn.dataset.group;
+                const b = document.getElementById('block-' + group);
+                if (!b) return;
+                const rows = b.querySelector('.study-rows');
+                if (!rows) return;
+                const allRows = rows.querySelectorAll('.study-row');
+                if (allRows.length <= 1) {
+                  _clearInputs(allRows[0]);
+                } else {
+                  allRows[allRows.length - 1].remove();
+                }
+                return;
+              }
+            });
+
+            const centerLinks = {
+              {% for name, url in center_links.items() %}
+              "{{ name }}": "{{ url }}",
+              {% endfor %}
+            };
+
+            function showPortalLinkForRow(centerSelect) {
+              if (!centerSelect) return;
+              const row = centerSelect.closest('.study-row');
+              if (!row) return;
+              const linkDisplay = row.querySelector('.center-link-display');
+              if (!linkDisplay) return;
+              const selectedCenter = centerSelect.value.toLowerCase();
+              const url = centerLinks[selectedCenter];
+              if (url) {
+                linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+                linkDisplay.style.display = 'block';
+              } else {
+                linkDisplay.style.display = 'none';
+              }
+            }
+
+            document.addEventListener('change', (ev) => {
+              const centerSelect = ev.target.closest('select[name="study_center_img[]"]');
+              if (centerSelect) {
+                showPortalLinkForRow(centerSelect);
+              }
+            });
+
+            update();
+            document.querySelectorAll('select[name="study_center_img[]"]').forEach(sel => {
+              if (sel.value) {
+                showPortalLinkForRow(sel);
+              }
+            });
+          });
           {% else %}
-            <a href="{{ url_for('study_edit', study_id=s.id) }}">Editar</a>
+            const centerLinks = {
+              {% for name, url in center_links.items() %}
+              "{{ name|lower }}": "{{ url }}",
+              {% endfor %}
+            };
+            function updatePortalLink(centerSelect) {
+              const linkDisplay = document.querySelector('.center-link-display');
+              if (!centerSelect || !linkDisplay) return;
+              const selectedCenter = centerSelect.value.toLowerCase();
+              const url = centerLinks[selectedCenter];
+              if (url) {
+                linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+                linkDisplay.style.display = 'block';
+              } else {
+                linkDisplay.style.display = 'none';
+              }
+            }
+            document.addEventListener('change', (ev) => {
+              const centerSelect = ev.target.closest('select[name="center"]');
+              if (centerSelect) {
+                updatePortalLink(centerSelect);
+              }
+            });
+            document.addEventListener("DOMContentLoaded", () => {
+              const centerSelect = document.querySelector('select[name="center"]');
+              if (centerSelect && centerSelect.value) {
+                updatePortalLink(centerSelect);
+              }
+            });
           {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-
-  <form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    
-    <div class="form-section">
-      <h2>Editar estudio {% if app_version %}<small style="float:right; font-size:12px; color:#6c757d;">v{{ app_version }}</small>{% endif %}</h2>
-      
-      <!-- Detectar grupo del estudio actual - case insensitive -->
-      {% set study_type_lower = (study.study_type or '')|lower %}
-      {% set current_group = 'other' %}
-      {% if study_type_lower in ['espirometría', 'test de la marcha 6m', 'dlco', 'volúmenes pulmonares'] %}
-        {% set current_group = 'func' %}
-      {% elif ('tc' in study_type_lower or 'rm' in study_type_lower or 'pet' in study_type_lower or 'rx' in study_type_lower or 'ecografia' in study_type_lower or 'ecocardiograma' in study_type_lower or 'ecodoppler' in study_type_lower) %}
-        {% set current_group = 'img' %}
-      {% elif study_type_lower in ['fibrobroncoscopía', 'biopsia', 'bal', 'otro'] %}
-        {% set current_group = 'inv' %}
-      {% endif %}
-      
-      {# Etiquetas alineadas a la UI de consulta #}
-      {{ sm.type_and_date_row(current_group, 'study_type', 'date', study.study_type, study.date, study_type_options) }}
-
-      <!-- Mostrar centro, acceso y link solo si es grupo imagen -->
-      {% if current_group == 'img' %}
-      {{ sm.image_center_row('center', study.center, center_options, 'center') }}
-      {{ sm.image_access_link_row('access_code', study.access_code, 'portal_link', study.portal_link) }}
-      {% endif %}
-
-      <div class="form-group">
-        <label for="description">Descripción / hallazgos</label>
-        <textarea id="description" name="description" class="form-control" rows="3">{{ study.description or '' }}</textarea>
-        <button type="button" class="btn btn-secondary btn-sm mt-2" data-voice-btn data-target="description">Dictado</button>
-      </div>
-
-      <div class="form-group">
-        <label for="study_file">Subir informe (PDF)</label>
-        <input id="study_file" type="file" name="study_file" accept="application/pdf" class="form-control">
-        {% if study.report_file %}
-        <small class="form-text text-muted d-block mt-2">
-          Archivo actual: <a href="{{ url_for('study_download', study_id=study.id) }}" target="_blank">{{ study.report_file }}</a>
-        </small>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Botones de acción -->
-    <div class="d-flex justify-content-between mb-4 gap-2 flex-wrap">
-      <div>
-        <button type="submit" class="btn btn-primary" name="action" value="">Guardar cambios</button>
-        <a class="btn btn-link" href="{{ url_for('patient_detail', patient_id=patient.id) }}">Cancelar</a>
-      </div>
-      <div>
-        <button type="submit" class="btn btn-primary btn-sm" name="action" value="add_study">Agregar estudio</button>
-        <button type="submit" class="btn btn-outline-danger btn-sm" name="action" value="delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este estudio?')">Eliminar</button>
-      </div>
-    </div>
-  </form>
-</div>
-
-<style>.d-none{display:none!important;}</style>
-<script>
-  // Portal link display para estudios de imagen
-  const centerLinks = {
-    {% for name, url in center_links.items() %}
-    "{{ name|lower }}": "{{ url }}",
-    {% endfor %}
-  };
-
-  function updatePortalLink(centerSelect) {
-    const linkDisplay = document.querySelector('.center-link-display');
-    if (!centerSelect || !linkDisplay) return;
-
-    const selectedCenter = centerSelect.value.toLowerCase();
-    const url = centerLinks[selectedCenter];
-    if (url) {
-      linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
-      linkDisplay.style.display = 'block';
-    } else {
-      linkDisplay.style.display = 'none';
-    }
-  }
-
-  // Al cambiar el centro (coincidir por nombre según macro)
-  document.addEventListener('change', (ev) => {
-    const centerSelect = ev.target.closest('select[name="center"]');
-    if (centerSelect) {
-      updatePortalLink(centerSelect);
-    }
-  });
-
-  // Ejecutar al cargar la página para mostrar link si ya hay centro seleccionado
-  document.addEventListener("DOMContentLoaded", () => {
-    const centerSelect = document.querySelector('select[name="center"]');
-    if (centerSelect && centerSelect.value) {
-      updatePortalLink(centerSelect);
-    }
-  });
-</script>
-{% endblock %}
+          </script>
+          {% endblock %}
