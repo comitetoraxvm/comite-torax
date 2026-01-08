@@ -50,11 +50,11 @@
   </div>
 {% endmacro %}
 
-{% macro image_center_row(field_name, value, center_options) %}
+{% macro image_center_row(field_name, value, center_options, id_value=None) %}
   <div class="form-row">
     <div class="form-group col-md-12">
       <label>Centro</label>
-      <select name="{{ field_name }}" class="form-control">
+      <select name="{{ field_name }}" class="form-control" {% if id_value %}id="{{ id_value }}"{% endif %}>
         <option value="">-- Seleccionar --</option>
         {% for c in center_options %}
           <option value="{{ c }}" {% if value == c %}selected{% endif %}>{{ c }}</option>

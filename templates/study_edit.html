@@ -33,7 +33,7 @@
 
       <!-- Mostrar centro, acceso y link solo si es grupo imagen -->
       {% if current_group == 'img' %}
-      {{ sm.image_center_row('center', study.center, center_options) }}
+      {{ sm.image_center_row('center', study.center, center_options, 'center') }}
       {{ sm.image_access_link_row('access_code', study.access_code, 'portal_link', study.portal_link) }}
       {% endif %}
 
