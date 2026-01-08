@@ -45,8 +45,10 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 ALLOWED_STUDY_EXTENSIONS = {"pdf"}
 ALLOWED_PATIENT_EXTENSIONS = {"pdf", "png", "jpg", "jpeg"}
 
-# Versión de la app (para mostrar badge visual en UI). Configurable por env.
-APP_VERSION = os.environ.get("APP_VERSION", "")
+# Versión de la app (para mostrar badge visual en UI).
+# Usa APP_VERSION si está definida; si no, intenta RENDER_GIT_COMMIT (Render la expone en runtime).
+_raw_version = os.environ.get("APP_VERSION") or os.environ.get("RENDER_GIT_COMMIT") or ""
+APP_VERSION = (_raw_version[:7] if _raw_version else "")
 
 
 # ------------------------------

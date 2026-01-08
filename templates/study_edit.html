@@ -80,7 +80,7 @@
   function updatePortalLink(centerSelect) {
     const linkDisplay = document.querySelector('.center-link-display');
     if (!centerSelect || !linkDisplay) return;
-    
+
     const selectedCenter = centerSelect.value.toLowerCase();
     const url = centerLinks[selectedCenter];
     if (url) {
@@ -91,9 +91,9 @@
     }
   }
 
-  // Al cambiar el centro
+  // Al cambiar el centro (coincidir por nombre según macro)
   document.addEventListener('change', (ev) => {
-    const centerSelect = ev.target.closest('select#center');
+    const centerSelect = ev.target.closest('select[name="center"]');
     if (centerSelect) {
       updatePortalLink(centerSelect);
     }
@@ -101,7 +101,7 @@
 
   // Ejecutar al cargar la página para mostrar link si ya hay centro seleccionado
   document.addEventListener("DOMContentLoaded", () => {
-    const centerSelect = document.getElementById('center');
+    const centerSelect = document.querySelector('select[name="center"]');
     if (centerSelect && centerSelect.value) {
       updatePortalLink(centerSelect);
     }
