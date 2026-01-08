@@ -389,28 +389,37 @@ document.addEventListener("DOMContentLoaded", () => {
     {% endfor %}
   };
 
+  function showPortalLinkForRow(centerSelect) {
+    if (!centerSelect) return;
+    const row = centerSelect.closest('.study-row');
+    if (!row) return;
+    const linkDisplay = row.querySelector('.center-link-display');
+    if (!linkDisplay) return;
+    const selectedCenter = centerSelect.value.toLowerCase();
+    const url = centerLinks[selectedCenter];
+    if (url) {
+      linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
+      linkDisplay.style.display = 'block';
+    } else {
+      linkDisplay.style.display = 'none';
+    }
+  }
+
   document.addEventListener('change', (ev) => {
     const centerSelect = ev.target.closest('select[name="study_center_img[]"]');
     if (centerSelect) {
-      const row = centerSelect.closest('.study-row');
-      if (!row) return;
-      const linkInput = row.querySelector('input[name="study_portal_link_img[]"]');
-      const linkDisplay = row.querySelector('.center-link-display');
-      if (!linkInput || !linkDisplay) return;
-      const selectedCenter = centerSelect.value.toLowerCase();
-      const url = centerLinks[selectedCenter];
-      if (url) {
-        // mostrar link debajo del select
-        linkDisplay.innerHTML = 'Portal: <a href="' + url + '" target="_blank">' + url + '</a>';
-        linkDisplay.style.display = 'block';
-      } else {
-        linkDisplay.style.display = 'none';
-      }
+      showPortalLinkForRow(centerSelect);
     }
   });
 
   // estado inicial
   update();
+  // mostrar links de portal en filas precargadas
+  document.querySelectorAll('select[name="study_center_img[]"]').forEach(sel => {
+    if (sel.value) {
+      showPortalLinkForRow(sel);
+    }
+  });
 });
 </script>
 {% endblock %}
