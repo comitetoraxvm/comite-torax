@@ -3301,6 +3301,15 @@ def study_edit(study_id):
     patient = study.patient
     review_users = get_review_recipient_options(current_user)
 
+    # Otros estudios de la misma consulta (para navegar rápido entre ellos)
+    sibling_studies = []
+    if study.consultation_id:
+        sibling_studies = (
+            Study.query.filter(Study.consultation_id == study.consultation_id)
+            .order_by(Study.date.desc().nullslast())
+            .all()
+        )
+
     # Permisos: 
     # - Si el estudio NO está ligado a consulta: solo el creador puede editar
     # - Si el estudio SÍ está ligado a consulta: cualquiera puede editar (solo la parte del estudio)
@@ -3378,6 +3387,7 @@ def study_edit(study_id):
         study_type_options=STUDY_TYPE_OPTIONS,
         center_options=CATALOGS.get("centers", []),
         center_links=CENTER_PORTAL_LINKS,
+        sibling_studies=sibling_studies,
     )
 
 
