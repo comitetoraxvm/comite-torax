@@ -3567,6 +3567,7 @@ def study_edit(study_id):
         img_studies=img_studies,
         inv_studies=inv_studies,
         other_studies=other_studies,
+        func_calc_url=os.environ.get("FUNC_PROGRESS_CALC_URL"),
     )
 
 
