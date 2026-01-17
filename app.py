@@ -2334,7 +2334,7 @@ def patient_new():
 
         missing = []
         if not full_name:
-            missing.append("Nombre y apellido")
+            missing.append("Apellido y nombre")
         if not dni:
             missing.append("DNI")
         if not email:
