@@ -318,9 +318,10 @@
     document.addEventListener('DOMContentLoaded', attachVoiceButtons);
   </script>
 
-  <!-- Estilos y scripts de celebración motivacional -->
+  <!-- Estilos de celebración motivacional -->
   <link rel="stylesheet" href="{{ url_for('static', filename='celebration.css') }}">
-  <script src="{{ url_for('static', filename='celebration.js') }}"></script>
+  <!-- Scripts de celebración se cargan de forma asíncrona para no bloquear -->
+  <script async defer src="{{ url_for('static', filename='celebration.js') }}"></script>
 </head>
 <body>
 

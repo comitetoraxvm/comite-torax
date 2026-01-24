@@ -2,6 +2,11 @@
 (function() {
     'use strict';
 
+    // Protección contra errores
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+        return;
+    }
+
     // Configuración
     const CONFETTI_COUNT = 150;
     const CONFETTI_COLORS = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
@@ -42,15 +47,21 @@
             // Múltiples opciones de sonido de celebración (fallback si uno no carga)
             const sounds = [
                 'https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg',
-                'https://actions.google.com/sounds/v1/cartoon/siren_whistle.ogg',
-                'https://freesound.org/data/previews/320/320655_5260872-lq.mp3'
+                'https://actions.google.com/sounds/v1/cartoon/siren_whistle.ogg'
             ];
             
-            const audio = new Audio(sounds[0]);
-            audio.volume = 0.4;
-            audio.play().catch(err => {
-                console.log('No se pudo reproducir el sonido:', err);
-            });
+            if (sounds[0]) {
+                const audio = new Audio(sounds[0]);
+                if (audio) {
+                    audio.volume = 0.4;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(err => {
+                            console.log('No se pudo reproducir el sonido:', err);
+                        });
+                    }
+                }
+            }
         } catch (e) {
             console.log('Audio no disponible');
         }
@@ -106,16 +117,23 @@
 
     // Auto-trigger si hay mensaje de éxito en la página
     document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert-success');
-        alerts.forEach(function(alert) {
-            const text = alert.textContent || alert.innerText;
-            const isNewPatient = text.includes('Paciente agregado correctamente');
-            const isUpdate = text.includes('Datos del paciente actualizados');
-            
-            if (isNewPatient || isUpdate) {
-                // Pequeño delay para que se vea el mensaje
-                setTimeout(() => celebrate(isNewPatient), 100);
+        try {
+            const alerts = document.querySelectorAll('.alert-success');
+            if (alerts && alerts.length > 0) {
+                alerts.forEach(function(alert) {
+                    if (!alert) return;
+                    const text = (alert.textContent || alert.innerText || '').toString();
+                    const isNewPatient = text.includes('Paciente agregado correctamente');
+                    const isUpdate = text.includes('Datos del paciente actualizados');
+                    
+                    if (isNewPatient || isUpdate) {
+                        // Pequeño delay para que se vea el mensaje
+                        setTimeout(() => celebrate(isNewPatient), 100);
+                    }
+                });
             }
-        });
+        } catch (err) {
+            console.log('Error en celebración:', err);
+        }
     });
 })();
